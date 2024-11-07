@@ -36,8 +36,8 @@ module.exports = {
                     {
                         loader: 'file-loader',
                         options: {
-                            publicPath: '/lots/',
-                            outputPath: 'src/',
+                            publicPath: '/lots/source',
+                            outputPath: 'source/',
                             name: '[name].[ext]',
                         },
                     },
@@ -69,7 +69,7 @@ module.exports = {
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: 'src/source', to: 'source' },
+                { from: './source', to: 'source' },
             ],
         }),
         new webpack.DefinePlugin({
