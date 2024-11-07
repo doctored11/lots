@@ -17,7 +17,7 @@ module.exports = {
         extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
     },
     mode: NODE_ENV ? NODE_ENV : 'development',
-    entry: path.resolve(__dirname, './src/index.tsx'),
+    entry: path.resolve(__dirname, 'src/index.tsx'),
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'index.js',
@@ -36,8 +36,8 @@ module.exports = {
                     {
                         loader: 'file-loader',
                         options: {
-                            publicPath: '/lots/source',
-                            outputPath: 'source/',
+                            publicPath: '/lots/source/',
+                            outputPath: 'src/source',
                             name: '[name].[ext]',
                         },
                     },
@@ -69,7 +69,7 @@ module.exports = {
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: './source', to: 'source' },
+                { from: 'src/source', to: 'source' },
             ],
         }),
         new webpack.DefinePlugin({

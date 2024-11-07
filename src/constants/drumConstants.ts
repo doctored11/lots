@@ -32,7 +32,7 @@ interface RewardValuePlus {
   
   export const REWARDS: Rewards = {
     bomb: {
-      image: "../source/bomb.png",
+      image: "./source/bomb.png",
       values: {
         1: { type: "plus", amount: 3 },
         2: { type: "plus", amount: 8 },
@@ -40,7 +40,7 @@ interface RewardValuePlus {
       }
     },
     clover: {
-      image: "../source/clover.png",
+      image: "./source/clover.png",
       values: {
         1: { type: "multiply", factor: 3 },
         2: { type: "multiply", factor: 7 },
@@ -48,7 +48,7 @@ interface RewardValuePlus {
       }
     },
     grape: {
-      image: "../source/grape.png",
+      image: "./source/grape.png",
       values: {
         1: { type: "plus", amount: 1 },
         2: { type: "plus", amount: 2 },
@@ -56,7 +56,7 @@ interface RewardValuePlus {
       }
     },
     mushroom: {
-      image: "../source/mushrum_v1.png",
+      image: "./source/mushrum_v1.png",
       values: {
         1: { type: "plus", amount: 1 },
         2: { type: "plus", amount: 4 },
@@ -64,7 +64,7 @@ interface RewardValuePlus {
       }
     },
     melon: {
-      image: "../source/melon.png",
+      image: "./source/melon.png",
       values: {
         1: { type: "plus", amount: 0 },
         2: { type: "plus", amount: 2 },
@@ -72,7 +72,7 @@ interface RewardValuePlus {
       }
     },
     cherry: {
-      image: "../source/cherry.png",
+      image: "./source/cherry.png",
       values: {
         1: { type: "plus", amount: 4 },
         2: { type: "plus", amount: 8 },
@@ -80,7 +80,7 @@ interface RewardValuePlus {
       }
     },
     banana: {
-      image: "../source/banana.png",
+      image: "./source/banana.png",
       values: {
         1: { type: "plus", amount: 0 },
         2: { type: "plus", amount: 5 },
@@ -88,7 +88,7 @@ interface RewardValuePlus {
       }
     },
     blueBerrie: {
-      image: "../source/blueBerrie.png",
+      image: "./source/blueBerrie.png",
       values: {
         1: { type: "plus", amount: 1 },
         2: { type: "plus", amount: 5 },
