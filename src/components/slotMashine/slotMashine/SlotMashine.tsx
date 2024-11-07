@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { MashineBody } from "./mashineBody/MashineBody";
 import { PlayerContext } from "../../../PlayerContext";
 import { REWARDS } from "constants/drumConstants";
@@ -14,13 +14,14 @@ interface SlotContextType {
   setCombination: (combination: Array<number | null>) => void;
 }
 
-
 export function SlotMashine() {
   const player = useContext(PlayerContext);
+  const mashine = useContext(SlotContext);
 
+  useEffect(() => mashine?.reelUpdate(), []);
   return (
     <>
-      <p>Баланс: {player?.balance}</p> 
+      <p>Баланс: {player?.balance}</p>
       <div>SlotMashine</div>
       <MashineBody />
     </>

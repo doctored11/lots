@@ -35,6 +35,15 @@ export function MashineDrum({
   };
 
   useEffect(() => {
+    if (rollRefs.current.length > 0 && rollRefs.current[0]) {
+      const width = Math.min( rollRefs.current[0].offsetWidth,itemHeight)
+      console.log("0< ", width)
+      setItemHeight(width);
+    }
+  }, []);
+  
+
+  useEffect(() => {
     rollRefs.current.forEach((roll) => {
       if (roll) {
         roll.style.height = `${itemHeight * 2}px`;
@@ -69,7 +78,7 @@ export function MashineDrum({
           tapeRef={tapeRefs.current[index]}
           addToRollRefs={addToRollRefs}
           reel={reel}
-          setItemHeight={setItemHeight}
+          itemHeight={itemHeight}
         />
       ))}
     </div>

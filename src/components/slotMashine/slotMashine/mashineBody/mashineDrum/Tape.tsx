@@ -4,21 +4,24 @@ import { REWARDS } from "../../../../../constants/drumConstants";
 interface TapeProps {
   tapeRef: React.RefObject<HTMLDivElement>;
   reel: Array<keyof typeof REWARDS>;
-  setItemHeight: (height: number) => void;
+  itemHeight: number;
 }
-
-export function Tape({ tapeRef, reel, setItemHeight }: TapeProps) {
+export function Tape({ tapeRef, reel, itemHeight }: TapeProps) {
   useEffect(() => {
     if (tapeRef.current) {
-      tapeRef.current.innerHTML = ""; 
+      tapeRef.current.innerHTML = "";
       reel.forEach((el) => {
         const img = document.createElement("img");
         img.src = REWARDS[el].image;
-        img.onload = () => setItemHeight(img.height);
+        img.onload = () => {
+          //  console.log(img.width)
+         img.style.height = `${itemHeight }px`;
+         img.style.width = `${itemHeight }px`;
+        };
         tapeRef.current?.appendChild(img);
       });
     }
-  }, []);
+  }, [reel]);
 
   return <div ref={tapeRef}></div>;
 }
