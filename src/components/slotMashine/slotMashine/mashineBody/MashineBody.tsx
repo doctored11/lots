@@ -5,10 +5,11 @@ import { getRandomInt } from "../../../../tools/tools";
 import styles from "./mashineBody.module.css";
 import { SlotContext } from "../SlotContext";
 import { PlayerContext } from "../../../../PlayerContext";
+import { HandBtn } from "./hendBtn/HandBtn";
 
 export function MashineBody() {
   const slotMashine = useContext(SlotContext);
-  const player = useContext(PlayerContext); 
+  const player = useContext(PlayerContext);
 
   const itemHeight = 128;
   if (!slotMashine) return;
@@ -19,21 +20,21 @@ export function MashineBody() {
 
   function handleSpinResult(results: string[]) {
     const finalWin = calculateWinnings(results);
-  
+
     if (player) {
       player.addBalance(finalWin);
     }
-  
+
     console.log(`Комбинация: ${results.join(", ")}`);
     console.log(`Выигрыш: ${finalWin}`);
-  
+
     slotMashine?.setBetInGame(0);
     setIsSpinning(false);
   }
-  
 
   async function startSpin() {
     setIsSpinning(true);
+
     const newValues = [
       getRandomInt(0, reel.length - 1),
       getRandomInt(0, reel.length - 1),
@@ -47,8 +48,9 @@ export function MashineBody() {
 
     if (player.canSpend(betStep)) {
       if (player.minusBalance(betStep)) {
-        slotMashine.setBetInGame(betStep); 
-        startSpin(); 
+        slotMashine.setBetInGame(betStep);
+
+        startSpin();
       }
     } else {
       alert("Без гроша и жизнь плоха, или как там в оригинале...");
@@ -56,20 +58,27 @@ export function MashineBody() {
   }
 
   return (
-    <div className={styles.mashineBody}>
-      <div>MashineBody</div>
-      <div className={styles.dramFrame}>
-        <MashineDrum
-          spinValues={spinValues}
-          reel={reel}
-          onSpinEnd={handleSpinResult}
-          isSpinning={isSpinning}
-        />
-      </div>{" "}
-      <button onClick={spin} disabled={isSpinning}>
-        {" "}
-        Крутить
-      </button>
+    <div className={styles.mashine}>
+      <div className={styles.out}>
+        <div className={styles.mashineHead}>
+          <div className={styles.headUp}></div>
+          <div className={styles.headMid}></div>
+          <div className={styles.headLow}></div>
+        </div>
+        <div className={styles.mashineBody}>
+        
+          <div className={styles.dramFrame}>
+            <MashineDrum
+              spinValues={spinValues}
+              reel={reel}
+              onSpinEnd={handleSpinResult}
+              isSpinning={isSpinning}
+            />
+          </div>{" "}
+        </div>
+        <div className={styles.mashineFooter}>footer</div>
+      </div>
+      <HandBtn spin={spin} isSpinning={isSpinning}></HandBtn>
     </div>
   );
 }

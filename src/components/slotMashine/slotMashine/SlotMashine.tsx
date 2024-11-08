@@ -3,6 +3,7 @@ import { MashineBody } from "./mashineBody/MashineBody";
 import { PlayerContext } from "../../../PlayerContext";
 import { REWARDS } from "constants/drumConstants";
 import { SlotContext, SlotProvider } from "./SlotContext";
+import style from "./style.module.css";
 
 interface SlotContextType {
   betStep: number;
@@ -23,7 +24,9 @@ export function SlotMashine() {
     <>
       <p>Баланс: {player?.balance}</p>
       <div>SlotMashine</div>
-      <MashineBody />
+      <div className={style.frame}>
+        <MashineBody />
+      </div>
     </>
   );
 }

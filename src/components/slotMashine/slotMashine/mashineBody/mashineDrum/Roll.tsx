@@ -12,7 +12,7 @@ interface RollProps {
 
 export function Roll({ tapeRef, addToRollRefs, reel, itemHeight }: RollProps) {
   return (
-    <div className={style.roll} ref={addToRollRefs}>
+    <div className={style.roll} ref={addToRollRefs} >
       <Tape tapeRef={tapeRef} reel={reel} itemHeight={itemHeight} />
     </div>
   );

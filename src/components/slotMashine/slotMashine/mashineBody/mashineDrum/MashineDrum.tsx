@@ -5,6 +5,7 @@ import { getRandomInt } from "../../../../../tools/tools";
 import { rollSpin } from "./rollSpin";
 import { Roll } from "./Roll";
 
+
 interface MashineDrumProps {
   spinValues: number[];
   reel: Array<keyof typeof REWARDS>;
@@ -46,15 +47,16 @@ export function MashineDrum({
   useEffect(() => {
     rollRefs.current.forEach((roll) => {
       if (roll) {
-        roll.style.height = `${itemHeight * 2}px`;
-        roll.style.width = `${itemHeight * 1.01}px`;
+        roll.style.height = `${itemHeight * 2.2}px`;
+        roll.style.width = `${itemHeight * 1.1}px`;
       }
     });
+   
   }, [itemHeight]);
 
   useEffect(() => {
     if (!isSpinning) return;
-
+    
     const rollPromises = spinValues.map((value, index) =>
       rollSpin(
         tapeRefs.current[index].current!,

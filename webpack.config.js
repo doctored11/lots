@@ -32,16 +32,11 @@ module.exports = {
             },
             {
                 test: /\.(png|jpe?g|gif)$/i,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            publicPath: '/',
-                            outputPath: 'src/',
-                            name: '[name].[ext]',
-                        },
-                    },
-                ],
+                type: 'asset/resource',
+                generator: {
+                    filename: 'source/[name][ext]',
+                },
+               
             },
             {
                 test: /\.module\.css$/,
@@ -75,7 +70,7 @@ module.exports = {
         new webpack.DefinePlugin({
             'process.env': JSON.stringify(process.env),
         })
-        
+
     ],
     devServer: {
         static: path.join(__dirname, 'dist'),

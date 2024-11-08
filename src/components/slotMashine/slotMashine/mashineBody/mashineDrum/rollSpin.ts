@@ -1,3 +1,5 @@
+import { delay } from "../../../../../tools/tools";
+
 export 
 function rollSpin(
   tape: HTMLDivElement,
@@ -6,9 +8,11 @@ function rollSpin(
   spins: number,
   targetEl: number
 ): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     if (spins < 3) spins = 3;
     initialSpeed = Math.min(initialSpeed, spins * 1.5);
+
+    await delay(400)
 
     Array.from(tape.children).forEach((el, index) => {
       if (!(el instanceof HTMLElement)) return;

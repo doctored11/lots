@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { REWARDS } from "../../../../../constants/drumConstants";
-
+import styles from "./mashineDrum.module.css"
 interface TapeProps {
   tapeRef: React.RefObject<HTMLDivElement>;
   reel: Array<keyof typeof REWARDS>;
@@ -23,5 +23,5 @@ export function Tape({ tapeRef, reel, itemHeight }: TapeProps) {
     }
   }, [reel]);
 
-  return <div ref={tapeRef}></div>;
+  return <div ref={tapeRef} className={styles.tape}></div>;
 }

@@ -1,0 +1,9 @@
+.frame{
+    /* width: 80vw; */
+    height: 60vh;
+
+    max-width: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
