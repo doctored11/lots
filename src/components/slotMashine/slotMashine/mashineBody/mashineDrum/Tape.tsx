@@ -21,7 +21,7 @@ export function Tape({ tapeRef, reel, itemHeight }: TapeProps) {
         tapeRef.current?.appendChild(img);
       });
     }
-  }, [reel]);
+  }, [reel,itemHeight]);
 
   return <div ref={tapeRef} className={styles.tape}></div>;
 }

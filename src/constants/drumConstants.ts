@@ -34,9 +34,9 @@ interface RewardValuePlus {
     bomb: {
       image: "../source/bomb.png",
       values: {
-        1: { type: "plus", amount: 3 },
-        2: { type: "plus", amount: 8 },
-        3: { type: "plus", amount: 88 }
+        1: { type: "plus", amount: 0.3 },
+        2: { type: "plus", amount: 0.8 },
+        3: { type: "plus", amount: 8.8 }
       }
     },
     clover: {
@@ -44,55 +44,55 @@ interface RewardValuePlus {
       values: {
         1: { type: "multiply", factor: 3 },
         2: { type: "multiply", factor: 7 },
-        3: { type: "plus", amount: 600 }
+        3: { type: "plus", amount: 60 }
       }
     },
     grape: {
       image: "../source/grape.png",
       values: {
-        1: { type: "plus", amount: 1 },
-        2: { type: "plus", amount: 2 },
-        3: { type: "plus", amount: 55 }
+        1: { type: "plus", amount: 0.1 },
+        2: { type: "plus", amount: 0.2 },
+        3: { type: "plus", amount: 5.5 }
       }
     },
     mushroom: {
       image: "../source/mushrum_v1.png",
       values: {
-        1: { type: "plus", amount: 1 },
-        2: { type: "plus", amount: 4 },
-        3: { type: "plus", amount: 40 }
+        1: { type: "plus", amount: 0.1 },
+        2: { type: "plus", amount: 0.4 },
+        3: { type: "plus", amount: 4 }
       }
     },
     melon: {
       image: "../source/melon.png",
       values: {
-        1: { type: "plus", amount: 0 },
-        2: { type: "plus", amount: 2 },
-        3: { type: "plus", amount: 77 }
+        1: { type: "plus", amount: 0.0 },
+        2: { type: "plus", amount: 0.2 },
+        3: { type: "plus", amount: 7.7 }
       }
     },
     cherry: {
       image: "../source/cherry.png",
       values: {
-        1: { type: "plus", amount: 4 },
-        2: { type: "plus", amount: 8 },
-        3: { type: "plus", amount: 22 }
+        1: { type: "plus", amount: 0.4 },
+        2: { type: "plus", amount: 0.8 },
+        3: { type: "plus", amount: 2.2 }
       }
     },
     banana: {
       image: "../source/banana.png",
       values: {
-        1: { type: "plus", amount: 0 },
-        2: { type: "plus", amount: 5 },
-        3: { type: "plus", amount: 100 }
+        1: { type: "plus", amount: 0.0 },
+        2: { type: "plus", amount: 0.5 },
+        3: { type: "plus", amount: 10 }
       }
     },
     blueBerrie: {
       image: "../source/blueBerrie.png",
       values: {
-        1: { type: "plus", amount: 1 },
-        2: { type: "plus", amount: 5 },
-        3: { type: "plus", amount: 166 }
+        1: { type: "plus", amount: 0.1 },
+        2: { type: "plus", amount: 0.5 },
+        3: { type: "plus", amount: 16.6 }
       }
     },
   };

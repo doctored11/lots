@@ -14,15 +14,18 @@
   position: relative;
 
   /* /* height: 80%; */
+  min-height: 40%;
   width: 100%;
-  flex: 20;
+  position: relative;
+  /* flex: 15; */
 }
+
 .out {
   flex: 7;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: flex-end;
   align-items: center;
   height: 100%;
 
@@ -33,9 +36,10 @@
   max-height: 80%; */
 }
 .mashineHead {
+  box-sizing: border-box;
   /* background-color: var(--color); */
   width: 110%;
-  flex: 2;
+  /* flex: 2; */
   transform: translateY(10%);
   /* border: 2px solid #0c22e7; */
   display: flex;
@@ -44,7 +48,8 @@
   align-items: center;
   align-content: center;
   justify-content: flex-end;
-  height: 20%;
+  /* min-height: 20%; */
+  max-height: 20%;
   position: relative;
   z-index: 3;
   /* height: 5vh; */
@@ -62,7 +67,7 @@
   /* padding-top: 5%; */
   width: 80%;
   /* height: 50%; */
-  min-height: 40px;
+  min-height: 70px;
   background-size: 100% 100%;
   background-image: url("../../../../source/topHead.png");
 }
@@ -81,15 +86,11 @@
   height: 3px;
   background-color: #3a393b;
 }
-.mashineFooter {
-  min-height: 10%;
-  width: 100%;
-  flex: 5;
-  background-color: var(--colorF);
-}
 
 .dramFrame {
   width: 90%;
+  height: 100%;
+  max-width: 95%;
 
   min-width: 250px;
   /* min-height: 40%; */
@@ -100,7 +101,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
 }
 
 .mashine {
@@ -110,13 +110,37 @@
   transform: translateX(-50%) translateY(-50%); */
 
   display: flex;
-  width: 80%;
+  width: 95%;
   max-width: 780px;
   min-width: 350px;
   min-height: 260px;
-  height: 90%;
+  /* height: 95%; */
 
   align-items: end;
   justify-content: flex-start;
   flex-direction: row;
+}
+
+/*  */
+
+@media (max-width: 700px) {
+  .dramFrame {
+    height: initial;
+    /* min-height: 100%; */
+  }
+  .mashineHead{
+    transform: translateY(7%);
+    
+  }
+  .mashineBody {
+    /* flex: 9; */
+    padding: 5% 0;
+  }
+  .mashineHead {
+    /* flex: 8; */
+    max-height: none;
+  }
+  .out {
+    flex: 9;
+  }
 }

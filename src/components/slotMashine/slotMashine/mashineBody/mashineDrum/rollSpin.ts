@@ -1,7 +1,6 @@
 import { delay } from "../../../../../tools/tools";
 
-export 
-function rollSpin(
+export function rollSpin(
   tape: HTMLDivElement,
   itemHeight: number,
   initialSpeed: number,
@@ -10,9 +9,9 @@ function rollSpin(
 ): Promise<void> {
   return new Promise(async (resolve) => {
     if (spins < 3) spins = 3;
-    initialSpeed = Math.min(initialSpeed, spins * 1.5);
+    initialSpeed = Math.max(initialSpeed, spins * 2);
 
-    await delay(400)
+    await delay(400);
 
     Array.from(tape.children).forEach((el, index) => {
       if (!(el instanceof HTMLElement)) return;
@@ -22,7 +21,7 @@ function rollSpin(
       }
     });
 
-    const minSpeed = 0.5;
+    const minSpeed = 0.8;
     const maxDeceleration = initialSpeed / (spins * 10);
     let deceleration = 0.001 * maxDeceleration;
     let speed = initialSpeed;
@@ -49,8 +48,8 @@ function rollSpin(
         if (
           index === targetEl &&
           currentSpin >= spins &&
-          newTop >itemHeight/2 &&
-          newTop <= itemHeight 
+          newTop > itemHeight / 2 &&
+          newTop <= itemHeight
         ) {
           allElementsInPlace = false;
         }
@@ -59,36 +58,17 @@ function rollSpin(
       if (elGetRound / tape.children.length >= 1) {
         elGetRound = 0;
         currentSpin++;
-        const deltaSpeed = speed / minSpeed;
-        if (
-          currentSpin >= spins * 0.5 &&
-          currentSpin < spins * 0.9 &&
-          deltaSpeed > 10
-        ) {
-          deceleration =
-            deceleration +
-            Math.pow(deceleration, 2) +
-            (1 / currentSpin) * maxDeceleration;
-        } else if (deltaSpeed < 3 && currentSpin > spins * 0.9) {
-          deceleration = deceleration * 1.1;
-          if (deceleration > maxDeceleration) deceleration = maxDeceleration;
-        }
-      }
-
-      if (speed > minSpeed) {
-        if (currentSpin >= spins * 0.5) {
-          deceleration += deceleration * 0.001;
-        }
-
-        if (currentSpin >= spins * 0.5) speed -= deceleration;
-        if (currentSpin >= spins) {
+        // if (speed < 3 * minSpeed) {
+        //   // console.log("низкая скорость",speed);
+        // }
+        if (currentSpin >= spins * 0.8) {
+          // console.log("конец вращения",speed);
+          speed *= 0.95;
           if (speed < minSpeed) speed = minSpeed;
-          deceleration = maxDeceleration / 100;
-        } else {
-          if (speed < 10 * minSpeed) {
-            speed = 10 * minSpeed;
-            deceleration = maxDeceleration / 10;
-          }
+        } else if (currentSpin >= spins * 0.4) {
+          // console.log("половина вращения ",speed);
+          speed *= 0.7;
+          if (speed < minSpeed * 2) speed = 2 * minSpeed;
         }
       }
 

@@ -1,9 +1,11 @@
-.frame{
-    /* width: 80vw; */
-    height: 60vh;
+.frame {
+  width: 100%;
+  max-width: 650px;
 
-    max-width: 650px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  height: 90vh;
+  max-height: 70vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

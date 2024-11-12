@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { MashineDrum } from "./mashineDrum/MashineDrum";
 import { REWARDS } from "../../../../constants/drumConstants";
 import { getRandomInt } from "../../../../tools/tools";
@@ -6,26 +6,32 @@ import styles from "./mashineBody.module.css";
 import { SlotContext } from "../SlotContext";
 import { PlayerContext } from "../../../../PlayerContext";
 import { HandBtn } from "./hendBtn/HandBtn";
+import { MashineFooter } from "./mashineFooter/MashineFooter";
 
 export function MashineBody() {
   const slotMashine = useContext(SlotContext);
   const player = useContext(PlayerContext);
 
   const itemHeight = 128;
+
   if (!slotMashine) return;
   const reel: Array<keyof typeof REWARDS> = slotMashine.reel;
   const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
   const [isSpinning, setIsSpinning] = useState(false);
   const tapeRefs = useRef<HTMLDivElement[]>([]);
 
+
+
+
   function handleSpinResult(results: string[]) {
-    const finalWin = calculateWinnings(results);
+    const finalWin = calculateWinnings(slotMashine?.betInGame || 0, results);
 
     if (player) {
       player.addBalance(finalWin);
     }
 
     console.log(`Комбинация: ${results.join(", ")}`);
+    console.log(`Было в игре ${slotMashine?.betInGame}`);
     console.log(`Выигрыш: ${finalWin}`);
 
     slotMashine?.setBetInGame(0);
@@ -46,15 +52,16 @@ export function MashineBody() {
     if (!slotMashine || !player) return;
     const betStep = slotMashine.betStep;
 
-    if (player.canSpend(betStep)) {
-      if (player.minusBalance(betStep)) {
-        slotMashine.setBetInGame(betStep);
+    if (slotMashine.betInGame > 0) startSpin();
+    // if (player.canSpend(betStep)) {
+    //   if (player.minusBalance(betStep)) {
+    //     slotMashine.setBetInGame(betStep);
 
-        startSpin();
-      }
-    } else {
-      alert("Без гроша и жизнь плоха, или как там в оригинале...");
-    }
+    //     startSpin();
+    //   }
+    // } else {
+    //   alert("Без гроша и жизнь плоха, или как там в оригинале...");
+    // }
   }
 
   return (
@@ -66,24 +73,24 @@ export function MashineBody() {
           <div className={styles.headLow}></div>
         </div>
         <div className={styles.mashineBody}>
-        
           <div className={styles.dramFrame}>
             <MashineDrum
               spinValues={spinValues}
               reel={reel}
               onSpinEnd={handleSpinResult}
               isSpinning={isSpinning}
+              
             />
           </div>{" "}
         </div>
-        <div className={styles.mashineFooter}>footer</div>
+        <MashineFooter></MashineFooter>
       </div>
       <HandBtn spin={spin} isSpinning={isSpinning}></HandBtn>
     </div>
   );
 }
 
-function calculateWinnings(results: string[]): number {
+function calculateWinnings(bet: number, results: string[]): number {
   let totalPlus = 0;
   let totalMultiply = 1;
 
@@ -104,5 +111,5 @@ function calculateWinnings(results: string[]): number {
     }
   });
 
-  return totalPlus * totalMultiply;
+  return bet * totalPlus * totalMultiply;
 }

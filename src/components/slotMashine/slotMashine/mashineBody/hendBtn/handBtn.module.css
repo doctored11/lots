@@ -96,7 +96,7 @@
   position: relative;
   height: 60%;
   max-height: 350px;
-  min-height: 80px;
+  min-height: 120px;
   width: 100%;
   justify-content: center;
   flex-direction: column;
@@ -195,5 +195,53 @@
   }
   100% {
     filter: brightness(80%);
+  }
+}
+
+
+
+@media (max-width: 500px) {
+  .handZone{
+    height: 35%;
+    transform: translateY(-30%);
+  }
+  .handBtn{
+    padding-top: 35% ;
+    min-width: 30px;
+    min-height: 30px;
+  }
+ 
+  .handZone::after {
+    content: "";
+    width: 60%;
+    height: 5%;
+  
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 0;
+    
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+
+  .handZone::before {
+    content: "";
+    width: 3%;
+    min-width: 5px;
+    height: 50%;
+   
+    border-top-width: 0;
+    border-right-width: 2px;
+    border-bottom-width: 0;
+    border-left-width: 2px;
+   
+    transform: translateY(-100%) translateX(-50%);
+    transform-origin: top;
+    z-index: 3;
+  
+    transition: transform 0.3s ease ;
   }
 }

@@ -22,7 +22,7 @@ export function SlotMashine() {
   useEffect(() => mashine?.reelUpdate(), []);
   return (
     <>
-      <p>Баланс: {player?.balance}</p>
+      {/* <p>Баланс: {player?.balance}</p> */}
       <div>SlotMashine</div>
       <div className={style.frame}>
         <MashineBody />
