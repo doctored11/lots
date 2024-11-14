@@ -104,21 +104,34 @@
 }
 
 .mashine {
-  /* position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%); */
+  /* overflow: hidden; */
 
   display: flex;
   width: 95%;
   max-width: 780px;
   min-width: 260px;
   min-height: 260px;
+  max-width: 600px;
   /* height: 95%; */
+  
 
   align-items: end;
   justify-content: flex-start;
   flex-direction: row;
+}
+.mashineContainer {
+  align-items: flex-end;
+  padding: 10% 5% 0 5%;
+  justify-content: center;
+  flex-direction: row;
+  display: flex;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  min-height: 95%;
+  z-index: 5;
+  /*  */
+  /* height: 100%; */
 }
 
 /*  */
@@ -128,9 +141,8 @@
     height: initial;
     /* min-height: 100%; */
   }
-  .mashineHead{
+  .mashineHead {
     transform: translateY(7%);
-    
   }
   .mashineBody {
     /* flex: 9; */

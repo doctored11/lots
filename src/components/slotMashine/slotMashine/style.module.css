@@ -1,11 +1,16 @@
 .frame {
   width: 100%;
-  max-width: 650px;
-
-  height: 90vh;
-  max-height: 70vh;
+ position: relative;
+  /* height: 90vh; */
 
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
+
+/* @media (max-width: 700px) {
+  .frame {
+    max-width: 650px;
+    max-height: 70vh;
+  }
+} */

@@ -63,7 +63,8 @@ export function MashineBody() {
   }
 
   return (
-    <div className={styles.mashine}>
+    <div className={styles.mashineContainer} >
+    <div className={styles.mashine} id="mashine">
       <div className={styles.out}>
         <div className={styles.mashineHead}>
           <div className={styles.headUp}></div>
@@ -86,6 +87,7 @@ export function MashineBody() {
         <MashineFooter></MashineFooter>
       </div>
       <HandBtn spin={spin} isSpinning={isSpinning}></HandBtn>
+    </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 .header{
   position: relative;
   display: flex;
+  background-color: rgb(26, 103, 131);
 }
 .balanceDeltaBlock {
   display: flex;

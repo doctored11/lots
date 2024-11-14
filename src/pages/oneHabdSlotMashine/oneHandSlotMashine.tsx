@@ -17,7 +17,6 @@ export function OneHandSlotMashine() {
         <SlotProvider>
           <div className={style.frame}>
             <SlotMashine />
-
             <BetControls />
             <ChangeMashine></ChangeMashine>
           </div>

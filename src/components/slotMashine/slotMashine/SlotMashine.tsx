@@ -26,6 +26,7 @@ export function SlotMashine() {
       <div>SlotMashine</div>
       <div className={style.frame}>
         <MashineBody />
+        <div id="shadow"></div>
       </div>
     </>
   );

@@ -11,7 +11,7 @@ function App() {
   return (
     <>
       <PlayerProvider>
-        S:OTЫ
+      
         <OneHandSlotMashine />
       </PlayerProvider>
     </>
