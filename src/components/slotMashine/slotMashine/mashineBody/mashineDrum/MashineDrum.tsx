@@ -48,16 +48,20 @@ export function MashineDrum({
       if (slotDrumRef.current) {
         const slotDrumWidth = slotDrumRef.current.offsetWidth;
         const slotDrumHeight = slotDrumRef.current.offsetHeight;
-       
+
         const calculatedSizeByWith = slotDrumWidth * 0.3;
         let calculatedSizeByHeight = slotDrumHeight * 0.5;
-        console.log("!_ ",calculatedSizeByHeight,slotDrumHeight, slotDrumWidth);
+        console.log(
+          "!_ ",
+          calculatedSizeByHeight,
+          slotDrumHeight,
+          slotDrumWidth
+        );
         // if (calculatedSizeByHeight * 3 > slotDrumWidth) {
         //   console.log("0_0", calculatedSizeByHeight * 3, slotDrumWidth);
         //   calculatedSizeByHeight = calculatedSizeByWith;
         // }
 
-       
         setItemHeight(calculatedSizeByWith);
       }
     };
@@ -93,6 +97,25 @@ export function MashineDrum({
 
     Promise.all(rollPromises).then((results) => {
       onSpinEnd(results);
+
+      const winningElements: HTMLElement[] = [];
+
+      spinValues.forEach((targetIndex, reelIndex) => {
+        const tape = tapeRefs.current[reelIndex].current;
+        if (tape) {
+          const winningElement = tape.children[targetIndex];
+          if (winningElement instanceof HTMLElement) {
+            winningElement.classList.add(style.winEl);
+            winningElements.push(winningElement);
+          }
+        }
+      });
+
+      setTimeout(() => {
+        winningElements.forEach((element) => {
+          element.classList.remove(style.winEl);
+        });
+      }, 500);
     });
   }, [spinValues, reel, onSpinEnd, itemHeight, isSpinning]);
 

@@ -19,7 +19,7 @@ export function BetControls() {
 
   return (
     <div>
-      <p>Текущая ставка: {betInGame} монет</p>
+      {/* <p>Текущая ставка: {betInGame} монет</p> */}
       <button onClick={increaseBet}>+10 к ставке</button>
     </div>
   );

@@ -7,6 +7,7 @@ import {
 import style from "./style.module.css";
 import { BetControls } from "../../components/betControl/BetControl";
 import { Header } from "../../components/header/header";
+import { ChangeMashine } from "../../components/changeMashine/ChangeMashine";
 
 export function OneHandSlotMashine() {
   const page = (
@@ -18,6 +19,7 @@ export function OneHandSlotMashine() {
             <SlotMashine />
 
             <BetControls />
+            <ChangeMashine></ChangeMashine>
           </div>
         </SlotProvider>
       </div>

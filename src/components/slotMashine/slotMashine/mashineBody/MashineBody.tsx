@@ -20,9 +20,6 @@ export function MashineBody() {
   const [isSpinning, setIsSpinning] = useState(false);
   const tapeRefs = useRef<HTMLDivElement[]>([]);
 
-
-
-
   function handleSpinResult(results: string[]) {
     const finalWin = calculateWinnings(slotMashine?.betInGame || 0, results);
 
@@ -34,6 +31,7 @@ export function MashineBody() {
     console.log(`Было в игре ${slotMashine?.betInGame}`);
     console.log(`Выигрыш: ${finalWin}`);
 
+    slotMashine?.updateSlotScore(finalWin);
     slotMashine?.setBetInGame(0);
     setIsSpinning(false);
   }
@@ -72,14 +70,16 @@ export function MashineBody() {
           <div className={styles.headMid}></div>
           <div className={styles.headLow}></div>
         </div>
-        <div className={styles.mashineBody}>
+        <div
+          className={styles.mashineBody}
+          style={{ backgroundColor: slotMashine.color }}
+        >
           <div className={styles.dramFrame}>
             <MashineDrum
               spinValues={spinValues}
               reel={reel}
               onSpinEnd={handleSpinResult}
               isSpinning={isSpinning}
-              
             />
           </div>{" "}
         </div>

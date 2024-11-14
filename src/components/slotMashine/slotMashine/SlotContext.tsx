@@ -10,12 +10,16 @@ import { getRandomInt } from "../../../tools/tools";
 
 type DrumItem = keyof typeof DRUM_CHANCES;
 
+// прости я в будущем
 interface SlotContextType {
   betStep: number;
   betInGame: number;
   combination: Array<number | null>;
   mode: string;
   reel: Array<keyof typeof REWARDS>;
+  color: string;
+  lastWin: number;
+  maxWin: number;
   rollCount: number;
   setCombination: (combination: Array<number | null>) => void;
   setBetStep: (betStep: number) => void;
@@ -23,7 +27,11 @@ interface SlotContextType {
   setMode: (mode: string) => void;
   setReel: (reel: Array<keyof typeof REWARDS>) => void;
   setRollCount: (rollCount: number) => void;
+  setColor: (color: string) => void;
+  setLastWin: (win: number) => void;
+  setMaxWin: (win: number) => void;
   reelUpdate: () => void;
+  updateSlotScore: (win: number) => void;
 }
 
 export const SlotContext = createContext<SlotContextType | undefined>(
@@ -51,13 +59,19 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     "cherry",
   ]);
   const [rollCount, setRollCount] = useState(3);
+  const [lastWin, setLastWin] = useState(0);
+  const [maxWin, setMaxWin] = useState(0);
+  const [color, setColor] = useState("#6294a4f0");
 
   const slotContextValue: SlotContextType = {
     betStep,
     betInGame,
     combination,
     mode,
+    color,
     reel,
+    lastWin,
+    maxWin,
     rollCount,
     setCombination,
     setBetStep,
@@ -65,7 +79,11 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     setMode,
     setReel,
     setRollCount,
+    setColor,
+    setLastWin,
+    setMaxWin,
     reelUpdate,
+    updateSlotScore,
   };
 
   return (
@@ -73,6 +91,14 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </SlotContext.Provider>
   );
+
+  function updateSlotScore(win: number) {
+    const roundedWin = Math.round(win);
+    setLastWin(roundedWin);
+    if (roundedWin > maxWin) {
+      setMaxWin(roundedWin);
+    }
+  }
 
   function reelUpdate() {
     const newReel: DrumItem[] = [];
@@ -93,7 +119,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       return acc;
     }, {} as Record<DrumItem, number>);
 
-    const elCount =getRandomInt(5,8)
+    const elCount = getRandomInt(5, 8);
     while (newReel.length < elCount) {
       const randomIndex = getRandomInt(0, weightedItems.length - 1);
       const selectedItem = weightedItems[randomIndex];
@@ -106,9 +132,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    
     setReel(newReel);
-    console.log("колесико обновлено, ",elCount, newReel)
+    console.log("колесико обновлено, ", elCount, newReel);
   }
 };
 
