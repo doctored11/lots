@@ -36,6 +36,19 @@ export function MashineBody() {
     setIsSpinning(false);
   }
 
+  const mashineElement = document.getElementById("mashine");
+  useEffect(() => {
+    if (mashineElement) {
+      if (isSpinning) {
+        setTimeout(() => {
+          mashineElement.classList.add(styles.working);
+        }, 300);
+      } else {
+        mashineElement.classList.remove(styles.working);
+      }
+    }
+  }, [isSpinning]);
+
   async function startSpin() {
     setIsSpinning(true);
 
@@ -63,31 +76,31 @@ export function MashineBody() {
   }
 
   return (
-    <div className={styles.mashineContainer} >
-    <div className={styles.mashine} id="mashine">
-      <div className={styles.out}>
-        <div className={styles.mashineHead}>
-          <div className={styles.headUp}></div>
-          <div className={styles.headMid}></div>
-          <div className={styles.headLow}></div>
+    <div className={styles.mashineContainer}>
+      <div className={styles.mashine} id="mashine">
+        <div className={styles.out}>
+          <div className={styles.mashineHead}>
+            <div className={styles.headUp}></div>
+            <div className={styles.headMid}></div>
+            <div className={styles.headLow}></div>
+          </div>
+          <div
+            className={styles.mashineBody}
+            style={{ backgroundColor: slotMashine.color }}
+          >
+            <div className={styles.dramFrame}>
+              <MashineDrum
+                spinValues={spinValues}
+                reel={reel}
+                onSpinEnd={handleSpinResult}
+                isSpinning={isSpinning}
+              />
+            </div>{" "}
+          </div>
+          <MashineFooter></MashineFooter>
         </div>
-        <div
-          className={styles.mashineBody}
-          style={{ backgroundColor: slotMashine.color }}
-        >
-          <div className={styles.dramFrame}>
-            <MashineDrum
-              spinValues={spinValues}
-              reel={reel}
-              onSpinEnd={handleSpinResult}
-              isSpinning={isSpinning}
-            />
-          </div>{" "}
-        </div>
-        <MashineFooter></MashineFooter>
+        <HandBtn spin={spin} isSpinning={isSpinning}></HandBtn>
       </div>
-      <HandBtn spin={spin} isSpinning={isSpinning}></HandBtn>
-    </div>
     </div>
   );
 }

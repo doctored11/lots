@@ -17,6 +17,7 @@
   min-height: 40%;
   width: 100%;
   position: relative;
+  transition: all 0.4s ease;
   /* flex: 15; */
 }
 
@@ -113,7 +114,6 @@
   min-height: 260px;
   max-width: 600px;
   /* height: 95%; */
-  
 
   align-items: end;
   justify-content: flex-start;
@@ -154,5 +154,23 @@
   }
   .out {
     flex: 9;
+  }
+}
+
+.working {
+  transform-origin: bottom;
+  animation: bounceHeight 0.2s ease-in-out infinite;
+}
+
+@keyframes bounceHeight {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.01);
+  }
+  75% {
+    transform: scaleY(0.99);
   }
 }
