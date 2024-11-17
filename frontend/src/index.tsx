@@ -19,6 +19,7 @@ function App() {
   return (
     <>
       <button onClick={onClose}>ЗАкрыть</button>
+      <span>{tg.initDataUnsafe?.user?.username}</span>
       <PlayerProvider>
         <OneHandSlotMashine />
       </PlayerProvider>
