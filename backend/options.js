@@ -1,3 +1,4 @@
+const webAppUrl = "https://yandex.ru/"
 module.exports = {
     gameOptions: {
         reply_markup: JSON.stringify({
@@ -13,6 +14,13 @@ module.exports = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [{ text: "еще раз!", callback_data: "/again" }]
+            ]
+        })
+    },
+    startProjectOptions: {
+        reply_markup: JSON.stringify({
+            inline_keyboard: [
+                [{ text: "Шлеппим", web_app: { url: webAppUrl } }]
             ]
         })
     }

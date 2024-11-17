@@ -1,12 +1,13 @@
 const TelegramApi = require('node-telegram-bot-api')
 // сменить токен)
 const token = '7692071006:AAEd1K_CTanWLJ6uhsehjsFeBmk1B1emlbw'
+const webAppUrl = "https://yandex.ru/search/?text=2.3*24*30&clid=2270455&banerid=6301000000%3A6410756e7460f71d765e2614&win=585&lr=213"
 
 const sequelize = require('./db.js')
 
 const UserModel = require('./models.js')
 
-const { gameOptions, againOptions } = require('./options.js')
+const { gameOptions, againOptions,startProjectOptions } = require('./options.js')
 const bot = new TelegramApi(token, { polling: true })
 bot.setMyCommands([
     { command: '/start', description: 'начальное приветствие' },
@@ -45,8 +46,8 @@ const start = async () => {
 
             }
             if (text == "/start") {
-                await UserModel.create({ chatId })
-                return bot.sendMessage(chatId, "ну привет, формошлеп! ")
+                // await UserModel.create({ chatId })
+                return bot.sendMessage(chatId, "ну привет, формошлеп! ",startProjectOptions)
             } if (text == "/info") {
                 const user = await UserModel.findOne({ chatId })
                 return bot.sendMessage(chatId, "у тебя, " + msg.from.first_name + " правильных" + user.right + "и не правильных: " + user.wrong)
