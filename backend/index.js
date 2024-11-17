@@ -6,8 +6,9 @@ const bot = new TelegramApi(token, { polling: true })
 bot.setMyCommands([
     { command: '/start', description: 'начальное приветствие' },
     { command: '/info', description: 'информация' },
-    { command: '/testGame', description: 'тестовая игра' },
+    { command: '/game', description: 'тестовая игра' },
 ]);
+
 
 chats = {}
 
@@ -33,7 +34,7 @@ const start = () => {
         } if (text == "/info") {
             return bot.sendMessage(chatId, "гугл в помощь " + msg.from.first_name)
         }
-        if (text == "/testGame") {
+        if (text == "/game") {
             await bot.sendMessage(chatId, "игрем " + msg.from.first_name + "?");
             return startGame(chatId)
 
