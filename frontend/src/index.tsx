@@ -4,25 +4,20 @@ import { OneHandSlotMashine } from "./pages/oneHabdSlotMashine/oneHandSlotMashin
 import { PlayerProvider } from "./PlayerContext";
 import "./index.css";
 import "./normalize.css";
+import { useTelegram } from "./hooks/useTelegram";
 
-const tg = window.Telegram.WebApp;
 function App() {
   //todo - вынести игрока и работу с балансом
 
-  useEffect(() => {
-    tg.ready();
-  }, []);
-
-  const onClose = () => {
-    tg.close();
-  };
+  const {user,onClose,onToggleButton} = useTelegram()
   return (
     <>
       <button onClick={onClose}>ЗАкрыть</button>
-      <span>{tg.initDataUnsafe?.user?.username}</span>
+      <span>{user?.username}</span>
       <PlayerProvider>
         <OneHandSlotMashine />
       </PlayerProvider>
+      <button onClick={onToggleButton}>toggle</button>
     </>
   );
 }
