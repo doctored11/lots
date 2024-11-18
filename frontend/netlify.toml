@@ -1,5 +1,5 @@
 [[redirects]]
-  from = "/api/*"
-  to = "{{API_BACKEND_URL}}/api/:splat"
+  from = "/*"
+  to = "index.html"
   status = 200
   force = true
