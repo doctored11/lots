@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { OneHandSlotMashine } from "./pages/oneHabdSlotMashine/oneHandSlotMashine";
 import { PlayerProvider } from "./PlayerContext";
@@ -9,6 +9,20 @@ const targetAddress = process.env.REACT_APP_TARGET_ADDRESS;
 
 function App() {
   //todo - вынести игрока и работу с балансом
+
+  const onSendData = useCallback(()=>{
+    const data = {
+      "0":"09"
+    }
+    tg.sendData(JSON.stringify(data))
+  },[])
+
+  useEffect(() => {
+    tg.onEvent('mainButtonClicked',onSendData)
+    return()=>{
+      tg.offEvent('mainButtonClicked',onSendData)
+    }
+  }, []);
 
   const { tg, user, chatId, onClose, onToggleButton } = useTelegram();
   useEffect(() => {
