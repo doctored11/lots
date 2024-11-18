@@ -12,7 +12,7 @@ function App() {
 
   const onSendData = useCallback(()=>{
     const data = {
-      "0":"09"
+      "0":"011"
     }
     tg.sendData(JSON.stringify(data))
   },[])
