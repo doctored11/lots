@@ -127,14 +127,17 @@ app.post('/web-data', async () => {
 })
 
 app.post('/api/send-message', async (req, res) => {
+    console.log('Request :', req.body); 
     const { chatId, message } = req.body;
 
     if (!chatId || !message) {
+        console.log('Error chatId or message');
         return res.status(400).json({ error: 'chatId and message are required' });
     }
 
     try {
         await bot.sendMessage(chatId, message);
+        console.log("0_0",message, chatId)
         res.status(200).json({ success: true, message: 'Message sent to bot!' });
     } catch (error) {
         console.error('Error sending message to bot:', error);
