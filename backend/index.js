@@ -125,6 +125,22 @@ app.post('/web-data', async () => {
     }
 
 })
+
+app.post('/api/send-message', async (req, res) => {
+    const { chatId, message } = req.body;
+
+    if (!chatId || !message) {
+        return res.status(400).json({ error: 'chatId and message are required' });
+    }
+
+    try {
+        await bot.sendMessage(chatId, message);
+        res.status(200).json({ success: true, message: 'Message sent to bot!' });
+    } catch (error) {
+        console.error('Error sending message to bot:', error);
+        res.status(500).json({ error: 'Failed to send message to bot' });
+    }
+});
 // start()
 const PORT = 8000;
 app.listen(PORT, () => {
