@@ -31,7 +31,7 @@ function App() {
 
   const sendMessageToBot = async () => {
     try {
-      const response = await fetch(`${targetAddress}/api/send-message`, {
+      const response = await fetch(`http://77.223.123.18:8000/api/send-message`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
