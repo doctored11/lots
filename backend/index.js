@@ -3,7 +3,6 @@ const express = require('express')
 const cors = require('cors')
 // сменить токен)
 const token = '7692071006:AAEd1K_CTanWLJ6uhsehjsFeBmk1B1emlbw'
-const webAppUrl = "https://yandex.ru/search/?text=2.3*24*30&clid=2270455&banerid=6301000000%3A6410756e7460f71d765e2614&win=585&lr=213"
 
 const sequelize = require('./db.js')
 
@@ -127,7 +126,7 @@ app.post('/web-data', async () => {
 })
 
 app.post('/api/send-message', async (req, res) => {
-    console.log('Request :', req.body); 
+    console.log('Request :', req.body);
     const { chatId, message } = req.body;
 
     if (!chatId || !message) {
@@ -136,8 +135,19 @@ app.post('/api/send-message', async (req, res) => {
     }
 
     try {
+        await bot.answerCallbackQuery(queryID, {
+            type: 'article',
+            id: queryID,
+            title: 'ответ с бека',
+            input_message_content: {
+                message_text: "Ответ ответ с бека"
+            }
+
+        })
+
+
         await bot.sendMessage(chatId, message);
-        console.log("0_0",message, chatId)
+        console.log("0_0", message, chatId)
         res.status(200).json({ success: true, message: 'Message sent to bot!' });
     } catch (error) {
         console.error('Error sending message to bot:', error);
