@@ -9,7 +9,11 @@ import { useTelegram } from "./hooks/useTelegram";
 function App() {
   //todo - вынести игрока и работу с балансом
 
-  const {user,onClose,onToggleButton} = useTelegram()
+  const {tg, user, onClose, onToggleButton } = useTelegram();
+  useEffect(() => {
+    tg.ready();
+  }, []);
+
   return (
     <>
       <button onClick={onClose}>ЗАкрыть</button>
