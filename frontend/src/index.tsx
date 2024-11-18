@@ -30,10 +30,11 @@ function App() {
   }, []);
 
   const sendMessageToBot = async () => {
-    try {
-      console.log(tg)
+    console.log(tg)
       console.log(targetAddress)
       console.log(`${targetAddress}/api/send-message`)
+    try {
+      
       const response = await fetch(`${targetAddress}/api/send-message`, {
         method: "POST",
         headers: {
