@@ -4,6 +4,7 @@ const cors = require('cors')
 // сменить токен)
 const token = '7692071006:AAEd1K_CTanWLJ6uhsehjsFeBmk1B1emlbw'
 
+
 const sequelize = require('./db.js')
 
 const UserModel = require('./models.js')
@@ -135,15 +136,7 @@ app.post('/api/send-message', async (req, res) => {
     }
 
     try {
-        await bot.answerCallbackQuery(queryID, {
-            type: 'article',
-            id: queryID,
-            title: 'ответ с бека',
-            input_message_content: {
-                message_text: "Ответ ответ с бека"
-            }
-
-        })
+       
 
 
         await bot.sendMessage(chatId, message);
