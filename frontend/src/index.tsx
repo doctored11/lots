@@ -5,16 +5,24 @@ import { PlayerProvider } from "./PlayerContext";
 import "./index.css";
 import "./normalize.css";
 import { useTelegram } from "./hooks/useTelegram";
+import { json } from "react-router-dom";
 const targetAddress = process.env.REACT_APP_TARGET_ADDRESS;
 
 function App() {
   //todo - вынести игрока и работу с балансом
-
+  const { tg,queryId ,user, chatId, onClose, onToggleButton } = useTelegram();
   const onSendData = useCallback(()=>{
     const data = {
-      "0":"09"
+      "0":"09",
+      queryId
     }
-    tg.sendData(JSON.stringify(data))
+    fetch(targetAddress+'/web-data',{
+      method:'POST',
+      headers:{
+        'Content-Type':"application/json",
+      },
+      body:JSON.stringify(data)
+    } )
   },[])
 
   useEffect(() => {
@@ -24,7 +32,7 @@ function App() {
     }
   }, []);
 
-  const { tg, user, chatId, onClose, onToggleButton } = useTelegram();
+  
   useEffect(() => {
     tg.ready();
   }, []);
