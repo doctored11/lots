@@ -1,4 +1,6 @@
 const TelegramApi = require('node-telegram-bot-api')
+const express = require('express')
+const cors = require('cors')
 // сменить токен)
 const token = '7692071006:AAEd1K_CTanWLJ6uhsehjsFeBmk1B1emlbw'
 const webAppUrl = "https://yandex.ru/search/?text=2.3*24*30&clid=2270455&banerid=6301000000%3A6410756e7460f71d765e2614&win=585&lr=213"
@@ -7,8 +9,13 @@ const sequelize = require('./db.js')
 
 const UserModel = require('./models.js')
 
-const { gameOptions, againOptions,startProjectOptions } = require('./options.js')
+const { gameOptions, againOptions, startProjectOptions } = require('./options.js')
 const bot = new TelegramApi(token, { polling: true })
+const app = express();
+
+app.use(express.json())
+app.use(cors())
+
 bot.setMyCommands([
     { command: '/start', description: 'начальное приветствие' },
     { command: '/info', description: 'информация' },
@@ -47,7 +54,7 @@ const start = async () => {
             }
             if (text == "/start") {
                 // await UserModel.create({ chatId })
-                return bot.sendMessage(chatId, "ну привет, формошлеп! ",startProjectOptions)
+                return bot.sendMessage(chatId, "ну привет, формошлеп! ", startProjectOptions)
             } if (text == "/info") {
                 const user = await UserModel.findOne({ chatId })
                 return bot.sendMessage(chatId, "у тебя, " + msg.from.first_name + " правильных" + user.right + "и не правильных: " + user.wrong)
@@ -92,4 +99,35 @@ const start = async () => {
 
 }
 
-start()
+app.post('/web-data', async () => {
+    const { queryID } = req.body;
+    try {
+        await bot.answerCallbackQuery(queryID, {
+            type: 'article',
+            id: queryID,
+            title: 'ответ с бека',
+            input_message_content: {
+                message_text: "Ответ ответ с бека"
+            }
+
+        })
+        return res.status(200).json({})
+    } catch (e) {
+        await bot.answerCallbackQuery(queryID, {
+            type: 'article',
+            id: queryID,
+            title: 'ошибка с бека',
+            input_message_content: {
+                message_text: "Ответ ОЩИБКА с бека"
+            }
+        })
+        return res.status(500).json({})
+    }
+
+})
+// start()
+const PORT = 8000;
+app.listen(PORT, () => {
+    console.log("server started on : ", PORT);
+    start()
+})

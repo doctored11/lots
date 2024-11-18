@@ -1,4 +1,4 @@
-const webAppUrl = "https://yandex.ru/"
+const webAppUrl = "https://testshlep.netlify.app/"
 module.exports = {
     gameOptions: {
         reply_markup: JSON.stringify({
