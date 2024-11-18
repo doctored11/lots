@@ -5,7 +5,7 @@ import { PlayerProvider } from "./PlayerContext";
 import "./index.css";
 import "./normalize.css";
 import { useTelegram } from "./hooks/useTelegram";
-const targetAddress = process.env.TARGET_ADDRESS;
+const targetAddress = process.env.REACT_APP_TARGET_ADDRESS;
 
 function App() {
   //todo - вынести игрока и работу с балансом
