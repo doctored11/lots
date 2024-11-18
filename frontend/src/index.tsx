@@ -31,9 +31,9 @@ function App() {
 
   const sendMessageToBot = async () => {
     console.log("testClick")
-    console.log(tg);
-    console.log(targetAddress);
-    console.log(`${targetAddress}/api/send-message`);
+    // console.log(tg);
+    // console.log(targetAddress);
+    // console.log(`${targetAddress}/api/send-message`);
     try {
       const response = await fetch(`${targetAddress}/api/send-message`, {
         method: "POST",
