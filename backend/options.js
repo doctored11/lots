@@ -1,4 +1,5 @@
-const webAppUrl = "https://testshlep.netlify.app/"
+const webAppUrl = "https://83.222.27.21/";
+
 module.exports = {
     gameOptions: {
         reply_markup: JSON.stringify({
