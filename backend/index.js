@@ -39,7 +39,7 @@ const start = async () => {
                 return bot.sendMessage(chatId, "ну привет, формошлеп! ", startProjectOptions);
             }
             if (text === '/info') {
-                // Временно выводим только имя пользователя
+               
                 return bot.sendMessage(chatId, `Привет, ${msg.from.first_name}`);
             }
             if (text === '/game') {
