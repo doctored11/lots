@@ -99,5 +99,5 @@ app.post('/api/send-message', async (req, res) => {
 const PORT = 8000;
 app.listen(PORT, () => {
     console.log("Сервер запущен на порту _:", PORT);
-    // start();
+    start();
 });
