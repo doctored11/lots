@@ -11,19 +11,30 @@ const targetAddress = process.env.REACT_APP_TARGET_ADDRESS;
 function App() {
   //todo - вынести игрока и работу с балансом
   const { tg,queryId ,user, chatId, onClose, onToggleButton } = useTelegram();
-  const onSendData = useCallback(()=>{
+  const onSendData = useCallback(() => {
     const data = {
-      "0":"09",
-      queryId
-    }
-    fetch(targetAddress+'/web-data',{
-      method:'POST',
-      headers:{
-        'Content-Type':"application/json",
-      },
-      body:JSON.stringify(data)
-    } )
-  },[])
+        "0": "09",
+        queryId,
+    };
+
+    console.log('Отправка данных на сервер:', data); 
+
+    fetch(targetAddress + '/web-data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => response.json())
+        .then((result) => {
+            console.log('⚠️ Ответ от сервера:', result); 
+        })
+        .catch((error) => {
+            console.error('🛑 Ошибка отправки данных:', error); 
+        });
+}, [queryId]);
+
 
   useEffect(() => {
     tg.onEvent('mainButtonClicked',onSendData)

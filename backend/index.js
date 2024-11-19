@@ -69,13 +69,23 @@ const start = async () => {
 };
 
 app.post('/web-data', async (req, res) => {
-    const { queryID } = req.body;
+    console.log(' -_- Получен запрос в /web-data:', req.body); 
+
     try {
+        const { queryId } = req.body;
+        if (!queryId) {
+            console.log('Ошибка: отсутствует queryId');
+            return res.status(400).json({ error: 'queryId обязателен' });
+        }
+
+        console.log('Обработан queryId:', queryId);
         return res.status(200).json({ success: true, message: 'Данные обработаны!' });
     } catch (e) {
+        console.error('Ошибка в обработке /web-data:', e.message);
         return res.status(500).json({ error: 'Ошибка обработки данных' });
     }
 });
+
 
 app.post('/api/send-message', async (req, res) => {
     console.log('Request :', req.body);
