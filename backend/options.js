@@ -1,4 +1,5 @@
-const webAppUrl = "https://83.222.27.21/";
+const webAppUrl = "https://snullprojects.ru/";
+
 
 module.exports = {
     gameOptions: {
