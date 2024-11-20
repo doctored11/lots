@@ -10,46 +10,44 @@ const targetAddress = process.env.REACT_APP_TARGET_ADDRESS;
 
 function App() {
   //todo - вынести игрока и работу с балансом
-  const { tg,queryId ,user, chatId, onClose, onToggleButton } = useTelegram();
+  const { tg, queryId, user, chatId, onClose, onToggleButton } = useTelegram();
   const onSendData = useCallback(() => {
     const data = {
-        "0": "09",
-        queryId,
+      "0": "09",
+      queryId,
     };
 
-    console.log('Отправка данных на сервер:', data); 
+    console.log("Отправка данных на сервер:", data);
 
-    fetch(targetAddress + '/web-data', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+    fetch(targetAddress + "/web-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     })
-        .then((response) => response.json())
-        .then((result) => {
-            console.log('⚠️ Ответ от сервера:', result); 
-        })
-        .catch((error) => {
-            console.error('🛑 Ошибка отправки данных:', error); 
-        });
-}, [queryId]);
-
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("⚠️ Ответ от сервера:", result);
+      })
+      .catch((error) => {
+        console.error("🛑 Ошибка отправки данных:", error);
+      });
+  }, [queryId]);
 
   useEffect(() => {
-    tg.onEvent('mainButtonClicked',onSendData)
-    return()=>{
-      tg.offEvent('mainButtonClicked',onSendData)
-    }
+    tg.onEvent("mainButtonClicked", onSendData);
+    return () => {
+      tg.offEvent("mainButtonClicked", onSendData);
+    };
   }, []);
 
-  
   useEffect(() => {
     tg.ready();
   }, []);
 
   const sendMessageToBot = async () => {
-    console.log("testClick")
+    console.log("testClick");
     console.log(tg);
     console.log(targetAddress);
     console.log(`${targetAddress}/api/send-message`);
@@ -74,14 +72,17 @@ function App() {
 
   return (
     <>
-    <div className="">TesT-_-</div>
+      <div className="">TesT-_-</div>
       <button onClick={onClose}>ЗАкрыть</button>
       <span>{user?.username}</span>
+      <div className="">TesT-_-</div>
+      <div className="">TesT-_-</div>
       <PlayerProvider>
         <OneHandSlotMashine />
       </PlayerProvider>
       <button onClick={onToggleButton}>toggle</button>
       <button onClick={sendMessageToBot}>senMEssageToBot</button>
+      <div className="">TesT-_-</div>
     </>
   );
 }
