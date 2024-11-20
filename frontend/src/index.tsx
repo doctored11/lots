@@ -74,6 +74,7 @@ function App() {
 
   return (
     <>
+    <div className="">TesT-_-</div>
       <button onClick={onClose}>ЗАкрыть</button>
       <span>{user?.username}</span>
       <PlayerProvider>
