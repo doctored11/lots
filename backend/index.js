@@ -105,6 +105,9 @@ app.post('/api/send-message', async (req, res) => {
         res.status(500).json({ error: 'Ошибка отправки сообщения в бот' });
     }
 });
+app.get('/', (req, res) => {
+    res.send('Бэкенд работает!'); 
+});
 
 const PORT = 8000;
 app.listen(PORT, () => {
