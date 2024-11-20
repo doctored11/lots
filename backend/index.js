@@ -108,6 +108,10 @@ app.post('/api/send-message', async (req, res) => {
 app.get('/', (req, res) => {
     res.send('Бэкенд работает!'); 
 });
+app.get('/api/', (req, res) => {
+    res.status(200).json({ message: 'API работает!' });
+});
+
 
 const PORT = 8000;
 app.listen(PORT, () => {
