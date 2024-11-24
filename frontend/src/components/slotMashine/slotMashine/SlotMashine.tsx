@@ -29,27 +29,50 @@ export function SlotMashine() {
   // тест
   const handleSendMessage = async () => {
     if (!player?.chatId) {
-      alert("Не найден ID игрока!");
+      alert("Не найден Chat ID!");
       return;
     }
 
-    const response = await sendMessageToBot(
-      player.chatId,
-      "Запрос отправлен в бота!"
-    );
-    if (response.success) {
-      alert("Сообщение успешно отправлено!");
-    } else {
-      alert(`Ошибка: ${response.error}`);
+    try {
+      const response = await sendMessageToBot(
+        player.chatId,
+        "Сообщение из слота!"
+      );
+      if (response.success) {
+        alert("Сообщение успешно отправлено!");
+      } else {
+        alert(`Ошибка отправки: ${response.error}`);
+      }
+    } catch (error) {
+      console.error("Ошибка при отправке сообщения:", error);
+      alert("Ошибка при отправке сообщения в бот!");
     }
   };
-
   const handleGetCombination = async () => {
-    const response = await getWinningCombination();
-    if (response.success) {
-      alert(`Выигрышная комбинация: ${response.data.combination.join(", ")}`);
-    } else {
-      alert(`Ошибка: ${response.error}`);
+    if (!player?.chatId) {
+      alert("Не найден Chat ID!");
+      return;
+    }
+
+    try {
+      const response = await getWinningCombination();
+      if (response.success) {
+        const combination = response.data.combination.join(", ");
+        const message = `Выигрышная комбинация: ${combination}`;
+
+        // Отправляем комбинацию в бот
+        const botResponse = await sendMessageToBot(player.chatId, message);
+        if (botResponse.success) {
+          alert("Комбинация успешно отправлена в бот!");
+        } else {
+          alert(`Ошибка отправки: ${botResponse.error}`);
+        }
+      } else {
+        alert(`Ошибка получения комбинации: ${response.error}`);
+      }
+    } catch (error) {
+      console.error("Ошибка получения комбинации:", error);
+      alert("Ошибка при получении комбинации!");
     }
   };
   //
