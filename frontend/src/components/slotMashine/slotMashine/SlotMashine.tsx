@@ -76,6 +76,7 @@ export function SlotMashine() {
     }
   };
   //
+
   useEffect(() => {
     const initializeChatId = () => {
       const tg = window.Telegram?.WebApp;
@@ -94,8 +95,9 @@ export function SlotMashine() {
     };
 
     initializeChatId();
-    mashine?.reelUpdate();
-  }, [player, mashine]);
+  }, [player]);
+
+  useEffect(() => mashine?.reelUpdate(), []);
   return (
     <>
       {/* <p>Баланс: {player?.balance}</p> */}
