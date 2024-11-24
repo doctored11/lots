@@ -14,6 +14,7 @@ export function OneHandSlotMashine() {
     <>
       <Header></Header>
       <div>
+        <p>TextPages-_-</p>
         <SlotProvider>
           <div className={style.frame}>
             <SlotMashine />
