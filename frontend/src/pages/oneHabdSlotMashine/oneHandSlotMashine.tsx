@@ -22,23 +22,27 @@ export function OneHandSlotMashine() {
   useEffect(() => {
     const fetchChatId = async () => {
       if (!playerContext) {
-        console.error("нет контектста");
+        console.error("нет контекста");
         return;
-    }
-    
+      }
+  
       try {
         const tg = window.Telegram?.WebApp;
         if (tg?.initDataUnsafe?.user) {
           const userId = tg.initDataUnsafe.user.id;
           const chatId = await getChatId(userId); 
           playerContext.setChatId(chatId); 
+        } else {
+          console.error("Telegram WebApp недоступен или user отсутствует");
         }
       } catch (error) {
         console.error("Ошибка получения chatId:", error);
       }
     };
+  
     fetchChatId();
-  }, [playerContext])
+  }, [playerContext]);
+  
 
   const page = (
     <>
