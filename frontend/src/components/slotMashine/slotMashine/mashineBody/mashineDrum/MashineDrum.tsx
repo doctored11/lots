@@ -11,6 +11,7 @@ interface MashineDrumProps {
   onSpinEnd: (results: string[]) => void;
   isSpinning: boolean;
 }
+
 export function MashineDrum({
   spinValues,
   reel,
@@ -18,7 +19,8 @@ export function MashineDrum({
   isSpinning = false,
 }: MashineDrumProps) {
   const tapeRefs = useRef<React.RefObject<HTMLDivElement>[]>([]);
-  const [itemHeight, setItemHeight] = useState(128);
+  const [itemHeight, setItemHeight] = useState(128); 
+  const [currentItemHeight, setCurrentItemHeight] = useState(128);
   const slotDrumRef = useRef<HTMLDivElement>(null);
 
   if (tapeRefs.current.length !== spinValues.length) {
@@ -35,34 +37,14 @@ export function MashineDrum({
     }
   };
 
-  // useEffect(() => {
-  //   if (rollRefs.current.length > 0 && rollRefs.current[0]) {
-  //     const width = Math.min( rollRefs.current[0].offsetWidth,itemHeight)
-  //     console.log("0< ", width)
-  //     setItemHeight(width);
-  //   }
-  // }, []);
-
+ 
   useEffect(() => {
     const updateItemSize = () => {
       if (slotDrumRef.current) {
         const slotDrumWidth = slotDrumRef.current.offsetWidth;
-        const slotDrumHeight = slotDrumRef.current.offsetHeight;
 
-        const calculatedSizeByWith = slotDrumWidth * 0.3;
-        let calculatedSizeByHeight = slotDrumHeight * 0.5;
-        console.log(
-          "!_ ",
-          calculatedSizeByHeight,
-          slotDrumHeight,
-          slotDrumWidth
-        );
-        // if (calculatedSizeByHeight * 3 > slotDrumWidth) {
-        //   console.log("0_0", calculatedSizeByHeight * 3, slotDrumWidth);
-        //   calculatedSizeByHeight = calculatedSizeByWith;
-        // }
-
-        setItemHeight(calculatedSizeByWith);
+        const calculatedSizeByWidth = slotDrumWidth * 0.3;
+        setItemHeight(calculatedSizeByWidth); 
       }
     };
 
@@ -72,6 +54,7 @@ export function MashineDrum({
     return () => window.removeEventListener("resize", updateItemSize);
   }, []);
 
+
   useEffect(() => {
     rollRefs.current.forEach((roll) => {
       if (roll) {
@@ -79,16 +62,22 @@ export function MashineDrum({
         roll.style.width = `${itemHeight * 1.2}px`;
       }
     });
-    console.log(itemHeight);
+    
+    if(!isSpinning) setCurrentItemHeight(itemHeight);
   }, [itemHeight]);
 
+ 
   useEffect(() => {
     if (!isSpinning) return;
+
+    
+    setCurrentItemHeight(itemHeight);
+   
 
     const rollPromises = spinValues.map((value, index) =>
       rollSpin(
         tapeRefs.current[index].current!,
-        itemHeight,
+        itemHeight, 
         getRandomInt(12, 35),
         getRandomInt(3, 8),
         value
@@ -117,7 +106,7 @@ export function MashineDrum({
         });
       }, 500);
     });
-  }, [spinValues, reel, onSpinEnd, itemHeight, isSpinning]);
+  }, [isSpinning, spinValues, reel, onSpinEnd]);
 
   return (
     <div className={style.slotDrum} ref={slotDrumRef}>
@@ -127,7 +116,7 @@ export function MashineDrum({
           tapeRef={tapeRefs.current[index]}
           addToRollRefs={addToRollRefs}
           reel={reel}
-          itemHeight={itemHeight}
+          itemHeight={currentItemHeight} 
         />
       ))}
     </div>

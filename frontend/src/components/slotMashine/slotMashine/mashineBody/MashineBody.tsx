@@ -13,16 +13,13 @@ export function MashineBody() {
   const player = useContext(PlayerContext);
 
   const itemHeight = 128;
-  const winFlashK = 8
-  const animationTime = 800;
 
   if (!slotMashine) return;
   const reel: Array<keyof typeof REWARDS> = slotMashine.reel;
   const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
   const [isSpinning, setIsSpinning] = useState(false);
   const tapeRefs = useRef<HTMLDivElement[]>([]);
-  const lightRef = useRef<HTMLDivElement>(null);
-  const lightsRef = useRef<HTMLDivElement>(null);
+
   function handleSpinResult(results: string[]) {
     const finalWin = calculateWinnings(slotMashine?.betInGame || 0, results);
 
@@ -37,17 +34,6 @@ export function MashineBody() {
     slotMashine?.updateSlotScore(finalWin);
     slotMashine?.setBetInGame(0);
     setIsSpinning(false);
-
-    if (lightRef.current && finalWin / (slotMashine?.betInGame || 100) >= winFlashK) {
-      lightRef.current.classList.add(styles.flashLightOn);
-      setTimeout(() => {
-        lightRef.current?.classList.remove(styles.flashLightOn);
-      }, animationTime);
-    }
-    if (lightsRef.current) {
-      const percent = Math.min(83, finalWin/(slotMashine?.betInGame||100)*10)
-      lightsRef.current.style.setProperty("--before-width", `${percent}%`);
-    }
   }
 
   const mashineElement = document.getElementById("mashine");
@@ -94,10 +80,9 @@ export function MashineBody() {
       <div className={styles.mashine} id="mashine">
         <div className={styles.out}>
           <div className={styles.mashineHead}>
-            <div className={styles.headUp} ref={lightRef}></div>
+            <div className={styles.headUp}></div>
             <div className={styles.headMid}></div>
-
-            <div className={styles.headLow} ref={lightsRef}></div>
+            <div className={styles.headLow}></div>
           </div>
           <div
             className={styles.mashineBody}

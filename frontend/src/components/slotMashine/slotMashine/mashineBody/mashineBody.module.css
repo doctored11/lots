@@ -55,45 +55,13 @@
   z-index: 3;
   /* height: 5vh; */
 }
-
 .headLow {
   min-height: 40px;
   height: 40%;
+  /* padding-top: 5%; */
   width: 100%;
-  position: relative; 
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  z-index: 8;
-  width: 100%;
-  height: 100%;
   background-image: url("../../../../source/slotHead2.png");
   background-size: 100% 100%;
-  overflow: hidden;
-}
-
-.headLow::before {
- 
-  content: '';
-  min-height: 20px;
-  background-color: rgb(218, 225, 6);
-  max-width: 83%;
-  width: var(--before-width, 0);
-  transition: width 0.2s cubic-bezier(0.19, 1, 0.22, 1);
-  top: 0; 
-  left: 0;
-  z-index: -1; 
-}
-
-.headLow::after{
-  position: absolute;
-  content: ' ';
-  width: 100%;
-  height: 100%;
-  min-height: 40px;
-  background-image: url("../../../../source/slotHead2.png");
-  background-size: 100% 100%;
-  overflow: hidden;
 }
 .headMid {
   height: 60%;
@@ -103,15 +71,6 @@
   min-height: 70px;
   background-size: 100% 100%;
   background-image: url("../../../../source/topHead.png");
-}
-.inside {
-  display: block;
-  height: 100%;
-  width: 100%;
-  background-color: rgb(225, 233, 13);
-  min-height: 30px;
-  position: absolute;
-  z-index: 2;
 }
 .headUp {
   /* height: 10%; */
@@ -202,11 +161,7 @@
   transform-origin: bottom;
   animation: bounceHeight 0.2s ease-in-out infinite;
 }
-.flashLightOn {
-  filter: brightness(1.5);
-  transform: scale(0.95, 1.1) translateY(-2%);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+
 @keyframes bounceHeight {
   0%,
   100% {
