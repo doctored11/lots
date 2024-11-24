@@ -39,7 +39,7 @@ const start = async () => {
                 return bot.sendMessage(chatId, "ну привет, формошлеп! ", startProjectOptions);
             }
             if (text === '/info') {
-               
+
                 return bot.sendMessage(chatId, `Привет, ${msg.from.first_name}`);
             }
             if (text === '/game') {
@@ -69,7 +69,7 @@ const start = async () => {
 };
 
 app.post('/web-data', async (req, res) => {
-    console.log(' -_- Получен запрос в /web-data:', req.body); 
+    console.log(' -_- Получен запрос в /web-data:', req.body);
 
     try {
         const { queryId } = req.body;
@@ -86,75 +86,27 @@ app.post('/web-data', async (req, res) => {
     }
 });
 
-
 app.post('/api/send-message', async (req, res) => {
-    console.log('Request :', req.body);
     const { chatId, message } = req.body;
 
     if (!chatId || !message) {
-        console.log('Error chatId or message');
-        return res.status(400).json({ error: 'chatId и message обязательны' });
+        return res.status(400).json({ success: false, error: "chatId и message обязательны" });
     }
 
     try {
         await bot.sendMessage(chatId, message);
-        console.log("0_0", message, chatId);
-        res.status(200).json({ success: true, message: 'Сообщение отправлено в бот!' });
+        res.status(200).json({ success: true });
     } catch (error) {
-        console.error('Error sending message to bot:', error);
-        res.status(500).json({ error: 'Ошибка отправки сообщения в бот' });
-    }
-});
-app.get('/', (req, res) => {
-    res.send('Бэкенд работает!'); 
-});
-app.get('/api/', (req, res) => {
-    res.status(200).json({ message: 'API работает!' });
-});
-
-app.get('/api/get-chat-id', async (req, res) => {
-    const { queryId, userId } = req.query; 
-    if (!queryId || !userId) {
-        return res.status(400).json({ error: 'Не хватает queryId или userId' });
-    }
-
-    try {
-        
-        const chatId = userId; 
-        return res.status(200).json({ chatId });
-    } catch (error) {
-        console.error('Ошибка получения chatId:', error.message);
-        return res.status(500).json({ error: 'Ошибка получения chatId' });
+        console.error("Ошибка отправки сообщения:", error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
 
-app.post('/api/generate-reels', async (req, res) => {
-    try {
-        const { chatId } = req.body;
-        if (!chatId) {
-            return res.status(400).json({ error: 'chatId обязателен' });
-        }
-
-        const message = 'Лента автомата сгенерирована';
-        await bot.sendMessage(chatId, message);
-        return res.status(200).json({ success: true, data: { message: 'Лента автомата отправлена в бот!' } });
-    } catch (error) {
-        console.error('Ошибка генерации ленты:', error);
-        return res.status(500).json({ error: 'Ошибка генерации ленты' });
-    }
+app.get('/api/get-combination', (req, res) => {
+    const combination = [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
+    res.status(200).json({ success: true, data: { combination } });
 });
-
-app.get('/api/winning-combination', async (req, res) => {
-    try {
-        const combination = [1, 2, 3];
-        return res.status(200).json({ success: true, data: { combination } });
-    } catch (error) {
-        console.error('Ошибка получения выигрышной комбинации:', error);
-        return res.status(500).json({ error: 'Ошибка получения комбинации' });
-    }
-});
-
 
 const PORT = 8000;
 app.listen(PORT, () => {

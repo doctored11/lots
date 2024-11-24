@@ -20,6 +20,12 @@ export function SlotMashine() {
   const player = useContext(PlayerContext);
   const mashine = useContext(SlotContext);
 
+  const tg = window.Telegram?.WebApp;
+  if (tg?.initDataUnsafe?.user) {
+    const chatId = tg.initDataUnsafe.user.id;
+    console.log("Chat ID:", chatId);
+  }
+
   // тест
   const handleSendMessage = async () => {
     if (!player?.chatId) {
