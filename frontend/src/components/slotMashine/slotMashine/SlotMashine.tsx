@@ -22,13 +22,13 @@ export function SlotMashine() {
 
   // тест
   const handleSendMessage = async () => {
-    if (!player?.id) {
+    if (!player?.chatId) {
       alert("Не найден ID игрока!");
       return;
     }
 
     const response = await sendMessageToBot(
-      player.id,
+      player.chatId,
       "Запрос отправлен в бота!"
     );
     if (response.success) {
