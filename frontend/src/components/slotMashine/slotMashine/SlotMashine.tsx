@@ -76,7 +76,26 @@ export function SlotMashine() {
     }
   };
   //
-  useEffect(() => mashine?.reelUpdate(), []);
+  useEffect(() => {
+    const initializeChatId = () => {
+      const tg = window.Telegram?.WebApp;
+      if (tg?.initDataUnsafe?.user) {
+        const chatId = tg.initDataUnsafe.user.id;
+        console.log("Chat ID:", chatId);
+
+        if (player) {
+          player.setChatId(chatId);
+        } else {
+          console.error("PlayerContext не найден!");
+        }
+      } else {
+        console.error("Telegram WebApp не предоставляет данные!");
+      }
+    };
+
+    initializeChatId();
+    mashine?.reelUpdate();
+  }, [player, mashine]);
   return (
     <>
       {/* <p>Баланс: {player?.balance}</p> */}
