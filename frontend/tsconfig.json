@@ -1,4 +1,5 @@
 {
+
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
@@ -110,6 +111,8 @@
       "*": ["src/*"],
       "source/*": ["src/source/*"]
     },
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+  },
+  "include": ["src", "global.d.ts"]
+
 }

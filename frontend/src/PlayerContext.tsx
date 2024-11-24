@@ -2,6 +2,8 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 
 interface PlayerContextType {
   balance: number;
+  chatId: number | null;
+  setChatId: (chatId: number) => void;
   addBalance: (amount: number) => void;
   minusBalance: (amount: number) => boolean;
   canSpend: (amount: number) => boolean;
@@ -11,6 +13,7 @@ export const PlayerContext = createContext<PlayerContextType | undefined>(undefi
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [balance, setBalance] = useState(100); 
+  const [chatId, setChatId] = useState<number | null>(null);
 
   const addBalance = (amount: number) => {
     setBalance((prevBalance) => prevBalance + amount);
@@ -31,9 +34,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const playerContextValue: PlayerContextType = {
     balance,
+    chatId,
     addBalance,
     minusBalance,
     canSpend,
+    setChatId,
   };
 
   return <PlayerContext.Provider value={playerContextValue}>{children}</PlayerContext.Provider>;

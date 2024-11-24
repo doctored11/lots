@@ -112,6 +112,49 @@ app.get('/api/', (req, res) => {
     res.status(200).json({ message: 'API работает!' });
 });
 
+app.get('/api/get-chat-id', async (req, res) => {
+    const { queryId, userId } = req.query; 
+    if (!queryId || !userId) {
+        return res.status(400).json({ error: 'Не хватает queryId или userId' });
+    }
+
+    try {
+        
+        const chatId = userId; 
+        return res.status(200).json({ chatId });
+    } catch (error) {
+        console.error('Ошибка получения chatId:', error.message);
+        return res.status(500).json({ error: 'Ошибка получения chatId' });
+    }
+});
+
+
+app.post('/api/generate-reels', async (req, res) => {
+    try {
+        const { chatId } = req.body;
+        if (!chatId) {
+            return res.status(400).json({ error: 'chatId обязателен' });
+        }
+
+        const message = 'Лента автомата сгенерирована';
+        await bot.sendMessage(chatId, message);
+        return res.status(200).json({ success: true, data: { message: 'Лента автомата отправлена в бот!' } });
+    } catch (error) {
+        console.error('Ошибка генерации ленты:', error);
+        return res.status(500).json({ error: 'Ошибка генерации ленты' });
+    }
+});
+
+app.get('/api/winning-combination', async (req, res) => {
+    try {
+        const combination = [1, 2, 3];
+        return res.status(200).json({ success: true, data: { combination } });
+    } catch (error) {
+        console.error('Ошибка получения выигрышной комбинации:', error);
+        return res.status(500).json({ error: 'Ошибка получения комбинации' });
+    }
+});
+
 
 const PORT = 8000;
 app.listen(PORT, () => {
