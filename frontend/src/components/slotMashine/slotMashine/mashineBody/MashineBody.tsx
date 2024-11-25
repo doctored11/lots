@@ -86,7 +86,7 @@ export function MashineBody() {
       if (response.success) {
         const { combination, newBalance } = response.data;
 
-        console.log("Новая комбинация:", combination);
+        console.log("🤔Новая комбинация:", combination);
         console.log("Новый баланс:", newBalance);
 
         setSpinValues(combination.map((index: number) => index % reel.length));
