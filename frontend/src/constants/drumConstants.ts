@@ -29,7 +29,7 @@ interface RewardValuePlus {
     banana:Reward;
     blueBerrie:Reward;
   }
-  
+  //избавиться от множителей (они на бекенде)
   export const REWARDS: Rewards = {
     bomb: {
       image: "../source/bomb.png",

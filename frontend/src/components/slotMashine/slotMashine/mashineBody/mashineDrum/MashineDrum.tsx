@@ -8,7 +8,7 @@ import { Roll } from "./Roll";
 interface MashineDrumProps {
   spinValues: number[];
   reel: Array<keyof typeof REWARDS>;
-  onSpinEnd: (results: string[]) => void;
+  onSpinEnd: () => void;
   isSpinning: boolean;
 }
 
@@ -85,7 +85,7 @@ export function MashineDrum({
     );
 
     Promise.all(rollPromises).then((results) => {
-      onSpinEnd(results);
+      onSpinEnd();
 
       const winningElements: HTMLElement[] = [];
 

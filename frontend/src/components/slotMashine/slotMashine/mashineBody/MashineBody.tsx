@@ -22,21 +22,35 @@ export function MashineBody() {
   const [isSpinning, setIsSpinning] = useState(false);
   const tapeRefs = useRef<HTMLDivElement[]>([]);
 
-  function handleSpinResult(results: string[]) {
-    const finalWin = calculateWinnings(slotMashine?.betInGame || 0, results);
+  // function handleSpinResult(results: string[]) {
+  //   const finalWin = calculateWinnings(slotMashine?.betInGame || 0, results);
 
-    if (player) {
-      player.addBalance(finalWin);
-    }
+  //   if (player) {
+  //     player.addBalance(finalWin);
+  //   }
 
-    console.log(`Комбинация: ${results.join(", ")}`);
-    console.log(`Было в игре ${slotMashine?.betInGame}`);
-    console.log(`Выигрыш: ${finalWin}`);
+  //   console.log(`Комбинация: ${results.join(", ")}`);
+  //   console.log(`Было в игре ${slotMashine?.betInGame}`);
+  //   console.log(`Выигрыш: ${finalWin}`);
 
-    slotMashine?.updateSlotScore(finalWin);
-    slotMashine?.setBetInGame(0);
-    setIsSpinning(false);
-  }
+  //   slotMashine?.updateSlotScore(finalWin);
+  //   slotMashine?.setBetInGame(0);
+  //   setIsSpinning(false);
+  // }
+
+  // function handleSpinResult() {
+  //   if (player) {
+  //     player.addBalance(newBalance - player.balance);
+  //   }
+
+  //   console.log(
+  //     `Выигрыш: ${(newBalance - (player?.balance || 1), newBalance)}`
+  //   );
+
+  //   if (player) slotMashine?.updateSlotScore(newBalance - player.balance);
+  //   slotMashine?.setBetInGame(0);
+  //   setIsSpinning(false);
+  // }
 
   const mashineElement = document.getElementById("mashine");
   useEffect(() => {
@@ -54,32 +68,46 @@ export function MashineBody() {
   async function startSpin() {
     setIsSpinning(true);
 
-    const newValues = [
-      getRandomInt(0, reel.length - 1),
-      getRandomInt(0, reel.length - 1),
-      getRandomInt(0, reel.length - 1),
-    ];
-    setSpinValues(newValues);
-  }
-  async function  spin() {
-    if (!slotMashine || !player) return;
-    const betStep = slotMashine.betStep;
+    // const newValues = [
+    //   getRandomInt(0, reel.length - 1),
+    //   getRandomInt(0, reel.length - 1),
+    //   getRandomInt(0, reel.length - 1),
+    // ];
 
-    if (slotMashine.betInGame > 0) startSpin();
-
+    //тут получать данные с бекенда
+    let newValues;
     try {
-      const response = await spinSlots(player.chatId,slotMashine.betInGame , player.balance);
+      if (!player || !slotMashine) return;
+      const response = await spinSlots(
+        player.chatId,
+        slotMashine.betInGame,
+        player.balance
+      );
       if (response.success) {
-        // +потом получить отвеит и пересчитать
-        console.log("Новая комбинация:", response.data.combination);
-        console.log("Новый баланс:", response.data.newBalance);
-        console.log("Ответ от бэкенда:", response);
+        const { combination, newBalance } = response.data;
+
+        console.log("Новая комбинация:", combination);
+        console.log("Новый баланс:", newBalance);
+
+        setSpinValues(combination.map((index: number) => index % reel.length));
+        player.addBalance(newBalance - player.balance); //возможно это надо делать после всего (уже в окончании спина)
+        slotMashine.updateSlotScore(newBalance - player.balance);
       } else {
         alert("Ошибка: " + response.error);
       }
     } catch (err) {
       console.error("Ошибка спина:", err);
+    } finally {
+      setIsSpinning(false);
+      slotMashine?.setBetInGame(0);
     }
+  }
+
+  async function spin() {
+    if (!slotMashine || !player) return;
+    const betStep = slotMashine.betStep;
+
+    if (slotMashine.betInGame > 0) await startSpin();
   }
 
   return (
@@ -97,10 +125,10 @@ export function MashineBody() {
           >
             <div className={styles.dramFrame}>
               <MashineDrum
-                spinValues={spinValues}
-                reel={reel}
-                onSpinEnd={handleSpinResult}
-                isSpinning={isSpinning}
+                 spinValues={spinValues}
+                 reel={reel}
+                 onSpinEnd={() => setIsSpinning(false)}
+                 isSpinning={isSpinning}
               />
             </div>{" "}
           </div>
@@ -112,26 +140,25 @@ export function MashineBody() {
   );
 }
 
-function calculateWinnings(bet: number, results: string[]): number {
-  let totalPlus = 0;
-  let totalMultiply = 1;
+// function calculateWinnings(bet: number, results: string[]): number {
+//   let totalPlus = 0;
+//   let totalMultiply = 1;
 
-  const counts: Record<string, number> = results.reduce((acc, symbol) => {
-    acc[symbol] = (acc[symbol] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+//   const counts: Record<string, number> = results.reduce((acc, symbol) => {
+//     acc[symbol] = (acc[symbol] || 0) + 1;
+//     return acc;
+//   }, {} as Record<string, number>);
 
-  Object.entries(counts).forEach(([symbol, count]) => {
-    const rewardKey = symbol as keyof typeof REWARDS;
-    const rewardValues = REWARDS[rewardKey].values;
-    const reward = rewardValues[count as 1 | 2 | 3];
+//   Object.entries(counts).forEach(([symbol, count]) => {
+//     const rewardKey = symbol as keyof typeof REWARDS;
+//     const rewardValues = REWARDS[rewardKey].values;
+//     const reward = rewardValues[count as 1 | 2 | 3];
 
-    if (reward.type === "plus") {
-      totalPlus += reward.amount;
-    } else if (reward.type === "multiply") {
-      totalMultiply *= reward.factor;
-    }
-  });
+//     if (reward.type === "plus") {
+//       totalPlus += reward.amount;
+//     } else if (reward.type === "multiply") {
+//       totalMultiply *= reward.factor;
+//     }
+//   });
 
-  return bet * totalPlus * totalMultiply;
-}
+//   return bet * totalPlus * totalMultiply;
