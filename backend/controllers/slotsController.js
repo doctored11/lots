@@ -19,3 +19,4 @@ export const spinSlot = async (req, res) => {
   }
 };
 
+module.exports = { spinSlot };
