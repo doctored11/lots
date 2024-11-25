@@ -50,6 +50,7 @@ function calculateWinnings(bet, results) {
 
     Object.entries(counts).forEach(([symbol, count]) => {
         const rewardKey = symbol;
+        console.log("rewardKey", rewardKey)
         const rewardValues = REWARDS[rewardKey]?.values;
         const reward = rewardValues?.[count];
 
@@ -135,13 +136,13 @@ const spinSlot = async (req, res) => {
         ];
 
         console.log("________операции с балансом_______")
-        console.log("\n пришло: ",balance,bet)
+        console.log("\n пришло: ", balance, bet)
         console.log("_____")
         const winnings = calculateWinnings(bet, combination);
         const newBalance = balance - bet + winnings;
         await updateUserBalance(chatId, newBalance);
 
-        console.log("баданс обновлен",balance,bet,winnings,newBalance)
+        console.log("баданс обновлен", balance, bet, winnings, newBalance)
         console.log("пытаемся обновить слоты")
         await updateSlotGame(user.id, {
             ...slotGame,
