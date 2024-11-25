@@ -6,7 +6,7 @@ import { PlayerContext } from "../../PlayerContext";
 const { getNewMachine } = useSlotContext();
 
 export function ChangeMashine() {
-  const slot = useContext(SlotContext);
+  const slot = useSlotContext();
   const player = useContext(PlayerContext);
   const mashineView = document.getElementById("mashine");
   const shadowView = document.getElementById("shadow");
@@ -42,7 +42,11 @@ export function ChangeMashine() {
       slot.setMaxWin(0);
       slot.setColor(getRandomColor());
       // slot.reelUpdate();
-      await slot.getNewMachine(player.chatId+"", player.balance); 
+      try {
+        await slot.getNewMachine(player.chatId+"", player.balance);
+      } catch (error) {
+        console.error("Ошибка смены автомата:", error);
+      }
 
     }, cssHideAniDuration + saveDelta);
 

@@ -1,9 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { SlotMashine } from "../../components/slotMashine/slotMashine/SlotMashine";
-import {
-  SlotProvider,
-  useSlotContext,
-} from "../../components/slotMashine/slotMashine/SlotContext";
+import { SlotProvider } from "../../components/slotMashine/slotMashine/SlotContext";
 import style from "./style.module.css";
 import { BetControls } from "../../components/betControl/BetControl";
 import { Header } from "../../components/header/header";
@@ -15,26 +12,22 @@ import { PlayerContext } from "../../PlayerContext";
 export function OneHandSlotMashine() {
   const playerContext = useContext(PlayerContext);
 
-  
-
   const page = (
     <>
-      <Header></Header>
-      <div>
-        <p>TextPages-_-</p>
-        <SlotProvider>
+      <Header></Header>{" "}
+      <SlotProvider>
+        <div>
+          <p>TextPages-_-</p>
+
           <div className={style.frame}>
             <SlotMashine />
             <BetControls />
             <ChangeMashine></ChangeMashine>
           </div>
-        </SlotProvider>
-      </div>
+        </div>{" "}
+      </SlotProvider>
     </>
   );
 
   return page;
-}
-function setPlayer(arg0: (prev: any) => any) {
-  throw new Error("Function not implemented.");
 }
