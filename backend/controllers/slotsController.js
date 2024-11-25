@@ -1,5 +1,5 @@
 const { sendMessage } = require('../services/botService');
-const { startProjectOptions } = require('./options');
+
 const spinSlot = async (req, res) => {
     const { chatId, bet, balance } = req.body;
 
