@@ -2,6 +2,69 @@ const pool = require('../db');
 const { getUserByChatId, updateUserBalance } = require('../controllers/userController');
 const { sendMessage } = require('../services/botService');
 
+
+//todo вынести
+const REWARDS = {
+    bomb: { values: { 1: { type: 'plus', amount: 3 }, 2: { type: 'plus', amount: 6 }, 3: { type: 'multiply', factor: 2 } } },
+    clover: { values: { 1: { type: 'multiply', factor: 1.5 }, 2: { type: 'multiply', factor: 2 }, 3: { type: 'multiply', factor: 3 } } },
+    grape: { values: { 1: { type: 'plus', amount: 1 }, 2: { type: 'plus', amount: 2 }, 3: { type: 'multiply', factor: 10 } } },
+    mushroom: { values: { 1: { type: 'plus', amount: 2 }, 2: { type: 'plus', amount: 4 }, 3: { type: 'multiply', factor: 1.2 } } },
+    melon: {
+        values: {
+            1: { type: "plus", amount: 0.0 },
+            2: { type: "plus", amount: 0.2 },
+            3: { type: "plus", amount: 7.7 }
+        }
+    },
+    cherry: {
+        values: {
+            1: { type: "plus", amount: 0.4 },
+            2: { type: "plus", amount: 0.8 },
+            3: { type: "plus", amount: 2.2 }
+        }
+    },
+    banana: {
+        values: {
+            1: { type: "plus", amount: 0.0 },
+            2: { type: "plus", amount: 0.5 },
+            3: { type: "plus", amount: 10 }
+        }
+    },
+    blueBerrie: {
+        values: {
+            1: { type: "plus", amount: 0.1 },
+            2: { type: "plus", amount: 0.5 },
+            3: { type: "plus", amount: 16.6 }
+        }
+    },
+};
+
+function calculateWinnings(bet, results) {
+    let totalPlus = 0;
+    let totalMultiply = 1;
+
+    const counts = results.reduce((acc, symbol) => {
+        acc[symbol] = (acc[symbol] || 0) + 1;
+        return acc;
+    }, {});
+
+    Object.entries(counts).forEach(([symbol, count]) => {
+        const rewardKey = symbol;
+        const rewardValues = REWARDS[rewardKey]?.values;
+        const reward = rewardValues?.[count];
+
+        if (!reward) return;
+
+        if (reward.type === 'plus') {
+            totalPlus += reward.amount;
+        } else if (reward.type === 'multiply') {
+            totalMultiply *= reward.factor;
+        }
+    });
+
+    return Math.ceil(bet * (totalPlus || 1) * totalMultiply);
+}
+
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
@@ -30,12 +93,10 @@ async function createSlotGame(userId) {
 async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
     const reelAsJson = JSON.stringify(reel);
 
-    console.log("Обновляем Слоты: ");
+    console.log("Обновляем Слоты (SlotsController): ");
     console.log("reel:", reelAsJson);
     console.log("bet_step:", bet_step);
-    console.log("last_win:", last_win);
-    console.log("max_win:", max_win);
-    console.log("machine_lives:", machine_lives);
+
 
     await pool.query(
         'UPDATE slot_game SET reel = $1::jsonb, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
@@ -73,14 +134,16 @@ const spinSlot = async (req, res) => {
             Math.floor(Math.random() * reel.length),
         ];
 
-        const newBalance = balance - bet;
-        console.log("обновляем баланс")
+        const winnings = calculateWinnings(bet, combination);
+        const newBalance = balance - bet + winnings;
         await updateUserBalance(chatId, newBalance);
-        console.log("баданс обновлен")
+
+        console.log("баданс обновлен",balance,bet,winnings,newBalance)
         console.log("пытаемся обновить слоты")
         await updateSlotGame(user.id, {
             ...slotGame,
-            last_win: 0, // TODO: логика выигрыша
+            last_win: winnings,
+            max_win: Math.max(slotGame.max_win, winnings),
             machine_lives: slotGame.machine_lives - 1,
         });
         console.log("обновили слоты")
