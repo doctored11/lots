@@ -40,6 +40,13 @@ export const SlotContext = createContext<SlotContextType | undefined>(
   undefined
 );
 
+export const useSlotContext = () => {
+  const context = useContext(SlotContext);
+  if (!context) {
+    throw new Error("Провайдер нужен");
+  }
+  return context;
+};
 export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [betStep, setBetStep] = useState(10);
   const [betInGame, setBetInGame] = useState(0);
@@ -151,6 +158,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       console.error("Ошибка смены автомата:", error);
     }
   }
+  
   return (
     <SlotContext.Provider value={slotContextValue}>
       {children}
@@ -158,10 +166,3 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useSlotContext = () => {
-  const context = useContext(SlotContext);
-  if (!context) {
-    throw new Error("Провайдер нужен");
-  }
-  return context;
-};

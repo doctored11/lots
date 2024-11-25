@@ -3,7 +3,7 @@ import { SlotContext, useSlotContext } from "../slotMashine/slotMashine/SlotCont
 import { getRandomColor } from "../../tools/tools";
 import styles from "./changeMashine.module.css";
 import { PlayerContext } from "../../PlayerContext";
-const { getNewMachine } = useSlotContext();
+
 
 export function ChangeMashine() {
   const slot = useSlotContext();
