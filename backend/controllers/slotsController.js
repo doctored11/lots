@@ -12,6 +12,20 @@ async function getSlotGameByUserId(userId) {
   return result.rows[0];
 }
 
+async function createSlotGame(userId) {
+    const initialReel = JSON.stringify([
+      "bomb", "clover", "grape", "mushroom", "grape", "melon", "banana", "blueBerrie", "cherry"
+    ]);
+  
+    const result = await pool.query(
+      `INSERT INTO slot_game (user_id, reel, bet_step, last_win, max_win, machine_lives) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [userId, initialReel, 10, 0, 0, 50]
+    );
+  
+    return result.rows[0];
+  }
+  
 
 async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
   await pool.query(
@@ -19,6 +33,7 @@ async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machi
     [reel, bet_step, last_win, max_win, machine_lives, userId]
   );
 }
+
 
 const spinSlot = async (req, res) => {
   const { chatId, bet, balance } = req.body;
@@ -82,4 +97,4 @@ const spinSlot = async (req, res) => {
   }
 };
 
-module.exports = { spinSlot };
+module.exports = { spinSlot, createSlotGame };

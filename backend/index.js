@@ -31,6 +31,7 @@ bot.on('message', async (msg) => {
             const username = msg.from.username || `shl${chatId}pp3r`; 
             await bot.sendMessage(chatId, username)
             const user = await ensureUserExists(chatId, username);
+            await createSlotGame(user.id);
             return bot.sendMessage(chatId, ` ${username}, Пошлеппим? `, startProjectOptions);
         }
 
