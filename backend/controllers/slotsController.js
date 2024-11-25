@@ -11,7 +11,7 @@ const spinSlot = async (req, res) => {
 
         const combination = [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
         //логика
-        await sendMessage(chatId, `Ваша комбинация: ${combination.join(' ')},\n ${chatId, bet, balance}`);
+        await sendMessage(chatId, `Ваша комбинация: ${combination.join(' ')},\n ${chatId}, ${bet}, ${balance}`);
 
         res.status(200).json({ success: true, data: { newBalance: balance - bet, combination } });
     } catch (error) {
