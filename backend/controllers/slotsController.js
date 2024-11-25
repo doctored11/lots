@@ -28,6 +28,7 @@ async function createSlotGame(userId) {
 
 
 async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
+    console.log("обновляем Слоты: ",reel, bet_step, last_win, max_win, machine_lives )
     await pool.query(
         'UPDATE slot_game SET reel = $1, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
         [reel, bet_step, last_win, max_win, machine_lives, userId]
@@ -65,14 +66,16 @@ const spinSlot = async (req, res) => {
         ];
 
         const newBalance = balance - bet;
-
+        console.log("обновляем баланс")
         await updateUserBalance(chatId, newBalance);
+        console.log("баданс обновлен")
+        console.log("пытаемся обновить слоты")
         await updateSlotGame(user.id, {
             ...slotGame,
             last_win: 0, // TODO: логика выигрыша
             machine_lives: slotGame.machine_lives - 1,
         });
-
+        console.log("обновили слоты")
         res.status(200).json({
             success: true,
             data: { combination, newBalance },

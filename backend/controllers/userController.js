@@ -27,6 +27,8 @@ async function ensureUserExists(chatId, username = 'miniShl3pP3r') {
     return user;
 }
 async function updateUserBalance(chatId, balance) {
+    console.log('Обновляем баланс. Новый баланс:', balance);
+
     await pool.query('UPDATE "user" SET balance = $1 WHERE chat_id = $2', [balance, chatId]);
 }
 
