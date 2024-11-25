@@ -5,6 +5,7 @@ const { bot } = require('./services/botService');
 const slotsRoutes = require('./routes/slotsRoutes');
 const userRoutes = require('./routes/userRoutes');
 const { ensureUserExists } = require('./controllers/userController');
+const {createSlotGame} = require('./controllers/slotsController')
 
 const { startProjectOptions } = require('./options');
 
