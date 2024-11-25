@@ -134,11 +134,12 @@ const spinSlot = async (req, res) => {
             Math.floor(Math.random() * reel.length),
             Math.floor(Math.random() * reel.length),
         ];
-
+        const results = combination.map(index => reel[index]); 
+        console.log('выпавшие символы:', results);
         console.log("________операции с балансом_______")
         console.log("\n пришло: ", balance, bet)
         console.log("_____")
-        const winnings = calculateWinnings(bet, combination);
+        const winnings = calculateWinnings(bet, results);
         const newBalance = balance - bet + winnings;
         await updateUserBalance(chatId, newBalance);
 
