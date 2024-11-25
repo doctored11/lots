@@ -29,10 +29,11 @@ export function useGameAPI() {
   };
 
 
-  const changeMachine = async (chatId, bet, balance, machineCost = 50) => {
-    const body = { chatId, bet, balance, machineCost, machineLives: 50 }; 
+  const changeMachine = async (chatId, balance, machineCost = 50) => {
+    const body = { chatId, balance, machineCost };
     return await request('/api/slots/change-machine', 'POST', body);
-  };
+};
+
 
   return {
     spinSlots,

@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { REWARDS, DRUM_CHANCES } from "../../../constants/drumConstants";
 import { getRandomInt } from "../../../tools/tools";
+import { useGameAPI } from "../../../api/useLotsAPI";
 
 type DrumItem = keyof typeof DRUM_CHANCES;
 
@@ -32,6 +33,7 @@ interface SlotContextType {
   setMaxWin: (win: number) => void;
   reelUpdate: () => void;
   updateSlotScore: (win: number) => void;
+  getNewMachine: (chatId: string, balance: number) => Promise<void>;
 }
 
 export const SlotContext = createContext<SlotContextType | undefined>(
@@ -63,6 +65,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [maxWin, setMaxWin] = useState(0);
   const [color, setColor] = useState("#6294a4f0");
 
+  const { changeMachine } = useGameAPI();
+
   const slotContextValue: SlotContextType = {
     betStep,
     betInGame,
@@ -84,13 +88,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     setMaxWin,
     reelUpdate,
     updateSlotScore,
+    getNewMachine
   };
-
-  return (
-    <SlotContext.Provider value={slotContextValue}>
-      {children}
-    </SlotContext.Provider>
-  );
 
   function updateSlotScore(win: number) {
     const roundedWin = Math.round(win);
@@ -135,6 +134,28 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     setReel(newReel);
     console.log("колесико обновлено, ", elCount, newReel);
   }
+
+  async function getNewMachine(chatId: string, balance: number) {
+    try {
+      const response = await changeMachine(chatId, balance);
+      if (response.success) {
+        setReel(response.data.newReel);
+        setBetStep(10);
+        setLastWin(0);
+        setMaxWin(0);
+        console.log("Новая лента автомата:", response.data.newReel);
+      } else {
+        alert("Ошибка смены автомата: " + response.error);
+      }
+    } catch (error) {
+      console.error("Ошибка смены автомата:", error);
+    }
+  }
+  return (
+    <SlotContext.Provider value={slotContextValue}>
+      {children}
+    </SlotContext.Provider>
+  );
 };
 
 export const useSlotContext = () => {

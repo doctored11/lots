@@ -91,19 +91,19 @@ async function createSlotGame(userId) {
 }
 
 
-async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
-    const reelAsJson = JSON.stringify(reel);
+// async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
+//     const reelAsJson = JSON.stringify(reel);
 
-    console.log("Обновляем Слоты (SlotsController): ");
-    console.log("reel:", reelAsJson);
-    console.log("bet_step:", bet_step);
+//     console.log("Обновляем Слоты (SlotsController): ");
+//     console.log("reel:", reelAsJson);
+//     console.log("bet_step:", bet_step);
 
 
-    await pool.query(
-        'UPDATE slot_game SET reel = $1::jsonb, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
-        [reelAsJson, bet_step, last_win, max_win, machine_lives, userId]
-    );
-}
+//     await pool.query(
+//         'UPDATE slot_game SET reel = $1::jsonb, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
+//         [reelAsJson, bet_step, last_win, max_win, machine_lives, userId]
+//     );
+// }
 
 
 const spinSlot = async (req, res) => {
@@ -162,5 +162,53 @@ const spinSlot = async (req, res) => {
     }
 };
 
+const changeMachine = async (req, res) => {
+    const { chatId, bet, balance, machineCost } = req.body;
 
-module.exports = { spinSlot, createSlotGame };
+    try {
+        const user = await getUserByChatId(chatId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+
+        const slotGame = await getSlotGameByUserId(user.id);
+        if (!slotGame) {
+            return res.status(404).json({ success: false, error: 'Слот-машина не найдена' });
+        }
+
+        if (balance < machineCost) {
+            return res.status(400).json({ success: false, error: 'Недостаточно средств для смены автомата' });
+        }
+
+        const newReel = [
+            "bomb", "clover", "grape", "mushroom", "melon", 
+            "banana", "blueBerrie", "cherry"
+        ].sort(() => Math.random() - 0.5);
+
+        const newBalance = balance - machineCost;
+
+        await updateUserBalance(chatId, newBalance);
+
+        await updateSlotGame(user.id, {
+            ...slotGame,
+            reel: newReel,
+            machine_lives: 50,
+        });
+
+        res.status(200).json({
+            success: true,
+            data: {
+                newReel,
+                newBalance,
+            },
+        });
+    } catch (error) {
+        console.error('Ошибка в changeMachine:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+
+
+
+module.exports = { spinSlot, createSlotGame, changeMachine };

@@ -1,17 +1,20 @@
 import React, { useContext } from "react";
-import { SlotContext } from "../slotMashine/slotMashine/SlotContext";
+import { SlotContext, useSlotContext } from "../slotMashine/slotMashine/SlotContext";
 import { getRandomColor } from "../../tools/tools";
 import styles from "./changeMashine.module.css";
+import { PlayerContext } from "../../PlayerContext";
+const { getNewMachine } = useSlotContext();
 
 export function ChangeMashine() {
   const slot = useContext(SlotContext);
+  const player = useContext(PlayerContext);
   const mashineView = document.getElementById("mashine");
   const shadowView = document.getElementById("shadow");
   const cssHideAniDuration = 2_000; //мс
   const cssShowAniDuration = 1_200; //мс
   const saveDelta = 100;
 
-  if (!slot) return;
+  if (!slot || !player) return null;
   const handleChangeMashine = () => {
     if (slot.betInGame > 0) return;
 
@@ -33,12 +36,14 @@ export function ChangeMashine() {
       shadowView?.classList.add(styles.shadowAppearance);
     }, cssHideAniDuration + 2 * saveDelta);
 
-    setTimeout(() => {
+    setTimeout(async() => {
       slot.setBetStep(10);
       slot.setLastWin(0);
       slot.setMaxWin(0);
       slot.setColor(getRandomColor());
-      slot.reelUpdate();
+      // slot.reelUpdate();
+      await slot.getNewMachine(player.chatId+"", player.balance); 
+
     }, cssHideAniDuration + saveDelta);
 
     setTimeout(() => {
