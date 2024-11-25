@@ -28,10 +28,18 @@ async function createSlotGame(userId) {
 
 
 async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
-    console.log("обновляем Слоты: ",reel, bet_step, last_win, max_win, machine_lives )
+    const reelAsJson = JSON.stringify(reel);
+
+    console.log("Обновляем Слоты: ");
+    console.log("reel:", reelAsJson);
+    console.log("bet_step:", bet_step);
+    console.log("last_win:", last_win);
+    console.log("max_win:", max_win);
+    console.log("machine_lives:", machine_lives);
+
     await pool.query(
-        'UPDATE slot_game SET reel = $1, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
-        [reel, bet_step, last_win, max_win, machine_lives, userId]
+        'UPDATE slot_game SET reel = $1::jsonb, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
+        [reelAsJson, bet_step, last_win, max_win, machine_lives, userId]
     );
 }
 
@@ -52,7 +60,7 @@ const spinSlot = async (req, res) => {
         console.log('slotGame:', slotGame);
         console.log('reel field:', slotGame.reel);
 
-       
+
 
         const reel = slotGame.reel;
 
