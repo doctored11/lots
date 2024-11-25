@@ -8,10 +8,7 @@ import style from "./style.module.css";
 import { BetControls } from "../../components/betControl/BetControl";
 import { Header } from "../../components/header/header";
 import { ChangeMashine } from "../../components/changeMashine/ChangeMashine";
-import {
-  sendMessageToBot,
-  getWinningCombination,
-} from "../../api/api";
+
 import { PlayerContext } from "../../PlayerContext";
 // import "../../../global"
 

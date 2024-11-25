@@ -7,10 +7,12 @@ import { SlotContext } from "../SlotContext";
 import { PlayerContext } from "../../../../PlayerContext";
 import { HandBtn } from "./hendBtn/HandBtn";
 import { MashineFooter } from "./mashineFooter/MashineFooter";
+import { useGameAPI } from "../../../../api/useLotsAPI";
 
 export function MashineBody() {
   const slotMashine = useContext(SlotContext);
   const player = useContext(PlayerContext);
+  const { spinSlots, loading, error } = useGameAPI();
 
   const itemHeight = 128;
 
@@ -59,20 +61,24 @@ export function MashineBody() {
     ];
     setSpinValues(newValues);
   }
-  function spin() {
+  async function  spin() {
     if (!slotMashine || !player) return;
     const betStep = slotMashine.betStep;
 
     if (slotMashine.betInGame > 0) startSpin();
-    // if (player.canSpend(betStep)) {
-    //   if (player.minusBalance(betStep)) {
-    //     slotMashine.setBetInGame(betStep);
 
-    //     startSpin();
-    //   }
-    // } else {
-    //   alert("Без гроша и жизнь плоха, или как там в оригинале...");
-    // }
+    try {
+      const response = await spinSlots(player.chatId, betStep, player.balance);
+      if (response.success) {
+        // +потом получить отвеит и пересчитать
+        console.log("Новая комбинация:", response.data.combination);
+        console.log("Новый баланс:", response.data.newBalance);
+      } else {
+        alert("Ошибка: " + response.error);
+      }
+    } catch (err) {
+      console.error("Ошибка спина:", err);
+    }
   }
 
   return (

@@ -1,115 +1,37 @@
-const TelegramApi = require('node-telegram-bot-api');
+
 const express = require('express');
 const cors = require('cors');
+const { bot } = require('./services/botService');
+const slotsRoutes = require('./routes/slotsRoutes'); 
+const { startProjectOptions } = require('./options'); 
 
-const token = '7692071006:AAEd1K_CTanWLJ6uhsehjsFeBmk1B1emlbw';
-const { gameOptions, againOptions, startProjectOptions } = require('./options.js');
-
-const bot = new TelegramApi(token, { polling: true });
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 
+app.use('/api/slots', slotsRoutes);
+
 bot.setMyCommands([
-    { command: '/start', description: 'начальное приветствие' },
-    { command: '/info', description: 'информация' },
-    { command: '/game', description: 'тестовая игра' },
+  { command: '/start', description: 'Начальное приветствие' },
+  { command: '/info', description: 'Информация' },
+  { command: '/game', description: 'Тестовая игра' },
 ]);
 
-const chats = {};
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+  const text = msg.text;
 
-const startGame = async (chatId) => {
-    await bot.sendMessage(chatId, "Я загадал число от 0 до 9 - отгадай)");
-    const randomNum = Math.floor(Math.random() * 10);
-    chats[chatId] = randomNum;
-    await bot.sendMessage(chatId, 'давай выбирай', gameOptions);
-};
-
-const start = async () => {
-    bot.on('message', async (msg) => {
-        const text = msg.text;
-        const chatId = msg.chat.id;
-
-        try {
-            if (text === '/again') {
-                return startGame(chatId);
-            }
-            if (text === '/start') {
-                return bot.sendMessage(chatId, "ну привет, формошлеп! ", startProjectOptions);
-            }
-            if (text === '/info') {
-
-                return bot.sendMessage(chatId, `Привет, ${msg.from.first_name}`);
-            }
-            if (text === '/game') {
-                await bot.sendMessage(chatId, `Игрем, ${msg.from.first_name}?`);
-                return startGame(chatId);
-            }
-            console.log(msg);
-            return bot.sendMessage(chatId, `Ты написал мне: ${text}?`);
-        } catch (e) {
-            bot.sendMessage(chatId, '🛑 Что-то пошло не по плану: ' + e.message);
-        }
-    });
-
-    bot.on('callback_query', async (msg) => {
-        const data = msg.data;
-        const chatId = msg.message.chat.id;
-
-        if (data === '/again') {
-            return startGame(chatId);
-        }
-        if (data == chats[chatId]) {
-            await bot.sendMessage(chatId, 'Угадал! 🎉', againOptions);
-        } else {
-            await bot.sendMessage(chatId, `Не угадал. 😢 Правильный ответ: ${chats[chatId]}`, againOptions);
-        }
-    });
-};
-
-app.post('/web-data', async (req, res) => {
-    console.log(' -_- Получен запрос в /web-data:', req.body);
-
-    try {
-        const { queryId } = req.body;
-        if (!queryId) {
-            console.log('Ошибка: отсутствует queryId');
-            return res.status(400).json({ error: 'queryId обязателен' });
-        }
-
-        console.log('Обработан queryId:', queryId);
-        return res.status(200).json({ success: true, message: 'Данные обработаны!' });
-    } catch (e) {
-        console.error('Ошибка в обработке /web-data:', e.message);
-        return res.status(500).json({ error: 'Ошибка обработки данных' });
+  try {
+    if (text === '/start') {
+      return bot.sendMessage(chatId, "Пошлеппим?", startProjectOptions);
     }
-});
-
-app.post('/api/send-message', async (req, res) => {
-    const { chatId, message } = req.body;
-
-    if (!chatId || !message) {
-        return res.status(400).json({ success: false, error: "chatId и message обязательны" });
-    }
-
-    try {
-        await bot.sendMessage(chatId, message);
-        res.status(200).json({ success: true });
-    } catch (error) {
-        console.error("Ошибка отправки сообщения:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-
-app.get('/api/get-combination', (req, res) => {
-    const combination = [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
-    res.status(200).json({ success: true, data: { combination } });
+    
+  } catch (e) {
+    bot.sendMessage(chatId, 'Ошибка: ' + e.message);
+  }
 });
 
 const PORT = 8000;
 app.listen(PORT, () => {
-    console.log("Сервер запущен на порту _:", PORT);
-    start();
+  console.log(`Сервер запущен на порту ${PORT}`);
 });
