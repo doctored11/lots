@@ -1,9 +1,23 @@
+const pool = require('../db'); 
 const { getUserByChatId, updateUserBalance } = require('../controllers/userController');
-const { getSlotGameByUserId, updateSlotGame } = require('../models/slot_games');
 const { sendMessage } = require('../services/botService');
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
+}
+
+
+async function getSlotGameByUserId(userId) {
+  const result = await pool.query('SELECT * FROM slot_game WHERE user_id = $1', [userId]);
+  return result.rows[0];
+}
+
+
+async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
+  await pool.query(
+    'UPDATE slot_game SET reel = $1, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
+    [reel, bet_step, last_win, max_win, machine_lives, userId]
+  );
 }
 
 const spinSlot = async (req, res) => {
@@ -46,13 +60,13 @@ const spinSlot = async (req, res) => {
 
     await updateSlotGame(user.id, {
       ...slotGame,
-      last_win: 0, // todo логика выигрыша
-      machine_lives: slotGame.machine_lives - 1, 
+      last_win: 0, // TODO: Логика выигрыша
+      machine_lives: slotGame.machine_lives - 1,
     });
 
     await sendMessage(
       chatId,
-      ` комбинация: ${combination.join(' ')}.\n новый баланс: ${newBalance}.`
+      `Комбинация: ${combination.join(' ')}.\nНовый баланс: ${newBalance}.`
     );
 
     res.status(200).json({
