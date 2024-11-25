@@ -106,8 +106,7 @@ export function MashineDrum({
         });
       }, 500);
     });
-  }, [isSpinning, spinValues, reel, onSpinEnd]);
-
+  }, [isSpinning, spinValues])
   return (
     <div className={style.slotDrum} ref={slotDrumRef}>
       {spinValues.map((_, index) => (
