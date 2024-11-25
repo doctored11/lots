@@ -7,6 +7,7 @@ export function rollSpin(
   spins: number,
   targetEl: number
 ): Promise<void> {
+  console.log("roll spint target = ",targetEl)
   return new Promise(async (resolve) => {
     if (spins < 3) spins = 3;
     initialSpeed = Math.max(initialSpeed, spins * 2);

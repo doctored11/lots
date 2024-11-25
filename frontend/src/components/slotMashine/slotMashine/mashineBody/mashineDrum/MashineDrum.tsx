@@ -72,7 +72,7 @@ export function MashineDrum({
 
     
     setCurrentItemHeight(itemHeight);
-   
+   console.log("👨‍🦼‍➡️ drum ",spinValues)
 
     const rollPromises = spinValues.map((value, index) =>
       rollSpin(
