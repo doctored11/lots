@@ -90,6 +90,7 @@ export function MashineBody() {
         console.log("Новый баланс:", newBalance);
 
         setSpinValues(combination);
+
         player.addBalance(newBalance - player.balance); //возможно это надо делать после всего (уже в окончании спина)
         slotMashine.updateSlotScore(newBalance - player.balance);
       } else {
@@ -98,7 +99,7 @@ export function MashineBody() {
     } catch (err) {
       console.error("Ошибка спина:", err);
     } finally {
-      setIsSpinning(false);
+      // setIsSpinning(false);
       slotMashine?.setBetInGame(0);
     }
   }
