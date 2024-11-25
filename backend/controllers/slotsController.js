@@ -53,7 +53,8 @@ const spinSlot = async (req, res) => {
 
        
 
-        const reel = typeof slotGame.reel == 'string' ? JSON.parse(slotGame.reel) : slotGame.reel;
+        const reel = slotGame.reel;
+
 
         console.log('Reel:', reel);
 
