@@ -50,7 +50,7 @@ function calculateWinnings(bet, results) {
 
     Object.entries(counts).forEach(([symbol, count]) => {
         const rewardKey = symbol;
-        console.log("rewardKey", rewardKey)
+        console.log("rewardKey", rewardKey,REWARDS[rewardKey]?.values)
         const rewardValues = REWARDS[rewardKey]?.values;
         const reward = rewardValues?.[count];
 
