@@ -84,7 +84,7 @@ export function MashineDrum({
       ).then(() => reel[value])
     );
 
-    Promise.all(rollPromises).then((results) => {
+    Promise.all(rollPromises).then(() => {
       onSpinEnd();
 
       const winningElements: HTMLElement[] = [];
@@ -106,7 +106,7 @@ export function MashineDrum({
         });
       }, 500);
     });
-  }, [isSpinning, spinValues])
+  }, [spinValues])
   return (
     <div className={style.slotDrum} ref={slotDrumRef}>
       {spinValues.map((_, index) => (
