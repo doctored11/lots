@@ -89,7 +89,7 @@ export function MashineBody() {
         console.log("🤔Новая комбинация:", combination);
         console.log("Новый баланс:", newBalance);
 
-        setSpinValues(combination.map((index: number) => index % reel.length));
+        setSpinValues(combination);
         player.addBalance(newBalance - player.balance); //возможно это надо делать после всего (уже в окончании спина)
         slotMashine.updateSlotScore(newBalance - player.balance);
       } else {
