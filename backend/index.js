@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const { bot } = require('./services/botService');
 const slotsRoutes = require('./routes/slotsRoutes'); 
+const userRoutes = require('./routes/userRoutes');
+const { ensureUserExists } = require('./controllers/userController');
+
 const { startProjectOptions } = require('./options'); 
 
 const app = express();
@@ -10,6 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/slots', slotsRoutes);
+app.use('/api/user', userRoutes);
 
 bot.setMyCommands([
   { command: '/start', description: 'Начальное приветствие' },
@@ -23,7 +27,9 @@ bot.on('message', async (msg) => {
 
   try {
     if (text === '/start') {
-      return bot.sendMessage(chatId, "Пошлеппим?", startProjectOptions);
+        const username = msg.from.username || `shl${chatId}pp3r`;
+        const user = await ensureUserExists(chatId, username);
+      return bot.sendMessage(chatId, ` ${username}, Пошлеппим? `, startProjectOptions);
     }
     
   } catch (e) {

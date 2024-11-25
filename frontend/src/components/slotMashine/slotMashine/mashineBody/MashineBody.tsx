@@ -68,11 +68,12 @@ export function MashineBody() {
     if (slotMashine.betInGame > 0) startSpin();
 
     try {
-      const response = await spinSlots(player.chatId, betStep, player.balance);
+      const response = await spinSlots(player.chatId,slotMashine.betInGame , player.balance);
       if (response.success) {
         // +потом получить отвеит и пересчитать
         console.log("Новая комбинация:", response.data.combination);
         console.log("Новый баланс:", response.data.newBalance);
+        console.log("Ответ от бэкенда:", response);
       } else {
         alert("Ошибка: " + response.error);
       }
