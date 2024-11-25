@@ -50,7 +50,7 @@ function calculateWinnings(bet, results) {
 
     Object.entries(counts).forEach(([symbol, count]) => {
         const rewardKey = symbol;
-        console.log("rewardKey", rewardKey,REWARDS[rewardKey]?.values)
+        console.log("rewardKey", rewardKey, REWARDS[rewardKey]?.values)
         const rewardValues = REWARDS[rewardKey]?.values;
         const reward = rewardValues?.[count];
 
@@ -66,8 +66,8 @@ function calculateWinnings(bet, results) {
     return Math.ceil(bet * (totalPlus || 1) * totalMultiply);
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 
@@ -91,20 +91,87 @@ async function createSlotGame(userId) {
 }
 
 
-// async function updateSlotGame(userId, { reel, bet_step, last_win, max_win, machine_lives }) {
-//     const reelAsJson = JSON.stringify(reel);
 
-//     console.log("Обновляем Слоты (SlotsController): ");
-//     console.log("reel:", reelAsJson);
-//     console.log("bet_step:", bet_step);
+async function updateSlotState(userId, state) {
+    const { reel, bet_step, last_win, max_win, machine_lives } = state;
+    const reelAsJson = JSON.stringify(reel);
 
+    console.log("Обновляем состояние автомата (SlotsController): ");
+    console.log("reel:", reelAsJson);
+    console.log("bet_step:", bet_step);
 
-//     await pool.query(
-//         'UPDATE slot_game SET reel = $1::jsonb, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
-//         [reelAsJson, bet_step, last_win, max_win, machine_lives, userId]
-//     );
-// }
+    await pool.query(
+        'UPDATE slot_game SET reel = $1::jsonb, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
+        [reelAsJson, bet_step, last_win, max_win, machine_lives, userId]
+    );
+}
 
+function generateNewReel() {
+    const DRUM_CHANCES = {
+        bomb: {
+            priority: 2,
+            maxCount: 1
+        },
+        clover: {
+            priority: 3,
+            maxCount: 2
+        },
+        grape: {
+            priority: 10,
+            maxCount: 3
+        },
+        mushroom: {
+            priority: 6,
+            maxCount: 4
+        },
+        melon: {
+            priority: 6,
+            maxCount: 2
+        },
+        cherry: {
+            priority: 4,
+            maxCount: 2
+        },
+        banana: {
+            priority: 4,
+            maxCount: 2
+        },
+        blueBerrie: {
+            priority: 1,
+            maxCount: 1
+        },
+    };
+
+    const newReel = [];
+    const weightedItems = [];
+
+    Object.entries(DRUM_CHANCES).forEach(([item, { priority, maxCount }]) => {
+        for (let i = 0; i < priority; i++) {
+            weightedItems.push(item);
+        }
+    });
+
+    weightedItems.sort(() => Math.random() - 0.5);
+
+    const itemCount = {};
+    Object.keys(DRUM_CHANCES).forEach(key => {
+        itemCount[key] = 0;
+    });
+
+    const elCount = getRandomInt(5, 8);
+    while (newReel.length < elCount) {
+        const randomIndex = getRandomInt(0, weightedItems.length - 1);
+        const selectedItem = weightedItems[randomIndex];
+
+        if (itemCount[selectedItem] < DRUM_CHANCES[selectedItem].maxCount) {
+            newReel.push(selectedItem);
+            itemCount[selectedItem] = (itemCount[selectedItem] || 0) + 1;
+        }
+    }
+    console.log("колесико обновлено, ", elCount, newReel);
+    return newReel;
+
+}
 
 const spinSlot = async (req, res) => {
     const { chatId, bet, balance } = req.body;
@@ -134,7 +201,7 @@ const spinSlot = async (req, res) => {
             Math.floor(Math.random() * reel.length),
             Math.floor(Math.random() * reel.length),
         ];
-        const results = combination.map(index => reel[index]); 
+        const results = combination.map(index => reel[index]);
         console.log('выпавшие символы:', results);
         console.log("________операции с балансом_______")
         console.log("\n пришло: ", balance, bet)
@@ -145,7 +212,7 @@ const spinSlot = async (req, res) => {
 
         console.log("баданс обновлен", balance, bet, winnings, newBalance)
         console.log("пытаемся обновить слоты")
-        await updateSlotGame(user.id, {
+        await updateSlotState(user.id, {
             ...slotGame,
             last_win: winnings,
             max_win: Math.max(slotGame.max_win, winnings),
@@ -180,16 +247,13 @@ const changeMachine = async (req, res) => {
             return res.status(400).json({ success: false, error: 'Недостаточно средств для смены автомата' });
         }
 
-        const newReel = [
-            "bomb", "clover", "grape", "mushroom", "melon", 
-            "banana", "blueBerrie", "cherry"
-        ].sort(() => Math.random() - 0.5);
+        const newReel = generateNewReel();
 
         const newBalance = balance - machineCost;
 
         await updateUserBalance(chatId, newBalance);
 
-        await updateSlotGame(user.id, {
+        await updateSlotState(user.id, {
             ...slotGame,
             reel: newReel,
             machine_lives: 50,
