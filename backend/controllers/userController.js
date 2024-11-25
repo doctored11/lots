@@ -9,7 +9,7 @@ async function getUserByChatId(chatId) {
 
 async function createUser(chatId, username) {
     const result = await pool.query(
-        'INSERT INTO user (chat_id, username) VALUES ($1, $2) RETURNING *',
+        'INSERT INTO "user" (chat_id, username) VALUES ($1, $2) RETURNING *',
         [chatId, username]
     );
     return result.rows[0];
