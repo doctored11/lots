@@ -22,35 +22,6 @@ export function MashineBody() {
   const [isSpinning, setIsSpinning] = useState(false);
   const tapeRefs = useRef<HTMLDivElement[]>([]);
 
-  // function handleSpinResult(results: string[]) {
-  //   const finalWin = calculateWinnings(slotMashine?.betInGame || 0, results);
-
-  //   if (player) {
-  //     player.addBalance(finalWin);
-  //   }
-
-  //   console.log(`Комбинация: ${results.join(", ")}`);
-  //   console.log(`Было в игре ${slotMashine?.betInGame}`);
-  //   console.log(`Выигрыш: ${finalWin}`);
-
-  //   slotMashine?.updateSlotScore(finalWin);
-  //   slotMashine?.setBetInGame(0);
-  //   setIsSpinning(false);
-  // }
-
-  // function handleSpinResult() {
-  //   if (player) {
-  //     player.addBalance(newBalance - player.balance);
-  //   }
-
-  //   console.log(
-  //     `Выигрыш: ${(newBalance - (player?.balance || 1), newBalance)}`
-  //   );
-
-  //   if (player) slotMashine?.updateSlotScore(newBalance - player.balance);
-  //   slotMashine?.setBetInGame(0);
-  //   setIsSpinning(false);
-  // }
 
   const mashineElement = document.getElementById("mashine");
   useEffect(() => {
@@ -68,14 +39,7 @@ export function MashineBody() {
   async function startSpin() {
     setIsSpinning(true);
 
-    // const newValues = [
-    //   getRandomInt(0, reel.length - 1),
-    //   getRandomInt(0, reel.length - 1),
-    //   getRandomInt(0, reel.length - 1),
-    // ];
 
-    //тут получать данные с бекенда
-    let newValues;
     try {
       if (!player || !slotMashine) return;
       const response = await spinSlots(
@@ -91,6 +55,8 @@ export function MashineBody() {
 
         setSpinValues(combination);
 
+
+        // todo делать это через ~100мс после решение промисов прокрутки
         player.addBalance(newBalance - player.balance); //возможно это надо делать после всего (уже в окончании спина)
         slotMashine.updateSlotScore(newBalance - player.balance);
       } else {
@@ -140,26 +106,3 @@ export function MashineBody() {
     </div>
   );
 }
-
-// function calculateWinnings(bet: number, results: string[]): number {
-//   let totalPlus = 0;
-//   let totalMultiply = 1;
-
-//   const counts: Record<string, number> = results.reduce((acc, symbol) => {
-//     acc[symbol] = (acc[symbol] || 0) + 1;
-//     return acc;
-//   }, {} as Record<string, number>);
-
-//   Object.entries(counts).forEach(([symbol, count]) => {
-//     const rewardKey = symbol as keyof typeof REWARDS;
-//     const rewardValues = REWARDS[rewardKey].values;
-//     const reward = rewardValues[count as 1 | 2 | 3];
-
-//     if (reward.type === "plus") {
-//       totalPlus += reward.amount;
-//     } else if (reward.type === "multiply") {
-//       totalMultiply *= reward.factor;
-//     }
-//   });
-
-//   return bet * totalPlus * totalMultiply;

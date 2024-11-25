@@ -1,7 +1,8 @@
 const pool = require('../db');
 const { getUserByChatId, updateUserBalance } = require('../controllers/userController');
 const { sendMessage } = require('../services/botService');
-
+// todo - разделить все тут
+// global todo - синхронизировать первую стартовую игровую машину
 
 //todo вынести
 const REWARDS = {
