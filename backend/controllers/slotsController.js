@@ -303,6 +303,7 @@ const changeMachine = async (req, res) => {
         }
 
         if (currentBalance - machineCost < 0 ) {
+            console.log("недостаточно на смену автомата")
             return res.status(400).json({ success: false, error: 'Недостаточно средств для смены автомата' });
         }
 
