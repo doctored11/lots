@@ -6,10 +6,10 @@ const { sendMessage } = require('../services/botService');
 
 //todo вынести
 const REWARDS = {
-    bomb: { values: { 1: { type: 'plus', amount: 3 }, 2: { type: 'plus', amount: 6 }, 3: { type: 'multiply', factor: 2 } } },
-    clover: { values: { 1: { type: 'multiply', factor: 1.5 }, 2: { type: 'multiply', factor: 2 }, 3: { type: 'multiply', factor: 3 } } },
-    grape: { values: { 1: { type: 'plus', amount: 1 }, 2: { type: 'plus', amount: 2 }, 3: { type: 'multiply', factor: 10 } } },
-    mushroom: { values: { 1: { type: 'plus', amount: 2 }, 2: { type: 'plus', amount: 4 }, 3: { type: 'multiply', factor: 1.2 } } },
+    bomb: { values: { 1: { type: 'plus', amount: 0.3 }, 2: { type: 'plus', amount: 0.8 }, 3: { type: 'multiply', factor: 8.8 } } },
+    clover: { values: { 1: { type: 'multiply', factor: 3 }, 2: { type: 'multiply', factor: 7 }, 3: { type: "plus", amount: 72 } } },
+    grape: { values: { 1: { type: 'plus', amount: 0.1 }, 2: { type: 'plus', amount: 0.2 }, 3: { type: 'plus', amount: 5.5 } } },
+    mushroom: { values: { 1: { type: 'plus', amount: 0.1 }, 2: { type: 'plus', amount: 0.4 }, 3: { type: "plus", amount: 4  } } },
     melon: {
         values: {
             1: { type: "plus", amount: 0.0 },
