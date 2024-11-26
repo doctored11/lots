@@ -276,7 +276,7 @@ const changeMachine = async (req, res) => {
 
         const slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
-            slotGame = await createSlotGame(user.id); // Создать автомат, если его нет
+            slotGame = await createSlotGame(user.id); 
         }
 
         if (balance < machineCost) {
