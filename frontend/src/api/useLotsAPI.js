@@ -46,6 +46,7 @@ export function useGameAPI() {
 
   
   const spinSlots = async (chatId, bet, balance) => {
+    console.log('⚙️ Данные для спина автомата:', { chatId, balance, machineCost });
     const body = { chatId, bet, balance };
     return await request('/api/slots/spin', 'POST', body);
   };
