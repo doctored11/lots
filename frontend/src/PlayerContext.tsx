@@ -53,7 +53,18 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const canSpend = (amount: number) => balance >= amount;
 
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+    if (tg?.initDataUnsafe?.user) {
+      const chatId = tg.initDataUnsafe.user.id;
+      console.log("Инициализация chatId:", chatId);
+      setChatId(chatId + "");
+    } else {
+      console.error("Ошибка инициализации Telegram WebApp");
+    }
+  }, []);
   
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);

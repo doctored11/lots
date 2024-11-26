@@ -132,7 +132,11 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    initializeSlot();
+    if (chatId) {
+      initializeSlot();
+    }else{
+      console.log("нет chatId в SlotContext")
+    }
   }, []);
 
   function updateSlotScore(win: number) {
