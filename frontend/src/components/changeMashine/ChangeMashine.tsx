@@ -36,6 +36,7 @@ export function ChangeMashine() {
 
     try {
       const response = await slot.getNewMachine(player.chatId + "", player.balance);
+      console.log("ОТвет на смену машины: ",response)
       if (response.success  && response.data) {
         setPendingResponse({
           newReel: response.data.newReel,
@@ -43,9 +44,11 @@ export function ChangeMashine() {
         });
       } else {
         console.error("Ошибка смены автомата: " + response.error);
+        restorePreviousState();
       }
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
+      restorePreviousState();
       
     }
     
@@ -66,6 +69,8 @@ export function ChangeMashine() {
         slot.setColor(getRandomColor());
         player.setBalance(pendingResponse.newBalance); 
         console.log("Новая лента автомата:", pendingResponse.newReel);
+      }else {
+        restorePreviousState();
       }
       
     }, cssHideAniDuration + saveDelta);
@@ -76,5 +81,13 @@ export function ChangeMashine() {
     }, cssHideAniDuration + cssShowAniDuration + saveDelta);
   };
 
+
+  function restorePreviousState() {
+    console.warn("🤡 Восстанавленно предыдущее состояние автомата ",slot.reel);
+    slot.setReel(slot.reel);
+    slot.setBetStep(10);
+    slot.setLastWin(0);
+    slot.setMaxWin(0);
+  }
   return <button onClick={handleChangeMashine}>Change Slot Machine</button>;
 }
