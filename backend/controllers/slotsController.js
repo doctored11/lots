@@ -78,6 +78,12 @@ async function getSlotGameByUserId(userId) {
 }
 
 async function createSlotGame(userId) {
+    const existingSlot = await getSlotGameByUserId(userId);
+    if (existingSlot) {
+        console.log('Слот уже существует для пользователя:', userId);
+        return existingSlot;
+    }
+
     const initialReel = JSON.stringify([
         "bomb", "clover", "grape", "mushroom", "grape", "melon", "banana", "blueBerrie", "cherry"
     ]);
@@ -269,7 +275,6 @@ const changeMachine = async (req, res) => {
     const { chatId, balance, machineCost } = req.body;
     console.log('запрос на смену автомата:', req.body);
 
-
     if (!chatId || typeof balance === 'undefined' || typeof machineCost === 'undefined') {
         return res.status(400).json({ success: false, error: 'Чего то не хватает' });
     }
@@ -280,9 +285,10 @@ const changeMachine = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Пользователь не найден' });
         }
 
-        const slotGame = await getSlotGameByUserId(user.id);
+        let slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
-            slotGame = await createSlotGame(user.id); 
+           
+            slotGame = await createSlotGame(user.id);
         }
 
         if (balance < machineCost) {
@@ -290,7 +296,6 @@ const changeMachine = async (req, res) => {
         }
 
         const newReel = generateNewReel();
-
         const newBalance = balance - machineCost;
 
         await updateUserBalance(chatId, newBalance);
@@ -313,6 +318,7 @@ const changeMachine = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 
 
