@@ -57,7 +57,7 @@ export function useGameAPI() {
   };
 
   const changeMachine = async (chatId, balance, machineCost = 50) => {
-    const body = { chatId, balance, machineCost };
+    const body =  JSON.stringify({ chatId, balance, machineCost });
     return await request('/api/slots/change-machine', 'POST', body);
 };
 

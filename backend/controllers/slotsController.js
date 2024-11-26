@@ -266,7 +266,13 @@ const spinSlot = async (req, res) => {
 };
 
 const changeMachine = async (req, res) => {
-    const { chatId, bet, balance, machineCost } = req.body;
+    const { chatId, balance, machineCost } = req.body;
+    console.log('запрос на смену автомата:', req.body);
+
+
+    if (!chatId || typeof balance === 'undefined' || typeof machineCost === 'undefined') {
+        return res.status(400).json({ success: false, error: 'Чего то не хватает' });
+    }
 
     try {
         const user = await getUserByChatId(chatId);
