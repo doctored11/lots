@@ -7,6 +7,7 @@ import { getRandomColor } from "../../tools/tools";
 import styles from "./changeMashine.module.css";
 import { PlayerContext } from "../../PlayerContext";
 import { REWARDS } from "../../constants/drumConstants";
+import { useMashineLogic } from "components/slotMashine/slotMashine/mashineBody/useMashineLogic";
 
 export function ChangeMashine() {
   const slot = useSlotContext();
@@ -17,14 +18,14 @@ export function ChangeMashine() {
   const cssShowAniDuration = 1_200; //мс
   const saveDelta = 100;
 
-  const [pendingResponse, setPendingResponse] = useState<{
-    newReel: Array<keyof typeof REWARDS>;
-    newBalance: number;
-  } | null>(null);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const { isSpinning } = useMashineLogic();
 
   if (!slot || !player) return null;
   const handleChangeMashine = async () => {
-    if (slot.betInGame > 0) return;
+    if (isDisabled || slot.betInGame > 0 || isSpinning) return;
+
+    setIsDisabled(true);
 
     shadowView?.classList.add(styles.shadow);
     if (mashineView) {
@@ -52,6 +53,8 @@ export function ChangeMashine() {
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
       restorePreviousState();
+    } finally {
+      setIsDisabled(false);
     }
 
     setTimeout(() => {
@@ -63,7 +66,7 @@ export function ChangeMashine() {
     }, cssHideAniDuration + 2 * saveDelta);
 
     setTimeout(async () => {
-      if (newReel.length >0 && newBalance) {
+      if (newReel.length > 0 && newBalance) {
         slot.setReel(newReel);
         slot.setBetStep(10);
         slot.setLastWin(0);
@@ -90,5 +93,13 @@ export function ChangeMashine() {
     slot.setMaxWin(slot.maxWin);
     slot.setColor(slot.color);
   }
-  return <button onClick={handleChangeMashine}>Change Slot Machine</button>;
+  return (
+    <button
+      onClick={handleChangeMashine}
+      disabled={isDisabled || isSpinning}
+      className={styles.button}
+    >
+      {"Change Slot Machine"}
+    </button>
+  );
 }

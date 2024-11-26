@@ -14,7 +14,7 @@ export function useMashineLogic() {
 
   async function startSpin() {
     try {
-      if (!player || !slotMashine) return;
+      if (!player || !slotMashine ||isSpinning) return;
       setIsSpinning(true);
       const response = await spinSlots(
         player.chatId,
