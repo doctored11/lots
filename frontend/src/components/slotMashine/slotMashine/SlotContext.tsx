@@ -205,7 +205,12 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     error?: string;
   }> {
     try {
+      console.log(" запрос на смену автомата:", {
+        chatId,
+        balance,
+      });
       const response = await changeMachine(chatId, balance);
+      console.log("Ответ от сервера при смене автомата:", response);
       if (response.success) {
         console.log(" - получили новую ленту:", response.data.newReel);
         return response;
