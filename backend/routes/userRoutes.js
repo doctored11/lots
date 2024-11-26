@@ -6,6 +6,7 @@ const {
     getUserInfo,
     getUserBalance,
     deleteUser,
+    ensureUserExists, 
 } = require('../controllers/userController');
 
 router.get('/', async (req, res) => {
