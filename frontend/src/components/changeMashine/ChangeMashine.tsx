@@ -7,7 +7,7 @@ import { getRandomColor } from "../../tools/tools";
 import styles from "./changeMashine.module.css";
 import { PlayerContext } from "../../PlayerContext";
 import { REWARDS } from "../../constants/drumConstants";
-import { useMashineLogic } from "components/slotMashine/slotMashine/mashineBody/useMashineLogic";
+import { useMashineLogic } from "../../components/slotMashine/slotMashine/mashineBody/useMashineLogic";
 
 export function ChangeMashine() {
   const slot = useSlotContext();
