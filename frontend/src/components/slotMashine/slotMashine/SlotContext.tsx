@@ -9,6 +9,7 @@ import React, {
 import { REWARDS, DRUM_CHANCES } from "../../../constants/drumConstants";
 import { getRandomInt } from "../../../tools/tools";
 import { useGameAPI } from "../../../api/useLotsAPI";
+import { usePlayerContext } from "../../../PlayerContext";
 
 type DrumItem = keyof typeof DRUM_CHANCES;
 
@@ -35,7 +36,7 @@ interface SlotContextType {
   reelUpdate: () => void;
   updateSlotScore: (win: number) => void;
   getNewMachine: (chatId: string, balance: number) => Promise<void>;
-  loading: boolean; 
+  loading: boolean;
 }
 
 export const SlotContext = createContext<SlotContextType | undefined>(
@@ -73,10 +74,9 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [lastWin, setLastWin] = useState(0);
   const [maxWin, setMaxWin] = useState(0);
   const [color, setColor] = useState("#6294a4f0");
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const { getSlotInfo, changeMachine } = useGameAPI();
-
 
   const slotContextValue: SlotContextType = {
     betStep,
@@ -103,9 +103,16 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     loading,
   };
 
-  const initializeSlot = async (chatId: string) => {
+  const { chatId } = usePlayerContext();
+  const initializeSlot = async () => {
+    if (!chatId) {
+      console.error("Отсутствует chatId для инициализации слота");
+      setLoading(false);
+      return;
+    }
+
     try {
-      setLoading(true); 
+      setLoading(true);
       const response = await getSlotInfo(chatId);
       if (response.success) {
         setReel(response.data.reel);
@@ -120,19 +127,14 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Ошибка инициализации слота:", error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
-  
+
   useEffect(() => {
-    const storedChatId = localStorage.getItem("chatId");
-    if (storedChatId) {
-      initializeSlot(storedChatId);
-    } else {
-      setLoading(false); 
-    }
+    initializeSlot();
   }, []);
-  
+
   function updateSlotScore(win: number) {
     const roundedWin = Math.round(win);
     setLastWin(roundedWin);
@@ -193,11 +195,10 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       console.error("Ошибка смены автомата:", error);
     }
   }
-  
+
   return (
     <SlotContext.Provider value={slotContextValue}>
       {children}
     </SlotContext.Provider>
   );
 };
-
