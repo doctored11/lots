@@ -23,6 +23,7 @@ export function ChangeMashine() {
 
   if (!slot || !player) return null;
   const handleChangeMashine = async () => {
+    console.log("чендж машины Isspin",isSpinning)
     if (isDisabled || slot.betInGame > 0 || isSpinning) return;
 
     setIsDisabled(true);
