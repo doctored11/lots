@@ -97,15 +97,15 @@ async function updateSlotState(userId, state) {
     const { reel, bet_step, last_win, max_win, machine_lives } = state;
     const reelAsJson = JSON.stringify(reel);
 
-    console.log("Обновляем состояние автомата (SlotsController): ");
-    console.log("reel:", reelAsJson);
-    console.log("bet_step:", bet_step);
-
+    console.log("Обновляем состояние автомата:");
     await pool.query(
-        'UPDATE slot_game SET reel = $1::jsonb, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5 WHERE user_id = $6',
+        `UPDATE slot_game
+         SET reel = $1, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5
+         WHERE user_id = $6`,
         [reelAsJson, bet_step, last_win, max_win, machine_lives, userId]
     );
 }
+
 
 async function getSlotInfo(req, res)  {
     const { chatId } = req.params;
@@ -220,7 +220,7 @@ const spinSlot = async (req, res) => {
 
         const slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
-            return res.status(404).json({ success: false, error: 'Слот-машина не найдена' });
+            slotGame = await createSlotGame(user.id);
         }
         console.log('slotGame:', slotGame);
         console.log('reel field:', slotGame.reel);
@@ -276,7 +276,7 @@ const changeMachine = async (req, res) => {
 
         const slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
-            return res.status(404).json({ success: false, error: 'Слот-машина не найдена' });
+            slotGame = await createSlotGame(user.id); // Создать автомат, если его нет
         }
 
         if (balance < machineCost) {
