@@ -4,6 +4,8 @@ import React, {
   useContext,
   ReactNode,
   useEffect,
+  SetStateAction,
+  Dispatch,
 } from "react";
 import { useGameAPI } from "./api/useLotsAPI";
 
@@ -15,6 +17,7 @@ interface PlayerContextType {
   minusBalance: (amount: number) => boolean;
   canSpend: (amount: number) => boolean;
   loading: boolean;
+  setBalance:Dispatch<SetStateAction<number>>;
 }
 
 export const PlayerContext = createContext<PlayerContextType | undefined>(
@@ -89,6 +92,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     canSpend,
     setChatId,
     loading,
+    setBalance,
   };
 
   return (

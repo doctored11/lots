@@ -35,7 +35,17 @@ interface SlotContextType {
   setMaxWin: (win: number) => void;
   reelUpdate: () => void;
   updateSlotScore: (win: number) => void;
-  getNewMachine: (chatId: string, balance: number) => Promise<void>;
+  getNewMachine: (
+    chatId: string,
+    balance: number
+  ) => Promise<{
+    success: boolean;
+    data?: {
+      newReel: Array<keyof typeof REWARDS>;
+      newBalance: number;
+    };
+    error?: string;
+  }>;
   loading: boolean;
 }
 
@@ -134,8 +144,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (chatId) {
       initializeSlot();
-    }else{
-      console.log("нет chatId в SlotContext")
+    } else {
+      console.log("нет chatId в SlotContext");
     }
   }, []);
 
@@ -183,20 +193,35 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     console.log("колесико обновлено, ", elCount, newReel);
   }
 
-  async function getNewMachine(chatId: string, balance: number) {
+  async function getNewMachine(
+    chatId: string,
+    balance: number
+  ): Promise<{
+    success: boolean;
+    data?: {
+      newReel: Array<keyof typeof REWARDS>;
+      newBalance: number;
+    };
+    error?: string;
+  }> {
     try {
       const response = await changeMachine(chatId, balance);
       if (response.success) {
-        setReel(response.data.newReel);
-        setBetStep(10);
-        setLastWin(0);
-        setMaxWin(0);
-        console.log("Новая лента автомата:", response.data.newReel);
+        console.log(" - получили новую ленту:", response.data.newReel);
+        return response;
       } else {
         alert("Ошибка смены автомата: " + response.error);
+        return { success: false, error: "не успех(" };
       }
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Неизвестная ошибка: " + error,
+      };
     }
   }
 
