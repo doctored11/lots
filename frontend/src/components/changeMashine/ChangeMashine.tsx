@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react";
-import { SlotContext, useSlotContext } from "../slotMashine/slotMashine/SlotContext";
+import {
+  SlotContext,
+  useSlotContext,
+} from "../slotMashine/slotMashine/SlotContext";
 import { getRandomColor } from "../../tools/tools";
 import styles from "./changeMashine.module.css";
 import { PlayerContext } from "../../PlayerContext";
 import { REWARDS } from "../../constants/drumConstants";
-
 
 export function ChangeMashine() {
   const slot = useSlotContext();
@@ -16,7 +18,7 @@ export function ChangeMashine() {
   const saveDelta = 100;
 
   const [pendingResponse, setPendingResponse] = useState<{
-    newReel:  Array<keyof typeof REWARDS>
+    newReel: Array<keyof typeof REWARDS>;
     newBalance: number;
   } | null>(null);
 
@@ -33,15 +35,16 @@ export function ChangeMashine() {
       // mashineView.classList.add(styles.mashineHide);
       // shadowView?.classList.add(styles.shadow);
     }
-
+    let newReel: Array<keyof typeof REWARDS>, newBalance: number; //мы же не можем использовать var (кто вообще придумал так самоограничиваться)
     try {
-      const response = await slot.getNewMachine(player.chatId + "", player.balance);
-      console.log("ОТвет на смену машины: ",response)
-      if (response.success  && response.data) {
-        setPendingResponse({
-          newReel: response.data.newReel,
-          newBalance: response.data.newBalance,
-        });
+      const response = await slot.getNewMachine(
+        player.chatId + "",
+        player.balance
+      );
+      console.log("ОТвет на смену машины: ", response);
+      if (response.success && response.data) {
+        newReel = response.data.newReel;
+        newBalance = response.data.newBalance;
       } else {
         console.error("Ошибка смены автомата: " + response.error);
         restorePreviousState();
@@ -49,9 +52,8 @@ export function ChangeMashine() {
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
       restorePreviousState();
-      
     }
-    
+
     setTimeout(() => {
       mashineView?.classList.remove(styles.mashineHide);
       shadowView?.classList.remove(styles.shadowGrow);
@@ -60,19 +62,18 @@ export function ChangeMashine() {
       shadowView?.classList.add(styles.shadowAppearance);
     }, cssHideAniDuration + 2 * saveDelta);
 
-    setTimeout(async() => {
-      if (pendingResponse) {
-        slot.setReel(pendingResponse.newReel);
+    setTimeout(async () => {
+      if (newReel.length >0 && newBalance) {
+        slot.setReel(newReel);
         slot.setBetStep(10);
         slot.setLastWin(0);
         slot.setMaxWin(0);
         slot.setColor(getRandomColor());
-        player.setBalance(pendingResponse.newBalance); 
-        console.log("Новая лента автомата:", pendingResponse.newReel);
-      }else {
+        player.setBalance(newBalance);
+        console.log("Новая лента автомата:", newReel);
+      } else {
         restorePreviousState();
       }
-      
     }, cssHideAniDuration + saveDelta);
 
     setTimeout(() => {
@@ -81,13 +82,13 @@ export function ChangeMashine() {
     }, cssHideAniDuration + cssShowAniDuration + saveDelta);
   };
 
-
   function restorePreviousState() {
-    console.warn("🤡 Восстанавленно предыдущее состояние автомата ",slot.reel);
+    console.warn("🤡 Восстанавленно предыдущее состояние автомата ", slot.reel);
     slot.setReel(slot.reel);
-    slot.setBetStep(10);
-    slot.setLastWin(0);
-    slot.setMaxWin(0);
+    slot.setBetStep(slot.betStep);
+    slot.setLastWin(slot.lastWin);
+    slot.setMaxWin(slot.maxWin);
+    slot.setColor(slot.color);
   }
   return <button onClick={handleChangeMashine}>Change Slot Machine</button>;
 }
