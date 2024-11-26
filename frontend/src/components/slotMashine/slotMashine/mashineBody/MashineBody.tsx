@@ -20,6 +20,10 @@ export function MashineBody() {
   const reel: Array<keyof typeof REWARDS> = slotMashine.reel;
   const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
   const [isSpinning, setIsSpinning] = useState(false);
+
+  const [pendingBalance, setPendingBalance] = useState<number | null>(null); 
+  
+
   const tapeRefs = useRef<HTMLDivElement[]>([]);
 
 
@@ -36,12 +40,21 @@ export function MashineBody() {
     }
   }, [isSpinning]);
 
+  async function onSpinEnd() {
+    if (pendingBalance !== null && player) {
+      console.log("✔️ Анимация завершена. Обновляем баланс и слот.");
+      player.addBalance(pendingBalance - player.balance);
+      slotMashine?.updateSlotScore(pendingBalance - player.balance);
+      slotMashine?.setBetInGame(0);
+      setPendingBalance(null);
+    }
+    setIsSpinning(false);
+  }
+
   async function startSpin() {
-    setIsSpinning(true);
-
-
     try {
       if (!player || !slotMashine) return;
+      setIsSpinning(true);
       const response = await spinSlots(
         player.chatId,
         slotMashine.betInGame,
@@ -54,11 +67,9 @@ export function MashineBody() {
         console.log("Новый баланс:", newBalance);
 
         setSpinValues(combination);
+        setPendingBalance(newBalance);
 
-
-        // todo делать это через ~100мс после решение промисов прокрутки
-        player.addBalance(newBalance - player.balance); //возможно это надо делать после всего (уже в окончании спина)
-        slotMashine.updateSlotScore(newBalance - player.balance);
+        
       } else {
         alert("Ошибка: " + response.error);
       }
@@ -94,7 +105,7 @@ export function MashineBody() {
               <MashineDrum
                  spinValues={spinValues}
                  reel={reel}
-                 onSpinEnd={() => setIsSpinning(false)}
+                 onSpinEnd={onSpinEnd}
                  isSpinning={isSpinning}
               />
             </div>{" "}
