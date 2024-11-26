@@ -204,6 +204,14 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     };
     error?: string;
   }> {
+    const currentState = {
+      reel,
+      color,
+      betStep,
+      lastWin,
+      maxWin,
+    };
+
     try {
       console.log(" запрос на смену автомата:", {
         chatId,
@@ -216,10 +224,12 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
         return response;
       } else {
         alert("Ошибка смены автомата: " + response.error);
+        restorePreviousState(currentState);
         return { success: false, error: "не успех(" };
       }
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
+      restorePreviousState(currentState)
       return {
         success: false,
         error:
@@ -227,6 +237,21 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
             ? error.message
             : "Неизвестная ошибка: " + error,
       };
+    }
+
+    function restorePreviousState(state: {
+      reel: Array<keyof typeof REWARDS>;
+      color: string;
+      betStep: number;
+      lastWin: number;
+      maxWin: number;
+    }) {
+      setReel(state.reel);
+      setColor(state.color);
+      setBetStep(state.betStep);
+      setLastWin(state.lastWin);
+      setMaxWin(state.maxWin);
+      console.log("🤡 Состояние автомата восстановлено:", state.reel);
     }
   }
 

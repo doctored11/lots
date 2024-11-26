@@ -59,9 +59,6 @@ export function ChangeMashine() {
     }, cssHideAniDuration + 2 * saveDelta);
 
     setTimeout(async() => {
-
-
-
       if (pendingResponse) {
         slot.setReel(pendingResponse.newReel);
         slot.setBetStep(10);
@@ -72,7 +69,6 @@ export function ChangeMashine() {
         console.log("Новая лента автомата:", pendingResponse.newReel);
       }
       
-
     }, cssHideAniDuration + saveDelta);
 
     setTimeout(() => {
