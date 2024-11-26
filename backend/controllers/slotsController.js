@@ -107,6 +107,41 @@ async function updateSlotState(userId, state) {
     );
 }
 
+async function getSlotInfo(req, res)  {
+    const { chatId } = req.params;
+
+    try {
+        const user = await getUserByChatId(chatId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: "Пользователь не найден" });
+        }
+
+        const slotQuery = `
+        SELECT * FROM slot_game WHERE user_id = $1
+      `;
+        const result = await pool.query(slotQuery, [user.id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: "Слот-машина не найдена" });
+        }
+
+        const slot = result.rows[0];
+        res.status(200).json({
+            success: true,
+            data: {
+                reel: slot.reel,
+                betStep: slot.bet_step,
+                lastWin: slot.last_win,
+                maxWin: slot.max_win,
+                color: "#6294a4f0", 
+            },
+        });
+    } catch (error) {
+        console.error("Ошибка получения информации о слоте:", error);
+        res.status(500).json({ success: false, error: "Внутренняя ошибка сервера" });
+    }
+};
+
 function generateNewReel() {
     const DRUM_CHANCES = {
         bomb: {
@@ -276,4 +311,4 @@ const changeMachine = async (req, res) => {
 
 
 
-module.exports = { spinSlot, createSlotGame, changeMachine };
+module.exports = { spinSlot, createSlotGame, changeMachine,getSlotInfo };

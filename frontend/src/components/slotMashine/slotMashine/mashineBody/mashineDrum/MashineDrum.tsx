@@ -106,6 +106,7 @@ export function MashineDrum({
         });
       }, 500);
     });
+    //Возможно вернуть зависимости(но разобраться тогда с окончанеим спина)
   }, [spinValues])
   return (
     <div className={style.slotDrum} ref={slotDrumRef}>

@@ -4,6 +4,7 @@ import React, {
   useContext,
   ReactNode,
   SetStateAction,
+  useEffect,
 } from "react";
 import { REWARDS, DRUM_CHANCES } from "../../../constants/drumConstants";
 import { getRandomInt } from "../../../tools/tools";
@@ -34,6 +35,7 @@ interface SlotContextType {
   reelUpdate: () => void;
   updateSlotScore: (win: number) => void;
   getNewMachine: (chatId: string, balance: number) => Promise<void>;
+  loading: boolean; 
 }
 
 export const SlotContext = createContext<SlotContextType | undefined>(
@@ -71,8 +73,10 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [lastWin, setLastWin] = useState(0);
   const [maxWin, setMaxWin] = useState(0);
   const [color, setColor] = useState("#6294a4f0");
+  const [loading, setLoading] = useState(true); 
 
-  const { changeMachine } = useGameAPI();
+  const { getSlotInfo, changeMachine } = useGameAPI();
+
 
   const slotContextValue: SlotContextType = {
     betStep,
@@ -95,9 +99,40 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     setMaxWin,
     reelUpdate,
     updateSlotScore,
-    getNewMachine
+    getNewMachine,
+    loading,
   };
 
+  const initializeSlot = async (chatId: string) => {
+    try {
+      setLoading(true); 
+      const response = await getSlotInfo(chatId);
+      if (response.success) {
+        setReel(response.data.reel);
+        setBetStep(response.data.betStep);
+        setLastWin(response.data.lastWin);
+        setMaxWin(response.data.maxWin);
+        setColor(response.data.color || "#6294a4f0");
+        console.log("Слот успешно инициализирован:", response.data);
+      } else {
+        console.error("Ошибка загрузки слота:", response.error);
+      }
+    } catch (error) {
+      console.error("Ошибка инициализации слота:", error);
+    } finally {
+      setLoading(false); 
+    }
+  };
+  
+  useEffect(() => {
+    const storedChatId = localStorage.getItem("chatId");
+    if (storedChatId) {
+      initializeSlot(storedChatId);
+    } else {
+      setLoading(false); 
+    }
+  }, []);
+  
   function updateSlotScore(win: number) {
     const roundedWin = Math.round(win);
     setLastWin(roundedWin);

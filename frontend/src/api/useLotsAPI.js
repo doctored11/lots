@@ -3,6 +3,28 @@ export function useGameAPI() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const getPlayerInfo = async (chatId) => {
+    const response = await fetch(`/api/user/${chatId}`);
+    return response.json();
+  };
+
+  const initializePlayer = async (chatId) => {
+    try {
+      const response = await fetch('/api/user/initialize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatId, username:   username ||  `User${chatId}` }), 
+      });
+  
+      return response.json(); 
+    } catch (error) {
+      console.error('Ошибка при инициализации пользователя:', error);
+      return { success: false, error: error.message };
+    }
+  };
+  
+  
+
   const request = async (endpoint, method, body = null) => {
     setLoading(true);
     setError(null);
@@ -29,6 +51,11 @@ export function useGameAPI() {
   };
 
 
+  const getSlotInfo = async (chatId) => {
+    const response = await fetch(`/api/slots/${chatId}`);
+    return response.json();
+  };
+
   const changeMachine = async (chatId, balance, machineCost = 50) => {
     const body = { chatId, balance, machineCost };
     return await request('/api/slots/change-machine', 'POST', body);
@@ -36,6 +63,9 @@ export function useGameAPI() {
 
 
   return {
+    getPlayerInfo,
+    initializePlayer,
+    getSlotInfo,
     spinSlots,
     changeMachine,
     loading,

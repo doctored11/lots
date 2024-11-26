@@ -1,16 +1,23 @@
 const pool = require('../db');
 
-
 async function getUserByChatId(chatId) {
     const result = await pool.query('SELECT * FROM "user" WHERE chat_id = $1', [chatId]);
     return result.rows[0];
 }
 
+async function createUser(chatId, username, initialData = {}) {
+    const {
+        balance = 150, 
+        status = '[]', 
+        exp = 0,       
+        rank = null,   
+    } = initialData;
 
-async function createUser(chatId, username) {
     const result = await pool.query(
-        'INSERT INTO "user" (chat_id, username) VALUES ($1, $2) RETURNING *',
-        [chatId, username]
+        `INSERT INTO "user" (chat_id, username, balance, status, exp, rank) 
+         VALUES ($1, $2, $3, $4, $5, $6) 
+         RETURNING *`,
+        [chatId, username, balance, status, exp, rank]
     );
     return result.rows[0];
 }
@@ -56,6 +63,9 @@ async function getUserBalance(chatId) {
     const result = await pool.query('SELECT balance FROM "user" WHERE chat_id = $1', [chatId]);
     return result.rows[0]?.balance;
 }
+
+
+  
 
 async function deleteUser(chatId) {
     const result = await pool.query('DELETE FROM "user" WHERE chat_id = $1 RETURNING *', [chatId]);
