@@ -35,7 +35,7 @@ export function SlotMashine() {
         console.log("Chat ID:", chatId);
 
         if (player) {
-          player.setChatId(chatId);
+          player.setChatId(chatId+"");
         } else {
           console.error("PlayerContext не найден!");
         }
