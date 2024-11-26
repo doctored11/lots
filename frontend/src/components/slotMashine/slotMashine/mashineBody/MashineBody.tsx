@@ -8,24 +8,17 @@ import { PlayerContext } from "../../../../PlayerContext";
 import { HandBtn } from "./hendBtn/HandBtn";
 import { MashineFooter } from "./mashineFooter/MashineFooter";
 import { useGameAPI } from "../../../../api/useLotsAPI";
+import { useMashineLogic } from "./useMashineLogic";
 
 export function MashineBody() {
   const slotMashine = useContext(SlotContext);
   const player = useContext(PlayerContext);
   const { spinSlots, loading, error } = useGameAPI();
-
+  const { spinValues, isSpinning, startSpin, onSpinEnd } = useMashineLogic();
   const itemHeight = 128;
 
   if (!slotMashine) return;
   const reel: Array<keyof typeof REWARDS> = slotMashine.reel;
-  const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
-  const [isSpinning, setIsSpinning] = useState(false);
-
-  const [pendingBalance, setPendingBalance] = useState<number | null>(null); 
-  
-
-  const tapeRefs = useRef<HTMLDivElement[]>([]);
-
 
   const mashineElement = document.getElementById("mashine");
   useEffect(() => {
@@ -39,47 +32,6 @@ export function MashineBody() {
       }
     }
   }, [isSpinning]);
-
-  async function onSpinEnd() {
-    if (pendingBalance !== null && player) {
-      console.log("✔️ Анимация завершена. Обновляем баланс и слот.");
-      player.addBalance(pendingBalance - player.balance);
-      slotMashine?.updateSlotScore(pendingBalance - player.balance);
-      slotMashine?.setBetInGame(0);
-      setPendingBalance(null);
-    }
-    setIsSpinning(false);
-  }
-
-  async function startSpin() {
-    try {
-      if (!player || !slotMashine) return;
-      setIsSpinning(true);
-      const response = await spinSlots(
-        player.chatId,
-        slotMashine.betInGame,
-        player.balance
-      );
-      if (response.success) {
-        const { combination, newBalance } = response.data;
-
-        console.log("🤔Новая комбинация:", combination);
-        console.log("Новый баланс:", newBalance);
-
-        setSpinValues(combination);
-        setPendingBalance(newBalance);
-
-        
-      } else {
-        alert("Ошибка: " + response.error);
-      }
-    } catch (err) {
-      console.error("Ошибка спина:", err);
-    } finally {
-      // setIsSpinning(false);
-      slotMashine?.setBetInGame(0);
-    }
-  }
 
   async function spin() {
     if (!slotMashine || !player) return;
@@ -103,10 +55,10 @@ export function MashineBody() {
           >
             <div className={styles.dramFrame}>
               <MashineDrum
-                 spinValues={spinValues}
-                 reel={reel}
-                 onSpinEnd={onSpinEnd}
-                 isSpinning={isSpinning}
+                spinValues={spinValues}
+                reel={reel}
+                onSpinEnd={onSpinEnd}
+                isSpinning={isSpinning}
               />
             </div>{" "}
           </div>
