@@ -59,7 +59,7 @@ export function useGameAPI() {
   const changeMachine = async (chatId, balance, machineCost = 50) => {
     console.log('⚙️ Данные для смены автомата:', { chatId, balance, machineCost });
 
-    const body =  JSON.stringify({ chatId, balance, machineCost });
+    const body =  { chatId, balance, machineCost };
     return await request('/api/slots/change-machine', 'POST', body);
 };
 
