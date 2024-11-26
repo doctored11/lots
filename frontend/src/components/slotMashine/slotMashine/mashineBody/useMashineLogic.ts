@@ -19,7 +19,7 @@ export function useMashineLogic() {
       const response = await spinSlots(
         player.chatId,
         slotMashine.betInGame,
-        player.balance
+        player.balance+ slotMashine.betInGame,
       );
       if (response.success) {
         const { combination, newBalance } = response.data;
@@ -42,8 +42,9 @@ export function useMashineLogic() {
   function onSpinEnd() {
     if (pendingBalance !== null && player) {
       console.log("✔️ Анимация завершена. Обновляем баланс и слот.");
-      player.addBalance(pendingBalance - player.balance);
-      slotMashine?.updateSlotScore(pendingBalance - player.balance);
+      const winValue = pendingBalance - player.balance
+      player.addBalance(winValue);
+      slotMashine?.updateSlotScore(winValue);
       slotMashine?.setBetInGame(0);
       setPendingBalance(null);
     }

@@ -1,5 +1,5 @@
 const pool = require('../db');
-const { getUserByChatId, updateUserBalance } = require('../controllers/userController');
+const { getUserByChatId, updateUserBalance, getUserBalance } = require('../controllers/userController');
 const { sendMessage } = require('../services/botService');
 // todo - разделить все тут
 // global todo - синхронизировать первую стартовую игровую машину
@@ -9,7 +9,7 @@ const REWARDS = {
     bomb: { values: { 1: { type: 'plus', amount: 0.3 }, 2: { type: 'plus', amount: 0.8 }, 3: { type: 'multiply', factor: 8.8 } } },
     clover: { values: { 1: { type: 'multiply', factor: 3 }, 2: { type: 'multiply', factor: 7 }, 3: { type: "plus", amount: 72 } } },
     grape: { values: { 1: { type: 'plus', amount: 0.1 }, 2: { type: 'plus', amount: 0.2 }, 3: { type: 'plus', amount: 5.5 } } },
-    mushroom: { values: { 1: { type: 'plus', amount: 0.1 }, 2: { type: 'plus', amount: 0.4 }, 3: { type: "plus", amount: 4  } } },
+    mushroom: { values: { 1: { type: 'plus', amount: 0.1 }, 2: { type: 'plus', amount: 0.4 }, 3: { type: "plus", amount: 4 } } },
     melon: {
         values: {
             1: { type: "plus", amount: 0.0 },
@@ -113,7 +113,7 @@ async function updateSlotState(userId, state) {
 }
 
 
-async function getSlotInfo(req, res)  {
+async function getSlotInfo(req, res) {
     const { chatId } = req.params;
 
     try {
@@ -139,7 +139,7 @@ async function getSlotInfo(req, res)  {
                 betStep: slot.bet_step,
                 lastWin: slot.last_win,
                 maxWin: slot.max_win,
-                color: "#6294a4f0", 
+                color: "#6294a4f0",
             },
         });
     } catch (error) {
@@ -223,11 +223,21 @@ const spinSlot = async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, error: 'Пользователь не найден' });
         }
+        const currentBalance = await validateBalance(chatId, balance);
+
+
+        if (typeof bet !== 'number' || bet <= 0 || bet > currentBalance || currentBalance - bet < 0) {
+            console.warn(
+                `⚠️ Некорректная ставка: \n- Ставка: ${bet}\n- Баланс: ${currentBalance}`
+            );
+            return res.status(400).json({ success: false, error: 'Некорректная ставка 🤨' });
+        }
 
         const slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
             slotGame = await createSlotGame(user.id);
         }
+        console.log('*__ .')
         console.log('slotGame:', slotGame);
         console.log('reel field:', slotGame.reel);
 
@@ -246,13 +256,13 @@ const spinSlot = async (req, res) => {
         const results = combination.map(index => reel[index]);
         console.log('выпавшие символы:', results);
         console.log("________операции с балансом_______")
-        console.log("\n пришло: ", balance, bet)
+        console.log("\n пришло: ", balance, bet, "|", currentBalance)
         console.log("_____")
         const winnings = calculateWinnings(bet, results);
-        const newBalance = balance - bet + winnings;
+        const newBalance = currentBalance - bet + winnings;
         await updateUserBalance(chatId, newBalance);
 
-        console.log("баданс обновлен", balance, bet, winnings, newBalance)
+        console.log("баданс обновлен", currentBalance, bet, winnings, newBalance)
         console.log("пытаемся обновить слоты")
         await updateSlotState(user.id, {
             ...slotGame,
@@ -273,9 +283,9 @@ const spinSlot = async (req, res) => {
 
 const changeMachine = async (req, res) => {
     const { chatId, balance, machineCost } = req.body;
-    console.log('запрос на смену автомата:', req.body);
+    console.log('    -  запрос на смену автомата:', req.body);
 
-    if (!chatId || typeof balance === 'undefined' || typeof machineCost === 'undefined') {
+    if (!chatId || typeof balance === 'undefined' || typeof machineCost !== 'number' || machineCost <= 0) {
         return res.status(400).json({ success: false, error: 'Чего то не хватает' });
     }
 
@@ -284,19 +294,20 @@ const changeMachine = async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, error: 'Пользователь не найден' });
         }
+        const currentBalance = await validateBalance(chatId, balance);
 
         let slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
-           
+
             slotGame = await createSlotGame(user.id);
         }
 
-        if (balance < machineCost) {
+        if (currentBalance - machineCost < 0 ) {
             return res.status(400).json({ success: false, error: 'Недостаточно средств для смены автомата' });
         }
 
         const newReel = generateNewReel();
-        const newBalance = balance - machineCost;
+        const newBalance = currentBalance - machineCost;
 
         await updateUserBalance(chatId, newBalance);
 
@@ -319,8 +330,18 @@ const changeMachine = async (req, res) => {
     }
 };
 
+async function validateBalance(chatId, providedBalance) {
+    const userBalance = await getUserBalance(chatId);
+    if (userBalance !== providedBalance) {
+        console.warn(
+            `⚠️ Несоответствие баланса: \n- В БД: ${userBalance}\n- Прислано с клиента: ${providedBalance}`
+        );
+    }
+    return userBalance;
+}
 
 
 
 
-module.exports = { spinSlot, createSlotGame, changeMachine,getSlotInfo };
+
+module.exports = { spinSlot, createSlotGame, changeMachine, getSlotInfo };
