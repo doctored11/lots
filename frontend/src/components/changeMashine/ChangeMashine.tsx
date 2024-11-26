@@ -99,7 +99,7 @@ export function ChangeMashine() {
       disabled={isDisabled || isSpinning}
       className={styles.button}
     >
-      {"Change Slot Machine"}
+      {"-Change Slot Machine-"}
     </button>
   );
 }
