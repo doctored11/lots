@@ -42,7 +42,7 @@ export function ChangeMashine() {
           newBalance: response.data.newBalance,
         });
       } else {
-        alert("Ошибка смены автомата: " + response.error);
+        console.error("Ошибка смены автомата: " + response.error);
       }
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
