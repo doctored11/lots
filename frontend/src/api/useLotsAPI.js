@@ -8,7 +8,7 @@ export function useGameAPI() {
     return response.json();
   };
 
-  const initializePlayer = async (chatId) => {
+  const initializePlayer = async (chatId, username) => {
     try {
       const response = await fetch('/api/user/initialize', {
         method: 'POST',

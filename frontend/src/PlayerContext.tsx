@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 import { useGameAPI } from "./api/useLotsAPI";
 
 interface PlayerContextType {
@@ -11,13 +17,16 @@ interface PlayerContextType {
   loading: boolean;
 }
 
-export const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
+export const PlayerContext = createContext<PlayerContextType | undefined>(
+  undefined
+);
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [balance, setBalance] = useState(100);
   const [chatId, setChatId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); 
-  const { getPlayerInfo,initializePlayer } = useGameAPI();
+  const [userName, setUserName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { getPlayerInfo, initializePlayer } = useGameAPI();
 
   const addBalance = (amount: number) => {
     setBalance((prevBalance) => prevBalance + amount);
@@ -33,24 +42,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // const initializePlayer = async (chatId: string) => {
-  //   try {
-  //     setLoading(true); 
-  //     const response = await getPlayerInfo(chatId);
-  //     if (response.success) {
-  //       setChatId(chatId);
-  //       setBalance(response.data.balance);
-  //       localStorage.setItem("chatId", chatId); 
-  //     } else {
-  //       console.error("Ошибка загрузки игрока:", response.error);
-  //     }
-  //   } catch (error) {
-  //     console.error("Ошибка инициализации игрока:", error);
-  //   } finally {
-  //     setLoading(false); 
-  //   }
-  // };
-
   const canSpend = (amount: number) => balance >= amount;
 
   useEffect(() => {
@@ -59,21 +50,21 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       const chatId = tg.initDataUnsafe.user.id;
       console.log("Инициализация chatId:", chatId);
       setChatId(chatId + "");
+      setUserName(tg.initDataUnsafe.user.username || null);
     } else {
       console.error("Ошибка инициализации Telegram WebApp");
     }
   }, []);
-  
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         if (chatId) {
-          const response = await initializePlayer(chatId);
+          const response = await initializePlayer(chatId,userName);
           if (response.success) {
             console.log("Пользователь успешно инициализирован:", response.data);
-            setBalance(response.data.balance); 
+            setBalance(response.data.balance);
           } else {
             console.error("Ошибка инициализации пользователя:", response.error);
           }
@@ -81,15 +72,14 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         console.error("Ошибка во время инициализации:", error);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
-  
+
     if (chatId) {
-      fetchData(); 
+      fetchData();
     }
   }, [chatId]);
-  
 
   const playerContextValue: PlayerContextType = {
     balance,
@@ -98,7 +88,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     minusBalance,
     canSpend,
     setChatId,
-    loading, 
+    loading,
   };
 
   return (
