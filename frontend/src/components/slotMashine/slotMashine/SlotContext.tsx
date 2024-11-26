@@ -24,6 +24,8 @@ interface SlotContextType {
   lastWin: number;
   maxWin: number;
   rollCount: number;
+  isSpinning: boolean;
+  setIsSpinning: (value: boolean) => void;
   setCombination: (combination: Array<number | null>) => void;
   setBetStep: (betStep: number) => void;
   setBetInGame: (betInGame: number) => void;
@@ -85,6 +87,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [maxWin, setMaxWin] = useState(0);
   const [color, setColor] = useState("#6294a4f0");
   const [loading, setLoading] = useState(true);
+  const [isSpinning, setIsSpinning] = useState(false);
 
   const { getSlotInfo, changeMachine } = useGameAPI();
 
@@ -98,6 +101,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     lastWin,
     maxWin,
     rollCount,
+    isSpinning,
+    setIsSpinning,
     setCombination,
     setBetStep,
     setBetInGame,
@@ -223,8 +228,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
         console.log(" - получили новую ленту:", response.data.newReel);
 
         // setReel(response.data.newReel);
-        // setColor(response.data.color); 
-        // setBetStep(10); 
+        // setColor(response.data.color);
+        // setBetStep(10);
         // setLastWin(0);
         // setMaxWin(0);
 
@@ -235,7 +240,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
-      
+
       return {
         success: false,
         error:
@@ -244,8 +249,6 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
             : "Неизвестная ошибка: " + error,
       };
     }
-
-    
   }
 
   return (

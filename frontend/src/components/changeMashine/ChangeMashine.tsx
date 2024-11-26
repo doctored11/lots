@@ -19,7 +19,7 @@ export function ChangeMashine() {
   const saveDelta = 100;
 
   const [isDisabled, setIsDisabled] = useState(false);
-  const { isSpinning } = useMashineLogic();
+  const { isSpinning } = useSlotContext();
 
   if (!slot || !player) return null;
   const handleChangeMashine = async () => {

@@ -58,13 +58,13 @@ export function MashineBody() {
                 spinValues={spinValues}
                 reel={reel}
                 onSpinEnd={onSpinEnd}
-                isSpinning={isSpinning}
+                isSpinning={isSpinning ||false}
               />
             </div>{" "}
           </div>
           <MashineFooter></MashineFooter>
         </div>
-        <HandBtn spin={spin} isSpinning={isSpinning}></HandBtn>
+        <HandBtn spin={spin} isSpinning={isSpinning||false}></HandBtn>
       </div>
     </div>
   );

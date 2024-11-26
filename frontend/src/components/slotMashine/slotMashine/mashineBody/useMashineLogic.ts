@@ -9,13 +9,13 @@ export function useMashineLogic() {
   const { spinSlots } = useGameAPI();
 
   const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
-  const [isSpinning, setIsSpinning] = useState(false);
+  
   const [pendingBalance, setPendingBalance] = useState<number | null>(null);
 
   async function startSpin() {
     try {
-      if (!player || !slotMashine ||isSpinning) return;
-      setIsSpinning(true);
+      if (!player || !slotMashine ||slotMashine.isSpinning) return;
+      slotMashine.setIsSpinning(true);
       const response = await spinSlots(
         player.chatId,
         slotMashine.betInGame,
@@ -48,12 +48,12 @@ export function useMashineLogic() {
       slotMashine?.setBetInGame(0);
       setPendingBalance(null);
     }
-    setIsSpinning(false);
+    slotMashine?.setIsSpinning(false);
   }
 
   return {
     spinValues,
-    isSpinning,
+    isSpinning:slotMashine?.isSpinning,
     startSpin,
     onSpinEnd,
   };
