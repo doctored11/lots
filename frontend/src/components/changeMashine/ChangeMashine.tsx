@@ -43,11 +43,10 @@ export function ChangeMashine() {
         });
       } else {
         alert("Ошибка смены автомата: " + response.error);
-        return;
       }
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
-      return;
+      
     }
     
     setTimeout(() => {
