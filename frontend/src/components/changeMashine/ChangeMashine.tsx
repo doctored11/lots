@@ -19,16 +19,16 @@ export function ChangeMashine() {
   const saveDelta = 100;
 
   const [isDisabled, setIsDisabled] = useState(false);
-  const { setIsSpinning,isSpinning } = useSlotContext();
+  const { isSpinning,isAnimating,setIsAnimating } = useSlotContext();
 
   if (!slot || !player) return null;
   const handleChangeMashine = async () => {
     console.log("чендж машины Isspin",isSpinning)
     if (isDisabled || slot.betInGame > 0 || isSpinning) return;
+    setIsAnimating(true)
 
-    setIsDisabled(true);
-    setIsSpinning(true)
-
+    // setIsDisabled(true);
+   
     shadowView?.classList.add(styles.shadow);
     if (mashineView) {
       setTimeout(() => {
@@ -56,7 +56,9 @@ export function ChangeMashine() {
       console.error("Ошибка смены автомата:", error);
       restorePreviousState();
     } finally {
-      setIsDisabled(false);
+      // setIsDisabled(false);
+      setIsAnimating(false)
+
     }
 
     setTimeout(() => {
@@ -65,7 +67,7 @@ export function ChangeMashine() {
 
       mashineView?.classList.add(styles.mashineShow);
       shadowView?.classList.add(styles.shadowAppearance);
-      setIsSpinning(false)
+     
     }, cssHideAniDuration + 2 * saveDelta);
 
     setTimeout(async () => {
@@ -99,7 +101,7 @@ export function ChangeMashine() {
   return (
     <button
       onClick={handleChangeMashine}
-      disabled={isDisabled || isSpinning}
+      disabled={isAnimating }
       className={styles.button}
     >
       {"-Change Slot Machine-"}

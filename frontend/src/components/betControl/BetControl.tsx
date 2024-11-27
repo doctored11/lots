@@ -6,7 +6,9 @@ import { useMashineLogic } from "../../components/slotMashine/slotMashine/mashin
 export function BetControls() {
   const { betInGame, setBetInGame, betStep } = useSlotContext();
   const player = useContext(PlayerContext);
-  const { isSpinning } = useMashineLogic();
+  // const { isSpinning } = useMashineLogic();
+  const { isSpinning,isAnimating } = useSlotContext();
+
 
   const increaseBet = () => {
     if (isSpinning) return;
@@ -22,7 +24,7 @@ export function BetControls() {
   return (
     <div>
       {/* <p>Текущая ставка: {betInGame} монет</p> */}
-      <button disabled={isSpinning} onClick={increaseBet}>
+      <button disabled={isSpinning||isAnimating} onClick={increaseBet}>
         +10 к ставке
       </button>
     </div>

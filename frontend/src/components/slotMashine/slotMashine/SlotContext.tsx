@@ -25,7 +25,9 @@ interface SlotContextType {
   maxWin: number;
   rollCount: number;
   isSpinning: boolean;
+  isAnimating:boolean;
   setIsSpinning: (value: boolean) => void;
+  setIsAnimating: (value: boolean) => void;
   setCombination: (combination: Array<number | null>) => void;
   setBetStep: (betStep: number) => void;
   setBetInGame: (betInGame: number) => void;
@@ -89,6 +91,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
 
+  const [isAnimating, setIsAnimating] = useState(false);
   const { getSlotInfo, changeMachine } = useGameAPI();
 
   const slotContextValue: SlotContextType = {
@@ -102,6 +105,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     maxWin,
     rollCount,
     isSpinning,
+    isAnimating,
+    setIsAnimating,
     setIsSpinning,
     setCombination,
     setBetStep,
