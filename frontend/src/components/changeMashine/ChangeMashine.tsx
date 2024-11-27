@@ -17,10 +17,10 @@ export function ChangeMashine() {
 
   const { isAnimating, setIsAnimating, isSpinning } = slot;
 
-  const [pendingState, setPendingState] = useState<{
+  let pendingState: {
     newReel: Array<keyof typeof REWARDS>;
     newBalance: number;
-  } | null>(null);
+  } | null = null;
 
   if (!slot || !player) return null;
 
@@ -45,7 +45,7 @@ export function ChangeMashine() {
       slot.setColor(getRandomColor());
       player.setBalance(pendingState.newBalance);
       console.log("Новая лента автомата:", pendingState.newReel);
-      setPendingState(null); 
+      pendingState = null;
     }
   };
 
@@ -74,10 +74,11 @@ export function ChangeMashine() {
         player.balance
       );
       if (response.success && response.data) {
-        setPendingState({
+        console.log("получили смену автомата: ", response.data)
+        pendingState = {
           newReel: response.data.newReel,
           newBalance: response.data.newBalance,
-        });
+        };
       } else {
         console.error("Ошибка смены автомата: " + response.error);
         restorePreviousState();
