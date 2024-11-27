@@ -6,7 +6,6 @@ const { getSlotGameByUserId, createSlotGame, updateSlotState } = require('./slot
 const { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel } = require('./slotsLogic/gameLogic');
 const { getUserByChatId, updateUserBalance,getUserBalance} = require('./userController');
 
-
 async function getSlotInfo(req, res) {
     const { chatId } = req.params;
 
@@ -18,14 +17,29 @@ async function getSlotInfo(req, res) {
             return res.status(404).json({ success: false, error: "Пользователь не найден" });
         }
 
-        const slotGame = await getSlotGameByUserId(user.id);
-        console.log("слот получен из бд:",slotGame)
-        if (!slotGame) return res.status(404).json({ success: false, error: "Slot machine not found" });
+        const slotQuery = `
+        SELECT * FROM slot_game WHERE user_id = $1
+      `;
+        const result = await pool.query(slotQuery, [user.id]);
 
-       
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: "Слот-машина не найдена" });
+        }
+    const slot = result.rows[0];
+        console.log("::-::");
+        console.log("Данные слота:", slot);
+        console.log("::_::");
+        
         res.status(200).json({
             success: true,
-            data: slotGame,
+            data: {
+                reel: slot.reel,
+                betStep: slot.bet_step,
+                lastWin: slot.last_win,
+                maxWin: slot.max_win,
+                color: slot.color || generateRandomColor(),
+                machineLives: slot.machine_lives,
+            },
         });
     } catch (error) {
         console.error("Ошибка получения информации о слоте:", error);
