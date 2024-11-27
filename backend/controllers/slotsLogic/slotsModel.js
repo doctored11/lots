@@ -1,4 +1,5 @@
-const pool = require('../db');
+const pool = require('../../db');
+const { generateRandomColor } = require('./gameLogic');
 
 async function getSlotGameByUserId(userId) {
     const result = await pool.query('SELECT * FROM slot_game WHERE user_id = $1', [userId]);
