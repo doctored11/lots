@@ -19,7 +19,7 @@ export function ChangeMashine() {
   const saveDelta = 100;
 
   const [isDisabled, setIsDisabled] = useState(false);
-  const { isSpinning } = useSlotContext();
+  const { setIsSpinning,isSpinning } = useSlotContext();
 
   if (!slot || !player) return null;
   const handleChangeMashine = async () => {
@@ -27,6 +27,7 @@ export function ChangeMashine() {
     if (isDisabled || slot.betInGame > 0 || isSpinning) return;
 
     setIsDisabled(true);
+    setIsSpinning(true)
 
     shadowView?.classList.add(styles.shadow);
     if (mashineView) {
@@ -64,6 +65,7 @@ export function ChangeMashine() {
 
       mashineView?.classList.add(styles.mashineShow);
       shadowView?.classList.add(styles.shadowAppearance);
+      setIsSpinning(false)
     }, cssHideAniDuration + 2 * saveDelta);
 
     setTimeout(async () => {
