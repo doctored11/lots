@@ -17,8 +17,12 @@ export function ChangeMashine() {
 
   const { isAnimating, setIsAnimating, isSpinning } = slot;
 
-  if (!slot || !player) return null;
+  const [pendingState, setPendingState] = useState<{
+    newReel: Array<keyof typeof REWARDS>;
+    newBalance: number;
+  } | null>(null);
 
+  if (!slot || !player) return null;
 
   const startAnimation = () => {
     setIsAnimating(true);
@@ -31,9 +35,27 @@ export function ChangeMashine() {
     }
   };
 
+  const applyPendingState = () => {
+    console.log("автомат pending = ", pendingState)
+    if (pendingState) {
+      slot.setReel(pendingState.newReel);
+      slot.setBetStep(10);
+      slot.setLastWin(0);
+      slot.setMaxWin(0);
+      slot.setColor(getRandomColor());
+      player.setBalance(pendingState.newBalance);
+      console.log("Новая лента автомата:", pendingState.newReel);
+      setPendingState(null); 
+    }
+  };
+
+ 
   const endAnimation = () => {
     mashineView?.classList.remove(styles.mashineHide);
     shadowView?.classList.remove(styles.shadowGrow);
+
+    
+    applyPendingState();
 
     mashineView?.classList.add(styles.mashineShow);
     shadowView?.classList.add(styles.shadowAppearance);
@@ -41,51 +63,38 @@ export function ChangeMashine() {
     setTimeout(() => {
       mashineView?.classList.remove(styles.mashineShow);
       shadowView?.classList.remove(styles.shadowAppearance);
-      setIsAnimating(false);
+      setIsAnimating(false); 
     }, cssShowAniDuration + saveDelta);
   };
 
- 
   const changeMachineLogic = async () => {
-    let newReel: Array<keyof typeof REWARDS> = [];
-    let newBalance: number = player.balance;
-
     try {
       const response = await slot.getNewMachine(
         player.chatId + "",
         player.balance
       );
       if (response.success && response.data) {
-        newReel = response.data.newReel;
-        newBalance = response.data.newBalance;
+        setPendingState({
+          newReel: response.data.newReel,
+          newBalance: response.data.newBalance,
+        });
       } else {
         console.error("Ошибка смены автомата: " + response.error);
         restorePreviousState();
-        return;
       }
     } catch (error) {
       console.error("Ошибка смены автомата:", error);
       restorePreviousState();
-      return;
     }
-
-    
-    slot.setReel(newReel);
-    slot.setBetStep(10);
-    slot.setLastWin(0);
-    slot.setMaxWin(0);
-    slot.setColor(getRandomColor());
-    player.setBalance(newBalance);
-    console.log("Новая лента автомата:", newReel);
   };
 
- 
+  
   const handleChangeMashine = async () => {
     if (isAnimating || isSpinning || slot.betInGame > 0) return;
 
     startAnimation(); 
-    await changeMachineLogic(); 
-    setTimeout(endAnimation, cssHideAniDuration + 2 * saveDelta);
+    await changeMachineLogic();
+    setTimeout(endAnimation, cssHideAniDuration + 2 * saveDelta); 
   };
 
   
