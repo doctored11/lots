@@ -3,13 +3,12 @@
     padding: 5vh 3%;
   }
   
-
+ 
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1.5rem;
-    justify-items: center;
-    align-items: center;
+    justify-content: center;
   }
   
 
@@ -19,7 +18,8 @@
     align-items: center;
     text-align: center;
     width: 100%;
-    aspect-ratio: 1 / 1;
+    max-width: 150px; 
+    aspect-ratio: 1 / 1; 
     background-color: #f4f4f4;
     border: 1px solid #ddd;
     border-radius: 10px;

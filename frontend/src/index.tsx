@@ -15,7 +15,7 @@ function HomePage() {
       <h1>Баланс</h1>
       <p>Ваш текущий баланс: {player?.balance || "🤔"}</p>
       <div className={styles.container}>
-      <Link className={styles.card} to="/lots">Перейти к игре</Link>
+      <Link className={styles.card} to="/lots">бандит</Link>
       </div>
     </div>
   );
