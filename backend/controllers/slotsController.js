@@ -137,11 +137,11 @@ async function getSlotInfo(req, res) {
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, error: "Слот-машина не найдена" });
         }
-
+    const slot = result.rows[0];
         console.log("::-::");
         console.log("Данные слота:", slot);
-
-        const slot = result.rows[0];
+        console.log("::_::");
+        
         res.status(200).json({
             success: true,
             data: {
