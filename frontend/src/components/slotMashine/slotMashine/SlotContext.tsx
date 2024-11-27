@@ -134,6 +134,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       const response = await getSlotInfo(chatId);
+      console.log("⚠️ - ",response)
       if (response.success) {
         setReel(response.data.reel);
         setBetStep(response.data.betStep);
