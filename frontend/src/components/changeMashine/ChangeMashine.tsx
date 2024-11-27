@@ -20,6 +20,9 @@ export function ChangeMashine() {
   let pendingState: {
     newReel: Array<keyof typeof REWARDS>;
     newBalance: number;
+    newColor: string;
+    newBetStep: number;
+    newLives: number;
   } | null = null;
 
   if (!slot || !player) return null;
@@ -39,10 +42,11 @@ export function ChangeMashine() {
     console.log("автомат pending = ", pendingState)
     if (pendingState) {
       slot.setReel(pendingState.newReel);
-      slot.setBetStep(10);
+      slot.setBetStep(pendingState.newBetStep); 
       slot.setLastWin(0);
       slot.setMaxWin(0);
-      slot.setColor(getRandomColor());
+      slot.setColor(pendingState.newColor); 
+      slot.setRollCount(pendingState.newLives); 
       player.setBalance(pendingState.newBalance);
       console.log("Новая лента автомата:", pendingState.newReel);
       pendingState = null;
@@ -78,6 +82,9 @@ export function ChangeMashine() {
         pendingState = {
           newReel: response.data.newReel,
           newBalance: response.data.newBalance,
+          newColor: response.data.newColor, 
+          newBetStep: response.data.newBetStep, 
+          newLives: response.data.newLives, 
         };
       } else {
         console.error("Ошибка смены автомата: " + response.error);

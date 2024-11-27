@@ -25,7 +25,7 @@ interface SlotContextType {
   maxWin: number;
   rollCount: number;
   isSpinning: boolean;
-  isAnimating:boolean;
+  isAnimating: boolean;
   setIsSpinning: (value: boolean) => void;
   setIsAnimating: (value: boolean) => void;
   setCombination: (combination: Array<number | null>) => void;
@@ -47,6 +47,9 @@ interface SlotContextType {
     data?: {
       newReel: Array<keyof typeof REWARDS>;
       newBalance: number;
+      newColor: string;
+      newBetStep: number;
+      newLives: number;
     };
     error?: string;
   }>;
@@ -134,7 +137,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       const response = await getSlotInfo(chatId);
-      console.log("⚠️ - ",response)
+      console.log("⚠️ - ", response);
       if (response.success) {
         setReel(response.data.reel);
         setBetStep(response.data.betStep);
@@ -212,6 +215,9 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     data?: {
       newReel: Array<keyof typeof REWARDS>;
       newBalance: number;
+      newColor: string;
+      newBetStep: number;
+      newLives: number;
     };
     error?: string;
   }> {
