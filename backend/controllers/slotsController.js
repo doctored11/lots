@@ -85,13 +85,17 @@ async function createSlotGame(userId) {
     }
 
     const initialReel = JSON.stringify([
-        "bomb", "clover", "grape", "mushroom", "grape", "melon", "banana", "blueBerrie", "cherry"
+        "bomb", "grape","clover", "bomb", "grape", "grape", 
     ]);
 
+    const randomColor = generateRandomColor();
+    const randomBetStep = generateRandomBetStep();
+    const lives = 10;
+
     const result = await pool.query(
-        `INSERT INTO slot_game (user_id, reel, bet_step, last_win, max_win, machine_lives) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [userId, initialReel, 10, 0, 0, 50]
+        `INSERT INTO slot_game (user_id, reel, bet_step, last_win, max_win, machine_lives, color) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [userId, initialReel, randomBetStep, 0, 0, lives, randomColor]
     );
 
     return result.rows[0];
@@ -100,17 +104,18 @@ async function createSlotGame(userId) {
 
 
 async function updateSlotState(userId, state) {
-    const { reel, bet_step, last_win, max_win, machine_lives } = state;
+    const { reel, bet_step, last_win, max_win, machine_lives, color } = state; 
     const reelAsJson = JSON.stringify(reel);
 
     console.log("Обновляем состояние автомата:");
     await pool.query(
         `UPDATE slot_game
-         SET reel = $1, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5
-         WHERE user_id = $6`,
-        [reelAsJson, bet_step, last_win, max_win, machine_lives, userId]
+         SET reel = $1, bet_step = $2, last_win = $3, max_win = $4, machine_lives = $5, color = $6
+         WHERE user_id = $7`,
+        [reelAsJson, bet_step, last_win, max_win, machine_lives, color, userId]
     );
 }
+
 
 
 async function getSlotInfo(req, res) {
@@ -135,11 +140,12 @@ async function getSlotInfo(req, res) {
         res.status(200).json({
             success: true,
             data: {
-                reel: slot.reel,
+                reel: JSON.parse(slot.reel),
                 betStep: slot.bet_step,
                 lastWin: slot.last_win,
                 maxWin: slot.max_win,
-                color: "#6294a4f0",
+                color: slot.color || generateRandomColor(),
+                machineLives: slot.machine_lives,
             },
         });
     } catch (error) {
@@ -269,6 +275,7 @@ const spinSlot = async (req, res) => {
             last_win: winnings,
             max_win: Math.max(slotGame.max_win, winnings),
             machine_lives: slotGame.machine_lives - 1,
+            color: slotGame.color,
         });
         console.log("обновили слоты")
         res.status(200).json({
@@ -308,6 +315,10 @@ const changeMachine = async (req, res) => {
         }
 
         const newReel = generateNewReel();
+        const newColor = generateRandomColor();
+        const newBetStep = generateRandomBetStep();
+        const newLives = generateRandomLives();
+
         const newBalance = currentBalance - machineCost;
 
         await updateUserBalance(chatId, newBalance);
@@ -315,13 +326,18 @@ const changeMachine = async (req, res) => {
         await updateSlotState(user.id, {
             ...slotGame,
             reel: newReel,
-            machine_lives: 50,
+            bet_step: newBetStep,
+            machine_lives: newLives,
+            color: newColor,
         });
 
         res.status(200).json({
             success: true,
             data: {
                 newReel,
+                newColor,
+                newBetStep,
+                newLives,
                 newBalance,
             },
         });
@@ -341,6 +357,22 @@ async function validateBalance(chatId, providedBalance) {
     return userBalance;
 }
 
+function generateRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color + 'f0'; // Добавляем прозрачность
+}
+
+function generateRandomBetStep() {
+    return getRandomInt(2, 10) * 5; 
+}
+
+function generateRandomLives() {
+    return getRandomInt(30, 100); 
+}
 
 
 

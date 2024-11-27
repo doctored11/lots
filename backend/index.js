@@ -1,6 +1,8 @@
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+
 const { bot } = require('./services/botService');
 const slotsRoutes = require('./routes/slotsRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -9,9 +11,12 @@ const {createSlotGame} = require('./controllers/slotsController')
 
 const { startProjectOptions } = require('./options');
 
+
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
 
 app.use('/api/slots', slotsRoutes);
 app.use('/api/user', userRoutes);
@@ -41,6 +46,9 @@ bot.on('message', async (msg) => {
     }
 });
 
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend/dist', 'index.html'));
+});
 const PORT = 8000;
 app.listen(PORT, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
