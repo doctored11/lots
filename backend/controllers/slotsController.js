@@ -145,7 +145,7 @@ async function getSlotInfo(req, res) {
         res.status(200).json({
             success: true,
             data: {
-                reel: JSON.parse(slot.reel),
+                reel: slot.reel,
                 betStep: slot.bet_step,
                 lastWin: slot.last_win,
                 maxWin: slot.max_win,
