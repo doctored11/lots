@@ -122,8 +122,10 @@ async function getSlotInfo(req, res) {
     const { chatId } = req.params;
 
     try {
+        console.log("Получение данных для chatId:", chatId);
         const user = await getUserByChatId(chatId);
         if (!user) {
+            console.error("Пользователь не найден:", chatId);
             return res.status(404).json({ success: false, error: "Пользователь не найден" });
         }
 
@@ -135,6 +137,9 @@ async function getSlotInfo(req, res) {
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, error: "Слот-машина не найдена" });
         }
+
+        console.log("::-::");
+        console.log("Данные слота:", slot);
 
         const slot = result.rows[0];
         res.status(200).json({
