@@ -5,6 +5,8 @@ import { OneHandSlotMashine } from "./pages/oneHabdSlotMashine/oneHandSlotMashin
 import { PlayerContext, PlayerProvider } from "./PlayerContext";
 import "./index.css";
 import "./normalize.css";
+import styles from "./homePage.module.css";
+
 
 function HomePage() {
   const player = useContext(PlayerContext);
@@ -12,7 +14,9 @@ function HomePage() {
     <div>
       <h1>Баланс</h1>
       <p>Ваш текущий баланс: {player?.balance || "🤔"}</p>
-      <Link to="/lots">Перейти к игре</Link>
+      <div className={styles.container}>
+      <Link className={styles.card} to="/lots">Перейти к игре</Link>
+      </div>
     </div>
   );
 }
