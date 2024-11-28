@@ -6,8 +6,8 @@ const path = require('path');
 const { bot } = require('./services/botService');
 const slotsRoutes = require('./routes/slotsRoutes');
 const userRoutes = require('./routes/userRoutes');
-const { ensureUserExists } = require('./controllers/userController');
-const {createSlotGame} = require('./controllers/slotsLogic/slotsModel')
+const { ensureUserExists } = require('./controllers/lots/userController');
+const {createSlotGame} = require('./controllers/lots/slotsLogic/slotsModel')
 
 const { startProjectOptions } = require('./options');
 

@@ -1,4 +1,4 @@
-const pool = require('../../db');
+const pool = require('../../../db');
 const { generateRandomColor } = require('./gameLogic');
 
 async function getSlotGameByUserId(userId) {
@@ -21,13 +21,13 @@ async function createSlotGame(userId) {
     ]);
 
     const randomColor = generateRandomColor();
-    const randomBetStep = generateRandomBetStep();
+    const betStep = 10;
     const lives = 10;
 
     const result = await pool.query(
         `INSERT INTO slot_game (user_id, reel, bet_step, last_win, max_win, machine_lives, color) 
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-        [userId, initialReel, randomBetStep, 0, 0, lives, randomColor]
+        [userId, initialReel, betStep, 0, 0, lives, randomColor]
     );
 
     return result.rows[0];

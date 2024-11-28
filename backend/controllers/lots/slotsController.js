@@ -1,5 +1,5 @@
-const pool = require('../db');
-const { sendMessage } = require('../services/botService');
+const pool = require('../../db');
+const { sendMessage } = require('../../services/botService');
 
 
 const { getSlotGameByUserId, createSlotGame, updateSlotState } = require('./slotsLogic/slotsModel');

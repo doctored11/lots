@@ -7,7 +7,7 @@ const {
     getUserBalance,
     deleteUser,
     ensureUserExists, 
-} = require('../controllers/userController');
+} = require('../controllers/lots/userController');
 
 router.get('/', async (req, res) => {
     try {

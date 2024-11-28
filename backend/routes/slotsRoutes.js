@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { spinSlot, changeMachine,getSlotInfo } = require('../controllers/slotsController');
+const { spinSlot, changeMachine,getSlotInfo } = require('../controllers/lots/slotsController');
 
 
 router.post('/spin', spinSlot);
