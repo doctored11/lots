@@ -1,5 +1,6 @@
 const pool = require('../../db');
-const { getUserByChatId, updateUserBalance } = require('../userController');
+const { getUserByChatId } = require('../userController');
+
 async function getGiftInfo(req, res) {
     const { chatId } = req.params;
     console.log(`Получение информации о подарке для chatId: ${chatId}`);
@@ -12,38 +13,22 @@ async function getGiftInfo(req, res) {
         }
 
         console.log(`Пользователь найден: ${JSON.stringify(user)}`);
-        
-        // Попробуем запросить запись в таблице gifts
-        let result;
-        try {
-            result = await pool.query(
-                'SELECT last_collected FROM gifts WHERE user_id = $1',
-                [user.id]
-            );
-        } catch (err) {
-            console.error('Ошибка выполнения SELECT-запроса к таблице gifts:', err);
-            throw err; // Бросаем ошибку выше
-        }
 
-        console.log(`Результат запроса к таблице gifts: ${JSON.stringify(result.rows)}`);
-        
-        // Если запись не найдена, создаем новую
+        const result = await pool.query(
+            'SELECT last_collected FROM gifts WHERE user_id = $1',
+            [user.id]
+        );
+
         if (result.rows.length === 0) {
             console.log(`Записи о подарке для пользователя ${user.id} не найдено. Создаем новую.`);
 
             const distantPast = new Date(2011, 10, 11, 11, 11, 11);
-            let newGift;
-            try {
-                newGift = await pool.query(
-                    'INSERT INTO gifts (user_id, last_collected) VALUES ($1, $2) RETURNING last_collected',
-                    [user.id, distantPast]
-                );
-            } catch (err) {
-                console.error('Ошибка выполнения INSERT-запроса к таблице gifts:', err);
-                throw err; // Бросаем ошибку выше
-            }
+            const newGift = await pool.query(
+                'INSERT INTO gifts (user_id, last_collected) VALUES ($1, $2) RETURNING last_collected',
+                [user.id, distantPast]
+            );
 
-            console.log(`Успешно создана новая запись для пользователя ${user.id}.`);
+            console.log(`Успешно создана запись для пользователя ${user.id}.`);
             return res.status(200).json({
                 success: true,
                 data: { lastCollected: newGift.rows[0].last_collected },
@@ -74,21 +59,29 @@ async function collectGift(req, res) {
         }
 
         console.log(`Пользователь найден: ${JSON.stringify(user)}`);
-        const result = await pool.query(
+
+        let result = await pool.query(
             'SELECT last_collected FROM gifts WHERE user_id = $1',
             [user.id]
         );
 
-        console.log(`Результат запроса к таблице gifts: ${JSON.stringify(result.rows)}`);
-        let lastCollected;
         if (result.rows.length === 0) {
-            console.log(`Создание новой записи для пользователя с id ${user.id}`);
-            await pool.query('INSERT INTO gifts (user_id, last_collected) VALUES ($1, NOW())', [user.id]);
-            lastCollected = new Date(0); 
-        } else {
-            lastCollected = new Date(result.rows[0].last_collected);
+            console.log(`Записи о подарке для пользователя ${user.id} не найдено. Создаем новую.`);
+
+            const distantPast = new Date(2011, 10, 11, 11, 11, 11);
+            await pool.query(
+                'INSERT INTO gifts (user_id, last_collected) VALUES ($1, $2)',
+                [user.id, distantPast]
+            );
+
+            
+            result = await pool.query(
+                'SELECT last_collected FROM gifts WHERE user_id = $1',
+                [user.id]
+            );
         }
 
+        const lastCollected = new Date(result.rows[0].last_collected);
         const now = new Date();
         const cooldown = 30 * 60 * 1000; 
         const timeDiff = now - lastCollected;
@@ -104,8 +97,9 @@ async function collectGift(req, res) {
             });
         }
 
-        const giftAmount = Math.floor(Math.random() * (150 - 5 + 1)) + 5; 
+        const giftAmount = Math.floor(Math.random() * (150 - 5 + 1)) + 5;
         console.log(`Начисление подарка на сумму: ${giftAmount}`);
+
         const updatedBalance = await updateUserBalance(chatId, user.balance + giftAmount);
 
         await pool.query(
@@ -124,4 +118,7 @@ async function collectGift(req, res) {
     }
 }
 
-module.exports = { getGiftInfo, collectGift };
+
+
+
+module.exports = { getGiftInfo,collectGift };
