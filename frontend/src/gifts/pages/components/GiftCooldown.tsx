@@ -11,7 +11,7 @@ export function GiftCooldown(props: GiftCooldownProps) {
         function updateCooldown() {
             const now = Date.now(); 
             const last = new Date(props.lastCollected).getTime(); 
-            const cooldown = 30 * 60 * 1000; 
+            const cooldown = 1 * 60 * 1000; 
             const remaining = Math.max(0, cooldown - (now - last)); 
             setTimeLeft(remaining); 
         }
