@@ -1,5 +1,5 @@
 const pool = require('../db');
-const { getUserByChatId, updateUserBalance } = require('../controllers/userController');
+const { getUserByChatId, updateUserBalance } = require('../userController');
 
 async function getGiftInfo(req, res) {
     const { chatId } = req.params;

@@ -1,5 +1,5 @@
 const express = require('express');
-const { getGiftInfo, collectGift } = require('../controllers/giftsController');
+const { getGiftInfo, collectGift } = require('../controllers/gifts/giftsController');
 const router = express.Router();
 
 router.get('/:chatId', getGiftInfo);
