@@ -58,10 +58,10 @@ async function collectGift(req, res) {
             return res.status(404).json({ success: false, error: "Пользователь не найден." });
         }
 
-        console.log(`Пользователь найден: ${JSON.stringify(user)}`);
+        console.log(`!Пользователь найден: ${JSON.stringify(user)}`);
         let result
         try {
-            console.log(`Попытка выполнения SELECT запроса в таблице gifts для user_id: ${user.id}`);
+            console.log(`!Попытка выполнения SELECT запроса в таблице gifts для user_id: ${user.id}`);
              result = await pool.query(
                 'SELECT last_collected FROM gifts WHERE user_id = $1',
                 [user.id]
