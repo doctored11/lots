@@ -3,10 +3,10 @@ import { SlotMashine } from "../../components/slotMashine/slotMashine/SlotMashin
 import { SlotProvider } from "../../components/slotMashine/slotMashine/SlotContext";
 import style from "./style.module.css";
 import { BetControls } from "../../components/betControl/BetControl";
-import { Header } from "../../components/header/header";
+import { Header } from "../../../globalComponents/header/header";
 import { ChangeMashine } from "../../components/changeMashine/ChangeMashine";
 
-import { PlayerContext } from "../../PlayerContext";
+import { PlayerContext } from "../../../PlayerContext";
 // import "../../../global"
 
 export function OneHandSlotMashine() {

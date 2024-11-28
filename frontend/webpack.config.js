@@ -64,7 +64,7 @@ module.exports = {
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: 'src/source', to: 'source' },
+                { from: 'src/lots/source', to: 'source' },
             ],
         }),
         new webpack.DefinePlugin({

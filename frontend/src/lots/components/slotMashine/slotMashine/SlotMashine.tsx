@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { MashineBody } from "./mashineBody/MashineBody";
-import { PlayerContext } from "../../../PlayerContext";
-import { REWARDS } from "constants/drumConstants";
+import { PlayerContext } from "../../../../PlayerContext";
+import { REWARDS } from "lots/constants/drumConstants";
 import { SlotContext, SlotProvider } from "./SlotContext";
 import style from "./style.module.css";
 

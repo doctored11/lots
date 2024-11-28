@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
-import { useSlotContext } from "../../components/slotMashine/slotMashine/SlotContext";
-import { PlayerContext } from "../../PlayerContext";
-import { useMashineLogic } from "../../components/slotMashine/slotMashine/mashineBody/useMashineLogic";
+import { useSlotContext } from "../slotMashine/slotMashine/SlotContext";
+import { PlayerContext } from "../../../PlayerContext";
 
 export function BetControls() {
   const { betInGame, setBetInGame, betStep } = useSlotContext();

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import styles from "./mashineFooter.module.css";
 import { SlotContext } from "../../SlotContext";
-import { PlayerContext } from "../../../../../PlayerContext";
+import { PlayerContext } from "../../../../../../PlayerContext";
 export function MashineFooter() {
   const slotMashine = useContext(SlotContext);
   const player = useContext(PlayerContext);

@@ -1,4 +1,4 @@
-import { delay } from "../../../../../tools/tools";
+import { delay } from "../../../../../../tools/tools";
 
 export function rollSpin(
   tape: HTMLDivElement,

@@ -7,9 +7,9 @@ import React, {
   useEffect,
 } from "react";
 import { REWARDS, DRUM_CHANCES } from "../../../constants/drumConstants";
-import { getRandomInt } from "../../../tools/tools";
-import { useGameAPI } from "../../../api/useLotsAPI";
-import { usePlayerContext } from "../../../PlayerContext";
+import { getRandomInt } from "../../../../tools/tools";
+import { useGameAPI } from "../../../../api/useLotsAPI";
+import { usePlayerContext } from "../../../../PlayerContext";
 
 type DrumItem = keyof typeof DRUM_CHANCES;
 

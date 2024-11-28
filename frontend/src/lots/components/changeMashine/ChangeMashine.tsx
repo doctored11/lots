@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useSlotContext } from "../slotMashine/slotMashine/SlotContext";
-import { getRandomColor } from "../../tools/tools";
 import styles from "./changeMashine.module.css";
-import { PlayerContext } from "../../PlayerContext";
+import { PlayerContext } from "../../../PlayerContext";
 import { REWARDS } from "../../constants/drumConstants";
 
 export function ChangeMashine() {

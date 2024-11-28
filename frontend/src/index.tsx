@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { OneHandSlotMashine } from "./pages/oneHabdSlotMashine/oneHandSlotMashine";
+import { OneHandSlotMashine } from "./lots/pages/oneHabdSlotMashine/oneHandSlotMashine";
 import { PlayerContext, PlayerProvider } from "./PlayerContext";
 import "./index.css";
 import "./normalize.css";

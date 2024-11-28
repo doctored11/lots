@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { REWARDS } from "../../../../../constants/drumConstants";
 import style from "./mashineDrum.module.css";
-import { getRandomInt } from "../../../../../tools/tools";
+import { getRandomInt } from "../../../../../../tools/tools";
 import { rollSpin } from "./rollSpin";
 import { Roll } from "./Roll";
 

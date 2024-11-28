@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MashineDrum } from "./mashineDrum/MashineDrum";
 import { REWARDS } from "../../../../constants/drumConstants";
-import { getRandomInt } from "../../../../tools/tools";
+import { getRandomInt } from "../../../../../tools/tools";
 import styles from "./mashineBody.module.css";
 import { SlotContext } from "../SlotContext";
-import { PlayerContext } from "../../../../PlayerContext";
+import { PlayerContext } from "../../../../../PlayerContext";
 import { HandBtn } from "./hendBtn/HandBtn";
 import { MashineFooter } from "./mashineFooter/MashineFooter";
-import { useGameAPI } from "../../../../api/useLotsAPI";
+import { useGameAPI } from "../../../../../api/useLotsAPI";
 import { useMashineLogic } from "./useMashineLogic";
 
 export function MashineBody() {

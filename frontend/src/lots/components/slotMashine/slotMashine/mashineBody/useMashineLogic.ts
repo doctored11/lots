@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { SlotContext } from "../SlotContext";
-import { PlayerContext } from "../../../../PlayerContext";
-import { useGameAPI } from "../../../../api/useLotsAPI";
+import { PlayerContext } from "../../../../../PlayerContext";
+import { useGameAPI } from "../../../../../api/useLotsAPI";
 
 export function useMashineLogic() {
   const slotMashine = useContext(SlotContext);
