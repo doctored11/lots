@@ -23,7 +23,7 @@ async function getGiftInfo(req, res) {
             );
             console.log(`Результат SELECT запроса: ${JSON.stringify(result.rows)}`);
         } catch (err) {
-            console.error('Ошибка выполнения SELECT-запроса к таблице gifts:', err);
+            console.log('Ошибка выполнения SELECT-запроса к таблице gifts:', err);
             throw err; // Проброс ошибки, чтобы основной catch обработал
         }
         
