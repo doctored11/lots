@@ -15,6 +15,7 @@ export function MashineBody() {
   const player = useContext(PlayerContext);
   const { spinSlots, loading, error } = useGameAPI();
   const { spinValues, isSpinning, startSpin, onSpinEnd } = useMashineLogic();
+  const [triggerSpin, setTriggerSpin] = useState(false);
   const itemHeight = 128;
 
   if (!slotMashine) return;
@@ -36,17 +37,27 @@ export function MashineBody() {
   async function spin() {
     if (!slotMashine || !player) return;
     const betStep = slotMashine.betStep;
+    if (slotMashine.betInGame > 0) {
+      setTriggerSpin(true);
+      return;
+    }
     if (slotMashine.betInGame == 0) {
       if (player.balance - betStep >= 0) {
         player.minusBalance(betStep);
         slotMashine.setBetInGame(slotMashine.betInGame + betStep);
-      }else{
-        console.log("нет деняг")
+        setTriggerSpin(true);
+      } else {
+        console.log("нет деняг");
       }
+    } else {
+      setTriggerSpin(false);
     }
-    if (slotMashine.betInGame > 0) await startSpin();
   }
-
+  useEffect(() => {
+    if (triggerSpin && slotMashine.betInGame > 0) {
+      startSpin().finally(() => setTriggerSpin(false));
+    }
+  }, [triggerSpin, slotMashine.betInGame, startSpin]);
   return (
     <div className={styles.mashineContainer}>
       <div className={styles.mashine} id="mashine">
@@ -76,4 +87,3 @@ export function MashineBody() {
     </div>
   );
 }
-
