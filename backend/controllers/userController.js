@@ -1,4 +1,4 @@
-const pool = require('../../db');
+const pool = require('../db');
 
 async function getUserByChatId(chatId) {
     const result = await pool.query('SELECT * FROM "user" WHERE chat_id = $1', [chatId]);
