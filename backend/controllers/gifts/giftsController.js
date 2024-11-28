@@ -1,6 +1,5 @@
 const pool = require('../../db');
 const { getUserByChatId, updateUserBalance } = require('../userController');
-
 async function getGiftInfo(req, res) {
     const { chatId } = req.params;
 
@@ -15,10 +14,12 @@ async function getGiftInfo(req, res) {
             [user.id]
         );
 
+        // Если запись отсутствует, создаём новую и устанавливаем далёкую дату
         if (result.rows.length === 0) {
+            const distantPast = new Date(2011, 10, 11, 11, 11, 11); // 11.11.2011 11:11:11
             const newGift = await pool.query(
-                'INSERT INTO gifts (user_id) VALUES ($1) RETURNING last_collected',
-                [user.id]
+                'INSERT INTO gifts (user_id, last_collected) VALUES ($1, $2) RETURNING last_collected',
+                [user.id, distantPast]
             );
             return res.status(200).json({
                 success: true,
@@ -36,6 +37,7 @@ async function getGiftInfo(req, res) {
         res.status(500).json({ success: false, error: "Внутренняя ошибка сервера." });
     }
 }
+
 
 async function collectGift(req, res) {
     const { chatId } = req.body;
