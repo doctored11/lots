@@ -1,24 +1,28 @@
-import React, { useState } from 'react';
-import { collectGift } from '../../../api/giftsApi';
+import React, { useState } from "react";
+import { collectGift } from "../../../api/giftsApi";
 
-export function GiftButton () {
-    const [loading, setLoading] = useState(false);
+interface Props {
+  chatId: string;
+}
 
-    const handleClick = async () => {
-        setLoading(true);
-        const response = await collectGift();
-        setLoading(false);
+export const GiftButton: React.FC<Props> = ({ chatId }) => {
+  const [loading, setLoading] = useState(false);
 
-        if (response.success) {
-            alert(`Вы получили ${response.reward} монет!`);
-        } else {
-            alert(response.error || 'Ошибка получения подарка');
-        }
-    };
+  const handleClick = async () => {
+    setLoading(true);
+    const response = await collectGift(chatId); 
+    setLoading(false);
 
-    return (
-        <button onClick={handleClick} disabled={loading}>
-            {loading ? 'Загрузка...' : 'Получить подарок'}
-        </button>
-    );
+    if (response.success) {
+      alert(`Вы получили ${response.data.giftAmount} монет!`);
+    } else {
+      alert(response.error || "Ошибка получения подарка");
+    }
+  };
+
+  return (
+    <button onClick={handleClick} disabled={loading}>
+      {loading ? "Загрузка..." : "Получить подарок"}
+    </button>
+  );
 };

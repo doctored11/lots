@@ -1,25 +1,24 @@
-export const getGiftStatus = async () => {
+export const getGiftStatus = async (chatId) => {
     try {
-        const response = await fetch('/api/gifts/status', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-        });
-        const data = await response.json();
-        return data;
+      const response = await fetch(`/api/gifts/status/${chatId}`);
+      return await response.json();
     } catch (error) {
-        return { success: false, error: error.message };
+      console.error("Ошибка получения статуса подарка:", error);
+      return { success: false, error: error.message };
     }
-};
-
-export const collectGift = async () => {
+  };
+  
+  export const collectGift = async (chatId) => {
     try {
-        const response = await fetch('/api/gifts/collect', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        });
-        const data = await response.json();
-        return data;
+      const response = await fetch("/api/gifts/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatId }),
+      });
+      return await response.json();
     } catch (error) {
-        return { success: false, error: error.message };
+      console.error("Ошибка сбора подарка:", error);
+      return { success: false, error: error.message };
     }
-};
+  };
+  
