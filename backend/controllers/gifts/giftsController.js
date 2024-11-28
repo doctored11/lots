@@ -1,6 +1,5 @@
 const pool = require('../../db');
 const { getUserByChatId, updateUserBalance } = require('../userController');
-
 async function getGiftInfo(req, res) {
     const { chatId } = req.params;
     console.log(`Получение информации о подарке для chatId: ${chatId}`);
@@ -13,21 +12,38 @@ async function getGiftInfo(req, res) {
         }
 
         console.log(`Пользователь найден: ${JSON.stringify(user)}`);
-        const result = await pool.query(
-            'SELECT last_collected FROM gifts WHERE user_id = $1',
-            [user.id]
-        );
+        
+        // Попробуем запросить запись в таблице gifts
+        let result;
+        try {
+            result = await pool.query(
+                'SELECT last_collected FROM gifts WHERE user_id = $1',
+                [user.id]
+            );
+        } catch (err) {
+            console.error('Ошибка выполнения SELECT-запроса к таблице gifts:', err);
+            throw err; // Бросаем ошибку выше
+        }
 
         console.log(`Результат запроса к таблице gifts: ${JSON.stringify(result.rows)}`);
+        
+        // Если запись не найдена, создаем новую
         if (result.rows.length === 0) {
             console.log(`Записи о подарке для пользователя ${user.id} не найдено. Создаем новую.`);
 
             const distantPast = new Date(2011, 10, 11, 11, 11, 11);
-            console.log(`Создание новой записи для пользователя с id ${user.id}`);
-            const newGift = await pool.query(
-                'INSERT INTO gifts (user_id, last_collected) VALUES ($1, $2) RETURNING last_collected',
-                [user.id, distantPast]
-            );
+            let newGift;
+            try {
+                newGift = await pool.query(
+                    'INSERT INTO gifts (user_id, last_collected) VALUES ($1, $2) RETURNING last_collected',
+                    [user.id, distantPast]
+                );
+            } catch (err) {
+                console.error('Ошибка выполнения INSERT-запроса к таблице gifts:', err);
+                throw err; // Бросаем ошибку выше
+            }
+
+            console.log(`Успешно создана новая запись для пользователя ${user.id}.`);
             return res.status(200).json({
                 success: true,
                 data: { lastCollected: newGift.rows[0].last_collected },
