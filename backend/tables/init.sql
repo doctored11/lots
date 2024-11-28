@@ -17,3 +17,10 @@ CREATE TABLE slot_game (
     max_win INTEGER DEFAULT 0,
     machine_lives INTEGER DEFAULT 50
 );
+
+CREATE TABLE gifts (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    last_collected TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);

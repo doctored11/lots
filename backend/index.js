@@ -4,15 +4,18 @@ const cors = require('cors');
 const path = require('path');
 
 const { bot } = require('./services/botService');
+
 const slotsRoutes = require('./routes/slotsRoutes');
 const userRoutes = require('./routes/userRoutes');
+const giftsRoutes = require('./routes/giftsRoutes');
+
 const { ensureUserExists } = require('./controllers/lots/userController');
 const {createSlotGame} = require('./controllers/lots/slotsLogic/slotsModel')
 
 const { startProjectOptions } = require('./options');
 
-
 const app = express();
+
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
@@ -20,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
 app.use('/api/slots', slotsRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/gifts', giftsRoutes);
 
 bot.setMyCommands([
     { command: '/start', description: 'Начальное приветствие' },
