@@ -14,9 +14,8 @@ async function getGiftInfo(req, res) {
             [user.id]
         );
 
-        // Если запись отсутствует, создаём новую и устанавливаем далёкую дату
         if (result.rows.length === 0) {
-            const distantPast = new Date(2011, 10, 11, 11, 11, 11); // 11.11.2011 11:11:11
+            const distantPast = new Date(2011, 10, 11, 11, 11, 11); 
             const newGift = await pool.query(
                 'INSERT INTO gifts (user_id, last_collected) VALUES ($1, $2) RETURNING last_collected',
                 [user.id, distantPast]
@@ -27,6 +26,7 @@ async function getGiftInfo(req, res) {
             });
         }
 
+        
         const lastCollected = result.rows[0].last_collected;
         return res.status(200).json({
             success: true,
@@ -53,9 +53,6 @@ async function collectGift(req, res) {
             [user.id]
         );
 
-        const now = new Date();
-        const cooldown = 30 * 60 * 1000; 
-
         let lastCollected;
         if (result.rows.length === 0) {
             await pool.query('INSERT INTO gifts (user_id, last_collected) VALUES ($1, NOW())', [user.id]);
@@ -63,6 +60,9 @@ async function collectGift(req, res) {
         } else {
             lastCollected = new Date(result.rows[0].last_collected);
         }
+
+        const now = new Date();
+        const cooldown = 30 * 60 * 1000; 
 
         const timeDiff = now - lastCollected;
         if (timeDiff < cooldown) {
@@ -74,11 +74,11 @@ async function collectGift(req, res) {
             });
         }
 
-        
-        const giftAmount = Math.floor(Math.random() * (150 - 5 + 1)) + 5; //todo вынести в переменные
-
+       
+        const giftAmount = Math.floor(Math.random() * (150 - 5 + 1)) + 5; 
         const updatedBalance = await updateUserBalance(chatId, user.balance + giftAmount);
 
+       
         await pool.query(
             'UPDATE gifts SET last_collected = NOW() WHERE user_id = $1',
             [user.id]
@@ -93,5 +93,6 @@ async function collectGift(req, res) {
         res.status(500).json({ success: false, error: "Внутренняя ошибка сервера." });
     }
 }
+
 
 module.exports = { getGiftInfo, collectGift };
