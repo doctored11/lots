@@ -13,12 +13,12 @@ async function getGiftInfo(req, res) {
         }
 
         console.log(`Пользователь найден: ${JSON.stringify(user)}`);
-
+        //!!тут ломается
         const result = await pool.query(
             'SELECT last_collected FROM gifts WHERE user_id = $1',
             [user.id]
         );
-
+        console.log(result)
         if (result.rows.length === 0) {
             console.log(`Записи о подарке для пользователя ${user.id} не найдено. Создаем новую.`);
 
@@ -74,7 +74,7 @@ async function collectGift(req, res) {
                 [user.id, distantPast]
             );
 
-            
+
             result = await pool.query(
                 'SELECT last_collected FROM gifts WHERE user_id = $1',
                 [user.id]
@@ -83,7 +83,7 @@ async function collectGift(req, res) {
 
         const lastCollected = new Date(result.rows[0].last_collected);
         const now = new Date();
-        const cooldown = 30 * 60 * 1000; 
+        const cooldown = 30 * 60 * 1000;
         const timeDiff = now - lastCollected;
 
         console.log(`Время с последнего сбора: ${timeDiff} ms`);
@@ -121,4 +121,4 @@ async function collectGift(req, res) {
 
 
 
-module.exports = { getGiftInfo,collectGift };
+module.exports = { getGiftInfo, collectGift };
