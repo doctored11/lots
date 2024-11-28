@@ -1,5 +1,5 @@
 const pool = require('../../db');
-const { getUserByChatId } = require('../userController');
+const { getUserByChatId,updateUserBalance } = require('../userController');
 
 async function getGiftInfo(req, res) {
     const { chatId } = req.params;
@@ -8,7 +8,7 @@ async function getGiftInfo(req, res) {
     try {
         const user = await getUserByChatId(chatId);
         if (!user) {
-            console.error(`Пользователь с chatId ${chatId} не найден.`);
+            console.log(`Пользователь с chatId ${chatId} не найден.`);
             return res.status(404).json({ success: false, error: "Пользователь не найден." });
         }
 
@@ -51,7 +51,7 @@ async function getGiftInfo(req, res) {
             data: { lastCollected },
         });
     } catch (error) {
-        console.error('Ошибка получения информации о подарке:', error);
+        console.log('Ошибка получения информации о подарке:', error);
         res.status(500).json({ success: false, error: "Внутренняя ошибка сервера." });
     }
 }
@@ -63,7 +63,7 @@ async function collectGift(req, res) {
     try {
         const user = await getUserByChatId(chatId);
         if (!user) {
-            console.error(`Пользователь с chatId ${chatId} не найден.`);
+            console.log(`Пользователь с chatId ${chatId} не найден.`);
             return res.status(404).json({ success: false, error: "Пользователь не найден." });
         }
 
@@ -77,7 +77,7 @@ async function collectGift(req, res) {
             );
             console.log(`Результат SELECT запроса: ${JSON.stringify(result.rows)}`);
         } catch (err) {
-            console.error('Ошибка выполнения SELECT-запроса к таблице gifts:', err);
+            console.log('Ошибка выполнения SELECT-запроса к таблице gifts:', err);
             throw err; // Проброс ошибки, чтобы основной catch обработал
         }
         
@@ -130,7 +130,7 @@ async function collectGift(req, res) {
             data: { giftAmount, newBalance: updatedBalance },
         });
     } catch (error) {
-        console.error('Ошибка при сборе подарка:', error);
+        console.log('Ошибка при сборе подарка:', error);
         res.status(500).json({ success: false, error: "Внутренняя ошибка сервера." });
     }
 }
