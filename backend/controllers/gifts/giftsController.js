@@ -20,6 +20,8 @@ async function getGiftInfo(req, res) {
 
         console.log(`Результат запроса к таблице gifts: ${JSON.stringify(result.rows)}`);
         if (result.rows.length === 0) {
+            console.log(`Записи о подарке для пользователя ${user.id} не найдено. Создаем новую.`);
+
             const distantPast = new Date(2011, 10, 11, 11, 11, 11);
             console.log(`Создание новой записи для пользователя с id ${user.id}`);
             const newGift = await pool.query(

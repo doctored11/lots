@@ -3,7 +3,7 @@ const { getGiftInfo, collectGift } = require('../controllers/gifts/giftsControll
 
 const router = express.Router();
 
-router.get('/:chatId', getGiftInfo);
+router.get('/status/:chatId', getGiftInfo);
 
 router.post('/collect', collectGift);
 
