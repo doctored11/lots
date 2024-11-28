@@ -23,6 +23,7 @@ async function ensureGiftRecordExists(userId) {
     console.log(`Запись найдена: ${JSON.stringify(result.rows[0])}`);
     return result.rows[0].last_collected;
 }
+// 
 
 function calculateTimeDiff(lastCollected) {
     const now = new Date();
