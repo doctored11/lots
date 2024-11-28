@@ -64,7 +64,7 @@ async function collectGift(req, res) {
             'SELECT last_collected FROM gifts WHERE user_id = $1',
             [user.id]
         );
-
+        console.log(result)
         if (result.rows.length === 0) {
             console.log(`Записи о подарке для пользователя ${user.id} не найдено. Создаем новую.`);
 
