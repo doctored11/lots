@@ -36,7 +36,14 @@ export function MashineBody() {
   async function spin() {
     if (!slotMashine || !player) return;
     const betStep = slotMashine.betStep;
-
+    if (slotMashine.betInGame == 0) {
+      if (player.balance - betStep >= 0) {
+        player.minusBalance(betStep);
+        slotMashine.setBetInGame(slotMashine.betInGame + betStep);
+      }else{
+        console.log("нет деняг")
+      }
+    }
     if (slotMashine.betInGame > 0) await startSpin();
   }
 
@@ -58,14 +65,15 @@ export function MashineBody() {
                 spinValues={spinValues}
                 reel={reel}
                 onSpinEnd={onSpinEnd}
-                isSpinning={isSpinning ||false}
+                isSpinning={isSpinning || false}
               />
             </div>{" "}
           </div>
           <MashineFooter></MashineFooter>
         </div>
-        <HandBtn spin={spin} isSpinning={isSpinning||false}></HandBtn>
+        <HandBtn spin={spin} isSpinning={isSpinning || false}></HandBtn>
       </div>
     </div>
   );
 }
+
