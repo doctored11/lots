@@ -9,7 +9,7 @@ const slotsRoutes = require('./routes/slotsRoutes');
 const userRoutes = require('./routes/userRoutes');
 const giftsRoutes = require('./routes/giftsRoutes');
 
-const { ensureUserExists } = require('./controllers/lots/userController');
+const { ensureUserExists } = require('./controllers/userController');
 const {createSlotGame} = require('./controllers/lots/slotsLogic/slotsModel')
 
 const { startProjectOptions } = require('./options');

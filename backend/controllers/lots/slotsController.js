@@ -1,10 +1,9 @@
 const pool = require('../../db');
-const { sendMessage } = require('../../services/botService');
 
 
 const { getSlotGameByUserId, createSlotGame, updateSlotState } = require('./slotsLogic/slotsModel');
 const { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel } = require('./slotsLogic/gameLogic');
-const { getUserByChatId, updateUserBalance,getUserBalance} = require('./userController');
+const { getUserByChatId, updateUserBalance,getUserBalance} = require('../userController');
 
 async function getSlotInfo(req, res) {
     const { chatId } = req.params;
