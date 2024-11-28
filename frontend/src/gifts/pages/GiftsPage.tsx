@@ -6,6 +6,7 @@ import { PlayerContext } from "../../PlayerContext";
 
 export function GiftsPage() {
   const [lastCollected, setLastCollected] = useState<string | null>(null);
+  const [lastWin, setLastWin] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const player = useContext(PlayerContext);
   const chatId = player?.chatId;
@@ -35,6 +36,11 @@ export function GiftsPage() {
     fetchGiftStatus();
   }, [chatId]);
 
+  const handleGiftCollected = (newLastCollected: string, giftAmount: number) => {
+    setLastCollected(newLastCollected);
+    setLastWin(giftAmount); // Обновляем последний выигрыш
+  };
+
   if (loading) {
     return <div>Загрузка...</div>;
   }
@@ -49,7 +55,8 @@ export function GiftsPage() {
       {lastCollected !== null ? (
         <>
           <GiftCooldown lastCollected={lastCollected} />
-          <GiftButton chatId={chatId} />
+          <GiftButton chatId={chatId} onGiftCollected={handleGiftCollected} />
+          {lastWin !== null && <p>Ваш последний выигрыш: {lastWin} монет</p>}
         </>
       ) : (
         <p>Не удалось загрузить данные.</p>
