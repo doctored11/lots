@@ -12,12 +12,21 @@ async function getGiftInfo(req, res) {
             return res.status(404).json({ success: false, error: "Пользователь не найден." });
         }
 
-        console.log(`Пользователь найден: ${JSON.stringify(user)}`);
+        console.log(`-_ Пользователь найден: ${JSON.stringify(user)}`);
         //!!тут ломается
-        const result = await pool.query(
-            'SELECT last_collected FROM gifts WHERE user_id = $1',
-            [user.id]
-        );
+        let result
+        try {
+            console.log(`Попытка выполнения SELECT запроса в таблице gifts для user_id: ${user.id}`);
+             result = await pool.query(
+                'SELECT last_collected FROM gifts WHERE user_id = $1',
+                [user.id]
+            );
+            console.log(`Результат SELECT запроса: ${JSON.stringify(result.rows)}`);
+        } catch (err) {
+            console.error('Ошибка выполнения SELECT-запроса к таблице gifts:', err);
+            throw err; // Проброс ошибки, чтобы основной catch обработал
+        }
+        
         console.log(result)
         if (result.rows.length === 0) {
             console.log(`Записи о подарке для пользователя ${user.id} не найдено. Создаем новую.`);
