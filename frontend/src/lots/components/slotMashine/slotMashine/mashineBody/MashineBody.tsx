@@ -23,14 +23,16 @@ export function MashineBody() {
 
   const mashineElement = document.getElementById("mashine");
   useEffect(() => {
-    console.log("💫 isSpining изменен",isSpinning)
+    console.log("💫 isSpining изменен", isSpinning);
     if (mashineElement) {
       if (isSpinning) {
-        // setTimeout(() => {
+        setTimeout(() => {
           mashineElement.classList.add(styles.working);
-        // }, 300);
+        }, 300);
       } else {
-        mashineElement.classList.remove(styles.working);
+        setTimeout(() => {
+          mashineElement.classList.remove(styles.working);
+        }, 0);
       }
     }
   }, [isSpinning]);
