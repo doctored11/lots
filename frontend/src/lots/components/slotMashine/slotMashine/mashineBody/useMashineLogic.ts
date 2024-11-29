@@ -3,6 +3,7 @@ import { SlotContext } from "../SlotContext";
 import { PlayerContext } from "../../../../../PlayerContext";
 import { useGameAPI } from "../../../../../api/useLotsAPI";
 import { ChangeMashine } from "../../../../../lots/components/changeMashine/ChangeMashine";
+import { REWARDS } from "../../../../../lots/constants/drumConstants";
 
 export function useMashineLogic() {
   const slotMashine = useContext(SlotContext);
@@ -16,7 +17,7 @@ export function useMashineLogic() {
   async function startSpin() {
     try {
       if (!player || !slotMashine || slotMashine.isSpinning) return;
-       slotMashine.setIsSpinning(true);
+      slotMashine.setIsSpinning(true);
       const response = await spinSlots(
         player.chatId,
         slotMashine.betInGame,
@@ -26,14 +27,7 @@ export function useMashineLogic() {
         if (response.action === "changeMachine") {
           setPendingBalance(null);
           console.log("⚙️ смена автомата инициирована сервером");
-          slotMashine.setReel(response.data.newReel);
-          slotMashine.setMachineLives(response.data.newLives);
-          slotMashine.setBetStep(response.data.newBetStep);
-          slotMashine.setColor(response.data.newColor);
-          player.setBalance(response.data.balance);
-          console.log("💥", response.data);
-          slotMashine.endAnimation();
-          slotMashine.setIsSpinning(false);
+          handleMachineChange(response.data);
           return;
         }
         const { combination, newBalance, machineLives } = response.data;
@@ -53,10 +47,28 @@ export function useMashineLogic() {
       console.error("Ошибка спина:", err);
     } finally {
       slotMashine?.setBetInGame(0);
-      slotMashine?.setIsSpinning(false);
     }
   }
+  function handleMachineChange(data: {
+    newReel:  Array<keyof typeof REWARDS>;
+    newLives: number;
+    newBetStep: number;
+    newColor: string;
+    balance: number;
+  }) {
+    if(!slotMashine) return
+    slotMashine.setReel(data.newReel);
+    slotMashine.setMachineLives(data.newLives);
+    slotMashine.setBetStep(data.newBetStep);
+    slotMashine.setColor(data.newColor);
+    player?.setBalance(data.balance);
 
+    console.log("💥 Новый автомат:", data);
+
+    slotMashine.setIsSpinning(false);
+
+    slotMashine.endAnimation();
+  }
   function onSpinEnd() {
     if (pendingBalance !== null && player) {
       console.log("✔️ Анимация завершена. Обновляем баланс и слот.");

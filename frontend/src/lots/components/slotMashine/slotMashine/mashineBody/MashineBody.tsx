@@ -23,6 +23,7 @@ export function MashineBody() {
 
   const mashineElement = document.getElementById("mashine");
   useEffect(() => {
+    console.log("💫 isSpining изменен")
     if (mashineElement) {
       if (isSpinning) {
         setTimeout(() => {
