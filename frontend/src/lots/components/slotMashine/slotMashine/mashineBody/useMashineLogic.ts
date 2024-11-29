@@ -16,7 +16,7 @@ export function useMashineLogic() {
   async function startSpin() {
     try {
       if (!player || !slotMashine || slotMashine.isSpinning) return;
-      if (slotMashine.machineLives > 0) slotMashine.setIsSpinning(true);
+       slotMashine.setIsSpinning(true);
       const response = await spinSlots(
         player.chatId,
         slotMashine.betInGame,
@@ -53,6 +53,7 @@ export function useMashineLogic() {
       console.error("Ошибка спина:", err);
     } finally {
       slotMashine?.setBetInGame(0);
+      slotMashine?.setIsSpinning(true);
     }
   }
 
