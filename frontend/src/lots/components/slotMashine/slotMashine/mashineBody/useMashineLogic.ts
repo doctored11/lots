@@ -24,6 +24,7 @@ export function useMashineLogic() {
       );
       if (response.success) {
         if (response.action === "changeMachine") {
+          setPendingBalance(null);
           console.log("⚙️ смена автомата инициирована сервером");
           slotMashine.setReel(response.data.newReel);
           slotMashine.setMachineLives(response.data.newLives);
