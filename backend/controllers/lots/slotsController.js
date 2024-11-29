@@ -132,14 +132,14 @@ const spinSlot = async (req, res) => {
             ...slotGame,
             last_win: winnings,
             max_win: Math.max(slotGame.max_win, winnings),
-            machine_lives: slotGame.machine_lives - 1,
-            color: slotGame.color,
             machine_lives: newLives,
+            color: slotGame.color,
+            
         });
         console.log("обновили слоты")
         res.status(200).json({
             success: true,
-            data: { combination, newBalance },
+            data: { combination, newBalance, machineLives: newLives },
         });
     } catch (error) {
         console.error('Ошибка в spinSlot:', error);
