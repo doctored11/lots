@@ -26,9 +26,9 @@ export function MashineBody() {
     console.log("💫 isSpining изменен",isSpinning)
     if (mashineElement) {
       if (isSpinning) {
-        setTimeout(() => {
+        // setTimeout(() => {
           mashineElement.classList.add(styles.working);
-        }, 300);
+        // }, 300);
       } else {
         mashineElement.classList.remove(styles.working);
       }
