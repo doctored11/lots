@@ -26,21 +26,7 @@ export function ChangeMashine() {
 
   if (!slot || !player) return null;
 
-  useEffect(() => {
-    if (slot.pendingState) {
-      console.log("🔄 Применяем pendingState:", slot.pendingState);
-
-      slot.setReel(slot.pendingState.newReel);
-      slot.setBetStep(slot.pendingState.newBetStep);
-      slot.setLastWin(0);
-      slot.setMaxWin(0);
-      slot.setColor(slot.pendingState.newColor);
-      slot.setRollCount(slot.pendingState.newLives);
-      player.setBalance(slot.pendingState.newBalance);
-
-      slot.setPendingState(null);
-    }
-  }, [slot.pendingState]);
+  
   // const startAnimation = () => {
   //   setIsAnimating(true);
   //   shadowView?.classList.add(styles.shadow);
@@ -52,20 +38,20 @@ export function ChangeMashine() {
   //   }
   // };
 
-  // const applyPendingState = () => {
-  //   console.log("автомат pending = ", pendingState)
-  //   if (pendingState) {
-  //     slot.setReel(pendingState.newReel);
-  //     slot.setBetStep(pendingState.newBetStep); 
-  //     slot.setLastWin(0);
-  //     slot.setMaxWin(0);
-  //     slot.setColor(pendingState.newColor); 
-  //     slot.setRollCount(pendingState.newLives); 
-  //     player.setBalance(pendingState.newBalance);
-  //     console.log("Новая лента автомата:", pendingState.newReel);
-  //     pendingState = null;
-  //   }
-  // };
+  const applyPendingState = () => {
+    console.log("автомат pending = ", slot.pendingState)
+    if (slot.pendingState) {
+      slot.setReel(slot.pendingState.newReel);
+      slot.setBetStep(slot.pendingState.newBetStep); 
+      slot.setLastWin(0);
+      slot.setMaxWin(0);
+      slot.setColor(slot.pendingState.newColor); 
+      slot.setRollCount(slot.pendingState.newLives); 
+      player.setBalance(slot.pendingState.newBalance);
+      console.log("Новая лента автомата:", slot.pendingState.newReel);
+      slot.pendingState = null;
+    }
+  };
 
  
   // const endAnimation = () => {
@@ -113,12 +99,12 @@ export function ChangeMashine() {
 
   
   const handleChangeMashine = async () => {
-    if (isAnimating || isSpinning || slot.betInGame > 0) return;
+    if (slot.isAnimating || slot.isSpinning || slot.betInGame > 0) return;
 
     slot.startAnimation();
  
     await changeMachineLogic();
-    setTimeout(slot.endAnimation, cssHideAniDuration + 2 * saveDelta); 
+    setTimeout(()=>{applyPendingState(),slot.endAnimation}, cssHideAniDuration + 2 * saveDelta); 
   };
 
   
