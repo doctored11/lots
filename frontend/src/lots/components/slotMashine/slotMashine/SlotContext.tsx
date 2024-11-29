@@ -10,7 +10,7 @@ import { REWARDS, DRUM_CHANCES } from "../../../constants/drumConstants";
 import { getRandomInt } from "../../../../tools/tools";
 import { useGameAPI } from "../../../../api/useLotsAPI";
 import { usePlayerContext } from "../../../../PlayerContext";
-import styles from "./mashineBody/mashineBody.module.css" //да стили для смены машины
+import styles from "../../changeMashine/changeMashine.module.css" //да стили для смены машины
 
 type DrumItem = keyof typeof DRUM_CHANCES;
 
