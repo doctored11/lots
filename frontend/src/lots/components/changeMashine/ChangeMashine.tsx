@@ -99,12 +99,12 @@ export function ChangeMashine() {
 
   
   const handleChangeMashine = async () => {
-    if (slot.isAnimating || slot.isSpinning || slot.betInGame > 0) return;
+    if ( slot.isAnimating || slot.isSpinning || slot.betInGame > 0) return;
 
     slot.startAnimation();
  
     await changeMachineLogic();
-    setTimeout(()=>{applyPendingState(),slot.endAnimation}, cssHideAniDuration + 2 * saveDelta); 
+    setTimeout(()=>{applyPendingState();slot.endAnimation()}, cssHideAniDuration + 2 * saveDelta); 
   };
 
   
