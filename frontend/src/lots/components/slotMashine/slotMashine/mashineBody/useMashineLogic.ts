@@ -53,7 +53,7 @@ export function useMashineLogic() {
       console.error("Ошибка спина:", err);
     } finally {
       slotMashine?.setBetInGame(0);
-      slotMashine?.setIsSpinning(true);
+      slotMashine?.setIsSpinning(false);
     }
   }
 
