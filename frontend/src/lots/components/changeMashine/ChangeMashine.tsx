@@ -16,31 +16,31 @@ export function ChangeMashine() {
 
   const { isAnimating, setIsAnimating, isSpinning } = slot;
 
-  let pendingState: {
-    newReel: Array<keyof typeof REWARDS>;
-    newBalance: number;
-    newColor: string;
-    newBetStep: number;
-    newLives: number;
-  } | null = null;
+  // let pendingState: {
+  //   newReel: Array<keyof typeof REWARDS>;
+  //   newBalance: number;
+  //   newColor: string;
+  //   newBetStep: number;
+  //   newLives: number;
+  // } | null = null;
 
   if (!slot || !player) return null;
 
   useEffect(() => {
-    if (pendingState) {
-      console.log("🔄 Применяем pendingState:", pendingState);
+    if (slot.pendingState) {
+      console.log("🔄 Применяем pendingState:", slot.pendingState);
 
-      slot.setReel(pendingState.newReel);
-      slot.setBetStep(pendingState.newBetStep);
+      slot.setReel(slot.pendingState.newReel);
+      slot.setBetStep(slot.pendingState.newBetStep);
       slot.setLastWin(0);
       slot.setMaxWin(0);
-      slot.setColor(pendingState.newColor);
-      slot.setRollCount(pendingState.newLives);
-      player.setBalance(pendingState.newBalance);
+      slot.setColor(slot.pendingState.newColor);
+      slot.setRollCount(slot.pendingState.newLives);
+      player.setBalance(slot.pendingState.newBalance);
 
       slot.setPendingState(null);
     }
-  }, [pendingState]);
+  }, [slot.pendingState]);
   // const startAnimation = () => {
   //   setIsAnimating(true);
   //   shadowView?.classList.add(styles.shadow);
@@ -93,7 +93,7 @@ export function ChangeMashine() {
       );
       if (response.success && response.data) {
         console.log("получили смену автомата: ", response.data)
-        pendingState = {
+        let pendingState = {
           newReel: response.data.newReel,
           newBalance: response.data.newBalance,
           newColor: response.data.newColor, 
