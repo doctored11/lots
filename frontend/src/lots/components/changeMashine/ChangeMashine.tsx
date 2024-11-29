@@ -14,6 +14,8 @@ export function ChangeMashine() {
   const cssShowAniDuration = 1_200; // мс
   const saveDelta = 100;
 
+  const [isReadyToApply, setIsReadyToApply] = useState(false);
+
   const { isAnimating, setIsAnimating, isSpinning } = slot;
 
   // let pendingState: {
@@ -26,7 +28,6 @@ export function ChangeMashine() {
 
   if (!slot || !player) return null;
 
-  
   // const startAnimation = () => {
   //   setIsAnimating(true);
   //   shadowView?.classList.add(styles.shadow);
@@ -39,26 +40,24 @@ export function ChangeMashine() {
   // };
 
   const applyPendingState = () => {
-    console.log("автомат pending = ", slot.pendingState)
+    console.log("автомат pending = ", slot.pendingState);
     if (slot.pendingState) {
       slot.setReel(slot.pendingState.newReel);
-      slot.setBetStep(slot.pendingState.newBetStep); 
+      slot.setBetStep(slot.pendingState.newBetStep);
       slot.setLastWin(0);
       slot.setMaxWin(0);
-      slot.setColor(slot.pendingState.newColor); 
-      slot.setRollCount(slot.pendingState.newLives); 
+      slot.setColor(slot.pendingState.newColor);
+      slot.setRollCount(slot.pendingState.newLives);
       player.setBalance(slot.pendingState.newBalance);
       console.log("Новая лента автомата:", slot.pendingState.newReel);
       slot.pendingState = null;
     }
   };
 
- 
   // const endAnimation = () => {
   //   mashineView?.classList.remove(styles.mashineHide);
   //   shadowView?.classList.remove(styles.shadowGrow);
 
-    
   //   applyPendingState();
 
   //   mashineView?.classList.add(styles.mashineShow);
@@ -67,7 +66,7 @@ export function ChangeMashine() {
   //   setTimeout(() => {
   //     mashineView?.classList.remove(styles.mashineShow);
   //     shadowView?.classList.remove(styles.shadowAppearance);
-  //     setIsAnimating(false); 
+  //     setIsAnimating(false);
   //   }, cssShowAniDuration + saveDelta);
   // };
 
@@ -78,15 +77,15 @@ export function ChangeMashine() {
         player.balance
       );
       if (response.success && response.data) {
-        console.log("получили смену автомата: ", response.data)
+        console.log("получили смену автомата: ", response.data);
         let pendingState = {
           newReel: response.data.newReel,
           newBalance: response.data.newBalance,
-          newColor: response.data.newColor, 
-          newBetStep: response.data.newBetStep, 
-          newLives: response.data.newLives, 
+          newColor: response.data.newColor,
+          newBetStep: response.data.newBetStep,
+          newLives: response.data.newLives,
         };
-        slot.setPendingState(pendingState)
+        slot.setPendingState(pendingState);
       } else {
         console.error("Ошибка смены автомата: " + response.error);
         restorePreviousState();
@@ -97,17 +96,23 @@ export function ChangeMashine() {
     }
   };
 
-  
   const handleChangeMashine = async () => {
-    if ( slot.isAnimating || slot.isSpinning || slot.betInGame > 0) return;
+    if (slot.isAnimating || slot.isSpinning || slot.betInGame > 0) return;
 
     slot.startAnimation();
- 
-    await changeMachineLogic();
-    setTimeout(()=>{applyPendingState();slot.endAnimation()}, cssHideAniDuration + 2 * saveDelta); 
-  };
 
-  
+    await changeMachineLogic();
+    setTimeout(() => {
+      setIsReadyToApply(true);
+    }, cssHideAniDuration + 2 * saveDelta);
+  };
+  useEffect(() => {
+    if (isReadyToApply) {
+      applyPendingState();
+      slot.endAnimation();
+      setIsReadyToApply(false);
+    }
+  }, [isReadyToApply]);
   const restorePreviousState = () => {
     console.warn("🤡 Восстановлено предыдущее состояние автомата ", slot.reel);
     slot.setReel(slot.reel);
@@ -115,7 +120,7 @@ export function ChangeMashine() {
     slot.setLastWin(slot.lastWin);
     slot.setMaxWin(slot.maxWin);
     slot.setColor(slot.color);
-    setIsAnimating(false); 
+    setIsAnimating(false);
   };
 
   return (
