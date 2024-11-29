@@ -103,6 +103,16 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [isSpinning, setIsSpinning] = useState(false);
 
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const [pendingState, setPendingState] = useState<{
+    newReel: Array<keyof typeof REWARDS>;
+    newBalance: number;
+    newColor: string;
+    newBetStep: number;
+    newLives: number;
+  } | null>(null);
+
+
   const { getSlotInfo, changeMachine } = useGameAPI();
 
   const { chatId } = usePlayerContext();
@@ -150,6 +160,22 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  function applyPendingState() {
+    if (pendingState) {
+      setReel(pendingState.newReel);
+      setBetStep(pendingState.newBetStep);
+      setLastWin(0);
+      setMaxWin(0);
+      setColor(pendingState.newColor);
+      setMachineLives(pendingState.newLives);
+      setPendingState(null); 
+    }
+  }
+
+  
+  
+
+
   const startAnimation = () => {
     setIsAnimating(true);
     const shadowView = document.getElementById("shadow");
@@ -160,9 +186,11 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       setTimeout(() => {
         mashineView.classList.add(styles.mashineHide);
         shadowView?.classList.add(styles.shadowGrow);
+       
       }, 100);
     }
   };
+  
 
   const endAnimation = () => {
     const shadowView = document.getElementById("shadow");
@@ -171,6 +199,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     mashineView?.classList.remove(styles.mashineHide);
     shadowView?.classList.remove(styles.shadowGrow);
 
+    applyPendingState()
+
     mashineView?.classList.add(styles.mashineShow);
     shadowView?.classList.add(styles.shadowAppearance);
 
@@ -178,7 +208,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       mashineView?.classList.remove(styles.mashineShow);
       shadowView?.classList.remove(styles.shadowAppearance);
       setIsAnimating(false);
-    }, 1200);
+    }, 1300);
   };
 
   function reelUpdate() {

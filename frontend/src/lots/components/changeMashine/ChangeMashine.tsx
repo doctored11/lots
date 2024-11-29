@@ -26,29 +26,49 @@ export function ChangeMashine() {
 
   if (!slot || !player) return null;
 
-  const startAnimation = () => {
-    slot.startAnimation()
-  };
+  // const startAnimation = () => {
+  //   setIsAnimating(true);
+  //   shadowView?.classList.add(styles.shadow);
+  //   if (mashineView) {
+  //     setTimeout(() => {
+  //       mashineView.classList.add(styles.mashineHide);
+  //       shadowView?.classList.add(styles.shadowGrow);
+  //     }, saveDelta);
+  //   }
+  // };
 
-  const applyPendingState = () => {
-    console.log("автомат pending = ", pendingState)
-    if (pendingState) {
-      slot.setReel(pendingState.newReel);
-      slot.setBetStep(pendingState.newBetStep); 
-      slot.setLastWin(0);
-      slot.setMaxWin(0);
-      slot.setColor(pendingState.newColor); 
-      slot.setRollCount(pendingState.newLives); 
-      player.setBalance(pendingState.newBalance);
-      console.log("Новая лента автомата:", pendingState.newReel);
-      pendingState = null;
-    }
-  };
+  // const applyPendingState = () => {
+  //   console.log("автомат pending = ", pendingState)
+  //   if (pendingState) {
+  //     slot.setReel(pendingState.newReel);
+  //     slot.setBetStep(pendingState.newBetStep); 
+  //     slot.setLastWin(0);
+  //     slot.setMaxWin(0);
+  //     slot.setColor(pendingState.newColor); 
+  //     slot.setRollCount(pendingState.newLives); 
+  //     player.setBalance(pendingState.newBalance);
+  //     console.log("Новая лента автомата:", pendingState.newReel);
+  //     pendingState = null;
+  //   }
+  // };
 
  
-  const endAnimation = () => {applyPendingState();
-   slot.endAnimation()
-  };
+  // const endAnimation = () => {
+  //   mashineView?.classList.remove(styles.mashineHide);
+  //   shadowView?.classList.remove(styles.shadowGrow);
+
+    
+  //   applyPendingState();
+
+  //   mashineView?.classList.add(styles.mashineShow);
+  //   shadowView?.classList.add(styles.shadowAppearance);
+
+  //   setTimeout(() => {
+  //     mashineView?.classList.remove(styles.mashineShow);
+  //     shadowView?.classList.remove(styles.shadowAppearance);
+  //     setIsAnimating(false); 
+  //   }, cssShowAniDuration + saveDelta);
+  // };
 
   const changeMachineLogic = async () => {
     try {
@@ -79,9 +99,10 @@ export function ChangeMashine() {
   const handleChangeMashine = async () => {
     if (isAnimating || isSpinning || slot.betInGame > 0) return;
 
-    startAnimation(); 
+    slot.startAnimation();
+ 
     await changeMachineLogic();
-    setTimeout(endAnimation, cssHideAniDuration + 2 * saveDelta); 
+    setTimeout(slot.endAnimation, cssHideAniDuration + 2 * saveDelta); 
   };
 
   
