@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useSlotContext } from "../slotMashine/slotMashine/SlotContext";
 import styles from "./changeMashine.module.css";
 import { PlayerContext } from "../../../PlayerContext";
@@ -26,6 +26,21 @@ export function ChangeMashine() {
 
   if (!slot || !player) return null;
 
+  useEffect(() => {
+    if (pendingState) {
+      console.log("🔄 Применяем pendingState:", pendingState);
+
+      slot.setReel(pendingState.newReel);
+      slot.setBetStep(pendingState.newBetStep);
+      slot.setLastWin(0);
+      slot.setMaxWin(0);
+      slot.setColor(pendingState.newColor);
+      slot.setRollCount(pendingState.newLives);
+      player.setBalance(pendingState.newBalance);
+
+      slot.setPendingState(null);
+    }
+  }, [pendingState]);
   // const startAnimation = () => {
   //   setIsAnimating(true);
   //   shadowView?.classList.add(styles.shadow);
