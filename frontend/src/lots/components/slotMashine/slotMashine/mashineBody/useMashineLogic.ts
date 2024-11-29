@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { SlotContext } from "../SlotContext";
 import { PlayerContext } from "../../../../../PlayerContext";
 import { useGameAPI } from "../../../../../api/useLotsAPI";
+import { ChangeMashine } from "../../../../../lots/components/changeMashine/ChangeMashine";
 
 export function useMashineLogic() {
   const slotMashine = useContext(SlotContext);
@@ -31,6 +32,7 @@ export function useMashineLogic() {
           slotMashine.setColor(response.data.newColor);
           player.setBalance(response.data.balance);
           console.log ("💥", response.data)
+          slotMashine.endAnimation();
           slotMashine.setIsSpinning(false);
           return;
       }

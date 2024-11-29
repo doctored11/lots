@@ -27,14 +27,7 @@ export function ChangeMashine() {
   if (!slot || !player) return null;
 
   const startAnimation = () => {
-    setIsAnimating(true);
-    shadowView?.classList.add(styles.shadow);
-    if (mashineView) {
-      setTimeout(() => {
-        mashineView.classList.add(styles.mashineHide);
-        shadowView?.classList.add(styles.shadowGrow);
-      }, saveDelta);
-    }
+    slot.startAnimation()
   };
 
   const applyPendingState = () => {
@@ -53,21 +46,8 @@ export function ChangeMashine() {
   };
 
  
-  const endAnimation = () => {
-    mashineView?.classList.remove(styles.mashineHide);
-    shadowView?.classList.remove(styles.shadowGrow);
-
-    
-    applyPendingState();
-
-    mashineView?.classList.add(styles.mashineShow);
-    shadowView?.classList.add(styles.shadowAppearance);
-
-    setTimeout(() => {
-      mashineView?.classList.remove(styles.mashineShow);
-      shadowView?.classList.remove(styles.shadowAppearance);
-      setIsAnimating(false); 
-    }, cssShowAniDuration + saveDelta);
+  const endAnimation = () => {applyPendingState();
+   slot.endAnimation()
   };
 
   const changeMachineLogic = async () => {

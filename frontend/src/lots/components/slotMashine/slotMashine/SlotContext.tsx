@@ -10,6 +10,7 @@ import { REWARDS, DRUM_CHANCES } from "../../../constants/drumConstants";
 import { getRandomInt } from "../../../../tools/tools";
 import { useGameAPI } from "../../../../api/useLotsAPI";
 import { usePlayerContext } from "../../../../PlayerContext";
+import styles from "./mashineBody/mashineBody.module.css" //да стили для смены машины
 
 type DrumItem = keyof typeof DRUM_CHANCES;
 
@@ -56,6 +57,8 @@ interface SlotContextType {
     error?: string;
   }>;
   loading: boolean;
+  startAnimation: () => void;
+  endAnimation: () => void;
 }
 
 export const SlotContext = createContext<SlotContextType | undefined>(
@@ -102,37 +105,6 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const { getSlotInfo, changeMachine } = useGameAPI();
 
-  const slotContextValue: SlotContextType = {
-    betStep,
-    betInGame,
-    combination,
-    mode,
-    color,
-    reel,
-    lastWin,
-    maxWin,
-    rollCount,
-    isSpinning,
-    machineLives,
-    setMachineLives,
-    isAnimating,
-    setIsAnimating,
-    setIsSpinning,
-    setCombination,
-    setBetStep,
-    setBetInGame,
-    setMode,
-    setReel,
-    setRollCount,
-    setColor,
-    setLastWin,
-    setMaxWin,
-    reelUpdate,
-    updateSlotScore,
-    getNewMachine,
-    loading,
-  };
-
   const { chatId } = usePlayerContext();
   const initializeSlot = async () => {
     if (!chatId) {
@@ -178,6 +150,37 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const startAnimation = () => {
+    setIsAnimating(true);
+    const shadowView = document.getElementById("shadow");
+    const mashineView = document.getElementById("mashine");
+
+    shadowView?.classList.add(styles.shadow);
+    if (mashineView) {
+      setTimeout(() => {
+        mashineView.classList.add(styles.mashineHide);
+        shadowView?.classList.add(styles.shadowGrow);
+      }, 100);
+    }
+  };
+
+  const endAnimation = () => {
+    const shadowView = document.getElementById("shadow");
+    const mashineView = document.getElementById("mashine");
+
+    mashineView?.classList.remove(styles.mashineHide);
+    shadowView?.classList.remove(styles.shadowGrow);
+
+    mashineView?.classList.add(styles.mashineShow);
+    shadowView?.classList.add(styles.shadowAppearance);
+
+    setTimeout(() => {
+      mashineView?.classList.remove(styles.mashineShow);
+      shadowView?.classList.remove(styles.shadowAppearance);
+      setIsAnimating(false);
+    }, 1200);
+  };
+
   function reelUpdate() {
     const newReel: DrumItem[] = [];
     const weightedItems: DrumItem[] = [];
@@ -213,6 +216,40 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     setReel(newReel);
     console.log("колесико обновлено, ", elCount, newReel);
   }
+
+  
+  const slotContextValue: SlotContextType = {
+    betStep,
+    betInGame,
+    combination,
+    mode,
+    color,
+    reel,
+    lastWin,
+    maxWin,
+    rollCount,
+    isSpinning,
+    machineLives,
+    setMachineLives,
+    isAnimating,
+    setIsAnimating,
+    setIsSpinning,
+    setCombination,
+    setBetStep,
+    setBetInGame,
+    setMode,
+    setReel,
+    setRollCount,
+    setColor,
+    setLastWin,
+    setMaxWin,
+    reelUpdate,
+    updateSlotScore,
+    getNewMachine,
+    loading,
+    startAnimation,
+    endAnimation,
+  };
 
   async function getNewMachine(
     chatId: string,
@@ -268,6 +305,11 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
             : "Неизвестная ошибка: " + error,
       };
     }
+
+
+
+
+    
   }
 
   return (
