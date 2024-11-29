@@ -31,6 +31,7 @@ export function useMashineLogic() {
           slotMashine.setColor(response.data.newColor);
           player.setBalance(response.data.balance);
           console.log ("💥", response.data)
+          slotMashine.setIsSpinning(false);
           return;
       }
         const { combination, newBalance,machineLives  } = response.data;
