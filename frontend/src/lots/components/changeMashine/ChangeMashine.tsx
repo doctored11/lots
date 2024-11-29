@@ -85,6 +85,7 @@ export function ChangeMashine() {
           newBetStep: response.data.newBetStep, 
           newLives: response.data.newLives, 
         };
+        slot.setPendingState(pendingState)
       } else {
         console.error("Ошибка смены автомата: " + response.error);
         restorePreviousState();

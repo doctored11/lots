@@ -11,6 +11,15 @@ import { getRandomInt } from "../../../../tools/tools";
 import { useGameAPI } from "../../../../api/useLotsAPI";
 import { usePlayerContext } from "../../../../PlayerContext";
 import styles from "../../changeMashine/changeMashine.module.css" //да стили для смены машины
+// Todo потом разбить это, максимум 150 строк в контексте 
+
+interface PendingStateType {
+  newReel: Array<keyof typeof REWARDS>;
+  newBalance: number;
+  newColor: string;
+  newBetStep: number;
+  newLives: number;
+}
 
 type DrumItem = keyof typeof DRUM_CHANCES;
 
@@ -39,6 +48,9 @@ interface SlotContextType {
   setRollCount: (rollCount: number) => void;
   setColor: (color: string) => void;
   setLastWin: (win: number) => void;
+  pendingState: PendingStateType | null; 
+  setPendingState: React.Dispatch<React.SetStateAction<PendingStateType | null>>;
+  
   setMaxWin: (win: number) => void;
   reelUpdate: () => void;
   updateSlotScore: (win: number) => void;
@@ -264,6 +276,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     isAnimating,
     setIsAnimating,
     setIsSpinning,
+    pendingState, 
+    setPendingState,
     setCombination,
     setBetStep,
     setBetInGame,
