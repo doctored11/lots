@@ -1,3 +1,5 @@
+// todo вынести в константы числа
+
 const REWARDS = {
     bomb: { values: { 1: { type: 'plus', amount: 0.3 }, 2: { type: 'plus', amount: 0.8 }, 3: { type: 'multiply', factor: 8.8 } } },
     clover: { values: { 1: { type: 'multiply', factor: 3 }, 2: { type: 'multiply', factor: 7 }, 3: { type: "plus", amount: 72 } } },
@@ -148,7 +150,8 @@ function generateRandomBetStep() {
 }
 
 function generateRandomLives() {
-    return getRandomInt(30, 100);
+    // return getRandomInt(30, 100);
+    return getRandomInt(5, 10);
 }
 
 function getRandomInt(min, max) {
