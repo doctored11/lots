@@ -22,13 +22,27 @@ export function useMashineLogic() {
         player.balance+ slotMashine.betInGame,
       );
       if (response.success) {
-        const { combination, newBalance } = response.data;
+
+        if (response.action === "changeMachine") {
+          console.log("⚙️ смена автомата инициирована сервером");
+          slotMashine.setReel(response.data.newReel);
+          slotMashine.setMachineLives(response.data.newLives);
+          slotMashine.setBetStep(response.data.newBetStep);
+          slotMashine.setColor(response.data.newColor);
+          player.setBalance(response.data.balance);
+          console.log ("💥", response.data)
+          return;
+      }
+        const { combination, newBalance,machineLives  } = response.data;
+        //давай и тут сетить жизни автомата - позже к ним анимации добавлю
 
         console.log("🤔 Новая комбинация:", combination);
         console.log("Новый баланс (ожидается):", newBalance);
 
         setSpinValues(combination);
         setPendingBalance(newBalance);
+        slotMashine.setMachineLives(machineLives); 
+        console.log("жизни автомата",machineLives )
       } else {
         alert("Ошибка: " + response.error);
       }

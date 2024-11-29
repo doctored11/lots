@@ -26,6 +26,8 @@ interface SlotContextType {
   rollCount: number;
   isSpinning: boolean;
   isAnimating: boolean;
+  machineLives: number;
+  setMachineLives: (lives: number) => void;
   setIsSpinning: (value: boolean) => void;
   setIsAnimating: (value: boolean) => void;
   setCombination: (combination: Array<number | null>) => void;
@@ -70,12 +72,15 @@ export const useSlotContext = () => {
 export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const [betStep, setBetStep] = useState(10);
   const [betInGame, setBetInGame] = useState(0);
+  const [machineLives, setMachineLives] = useState(10);
+
   const [combination, setCombination] = useState<Array<number | null>>([
     null,
     null,
     null,
   ]);
   const [mode, setMode] = useState("normal");
+
   const [reel, setReel] = useState<Array<keyof typeof REWARDS>>([
     "bomb",
     "clover",
@@ -108,6 +113,8 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     maxWin,
     rollCount,
     isSpinning,
+    machineLives,
+    setMachineLives,
     isAnimating,
     setIsAnimating,
     setIsSpinning,

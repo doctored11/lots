@@ -25,11 +25,11 @@ async function getSlotInfo(req, res) {
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, error: "Слот-машина не найдена" });
         }
-    const slot = result.rows[0];
+        const slot = result.rows[0];
         console.log("::-::");
         console.log("Данные слота:", slot);
         console.log("::_::");
-        
+
         res.status(200).json({
             success: true,
             data: {
@@ -74,6 +74,35 @@ const spinSlot = async (req, res) => {
         console.log('slotGame:', slotGame);
         console.log('reel field:', slotGame.reel);
 
+        if (slotGame.machine_lives <= 0) {
+            console.log("HP автомата достигло 0. Смена автомата.");
+            const newReel = generateNewReel();
+            const newLives = generateRandomLives();
+            const newColor = generateRandomColor();
+            const newBetStep = generateRandomBetStep();
+
+            await updateSlotState(user.id, {
+                ...slotGame,
+                reel: newReel,
+                machine_lives: newLives,
+                bet_step: newBetStep,
+                last_win: 0,
+                max_win: 0,
+                color: newColor,
+            });
+
+            return res.status(200).json({
+                success: true,
+                action: "changeMachine",
+                data: {
+                    newReel,
+                    newLives,
+                    newColor,
+                    newBetStep,
+                    balance: currentBalance,
+                },
+            });
+        }
 
 
         const reel = slotGame.reel;
@@ -94,6 +123,8 @@ const spinSlot = async (req, res) => {
         const winnings = calculateWinnings(bet, results);
         const newBalance = currentBalance - bet + winnings;
         await updateUserBalance(chatId, newBalance);
+        const newLives = slotGame.machine_lives - 1;
+
 
         console.log("баданс обновлен", currentBalance, bet, winnings, newBalance)
         console.log("пытаемся обновить слоты")
@@ -103,6 +134,7 @@ const spinSlot = async (req, res) => {
             max_win: Math.max(slotGame.max_win, winnings),
             machine_lives: slotGame.machine_lives - 1,
             color: slotGame.color,
+            machine_lives: newLives,
         });
         console.log("обновили слоты")
         res.status(200).json({
@@ -153,7 +185,7 @@ const changeMachine = async (req, res) => {
         await updateSlotState(user.id, {
             ...slotGame,
             reel: newReel,
-            bet_step: newBetStep, 
+            bet_step: newBetStep,
             last_win: 0,
             max_win: 0,
             machine_lives: newLives,
