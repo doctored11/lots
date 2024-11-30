@@ -212,11 +212,12 @@
   transform: scale(0.5);
   opacity: 0;
   z-index: 1000;
-  pointer-events: none;
+  pointer-events: none; 
+  animation: growExplosion 4s forwards;
 
 }
 .explosion.animate {
-  animation: growExplosion 0.3s forwards;
+  animation: growExplosion 4s forwards;
 }
 
 

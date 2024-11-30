@@ -219,7 +219,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
         explosion.style.display = "none"; 
         explosion.classList.remove(styles.explosion);
        
-      }, 300);
+      }, 10000);
     }
   };
   
