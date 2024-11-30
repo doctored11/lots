@@ -70,7 +70,7 @@ export function useMashineLogic() {
     setTimeout(() => {
       slotMashine.setIsSpinning(false);
       slotMashine.endAnimation();
-    }, 500)
+    }, 1000)
   }
   function onSpinEnd() {
     if (pendingBalance !== null && player) {
