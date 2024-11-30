@@ -216,7 +216,7 @@
   background-position: center;
   top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%) scale(0.5);
   width: 50vw;
   height: 50vw;
   transform: scale(0.5);
@@ -230,17 +230,17 @@
 
 @keyframes growExplosion {
   0% {
-    transform: scale(1) translateX(-50%);
+    transform: translate(-50%, -50%) scale(1); 
     opacity: 1;
   }
   70%{
     opacity: 1;
   }
   80%{
-    transform: scale(5) translateX(-50%);
+    transform: translate(-50%, -50%) scale(5);
   }
   98% {
-    transform: scale(8) translateX(-50%);
+    transform: translate(-50%, -50%) scale(8);
     opacity: 0;
   }
   100%{
