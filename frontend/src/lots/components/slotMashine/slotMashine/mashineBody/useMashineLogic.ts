@@ -28,10 +28,11 @@ export function useMashineLogic() {
           setPendingBalance(null);
           console.log("⚙️ смена автомата инициирована сервером");
           handleMachineChange(response.data);
+
           return;
         }
         const { combination, newBalance, machineLives } = response.data;
-        slotMashine.startExplosionAnimation()
+        
 
         console.log("🤔 Новая комбинация:", combination);
         console.log("Новый баланс (ожидается):", newBalance);
@@ -64,6 +65,7 @@ export function useMashineLogic() {
     player?.setBalance(data.balance);
 
     console.log("💥 Новый автомат:", data);
+    slotMashine.startExplosionAnimation()
 
     slotMashine.setIsSpinning(false);
 
