@@ -195,7 +195,10 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     const mashineView = document.getElementById("mashine");
 
     shadowView?.classList.add(styles.shadow);
+   
+
     if (mashineView) {
+      mashineView.style.opacity = "1"; 
       setTimeout(() => {
         mashineView.classList.add(styles.mashineHide);
         shadowView?.classList.add(styles.shadowGrow);
@@ -216,7 +219,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       explosion.classList.add(styles.explosion);
       mashineView.classList.add(styles.mashineHide);
      
-      // mashineView.style.opacity = "0"; 
+      mashineView.style.opacity = "0"; 
       setTimeout(() => {
         explosion.style.display = "none"; 
         explosion.classList.remove(styles.explosion);
@@ -230,9 +233,11 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   const endAnimation = () => {
     const shadowView = document.getElementById("shadow");
     const mashineView = document.getElementById("mashine");
-
+    
+    if(!mashineView) return
     mashineView?.classList.remove(styles.mashineHide);
     shadowView?.classList.remove(styles.shadowGrow);
+    mashineView.style.opacity = "1"; 
 
     applyPendingState()
 
