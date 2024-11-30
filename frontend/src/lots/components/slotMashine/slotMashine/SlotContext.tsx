@@ -204,6 +204,25 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   };
   
 
+  const startExplosionAnimation = () => {
+    setIsAnimating(true);
+    const explosion = document.getElementById("explosion");
+    const mashineView = document.getElementById("mashine");
+
+   
+    if (mashineView && explosion ) {
+      explosion.style.display = "block";
+      explosion.classList.add(styles.explosion);
+      mashineView.classList.add(styles.mashineHide);
+      setTimeout(() => {
+        explosion.style.display = "none"; 
+        explosion.classList.remove(styles.explosion);
+       
+      }, 300);
+    }
+  };
+  
+
   const endAnimation = () => {
     const shadowView = document.getElementById("shadow");
     const mashineView = document.getElementById("mashine");

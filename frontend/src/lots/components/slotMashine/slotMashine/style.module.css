@@ -1,13 +1,16 @@
 .frame {
   width: 100%;
  position: relative;
-  /* height: 90vh; */
+ 
 
   display: flex;
   align-items: flex-start;
   justify-content: center;
 }
 
+/* .explosion {
+  display: nonne;
+} */
 /* @media (max-width: 700px) {
   .frame {
     max-width: 650px;

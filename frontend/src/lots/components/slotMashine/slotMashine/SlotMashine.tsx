@@ -35,7 +35,7 @@ export function SlotMashine() {
         console.log("Chat ID:", chatId);
 
         if (player) {
-          player.setChatId(chatId+"");
+          player.setChatId(chatId + "");
         } else {
           console.error("PlayerContext не найден!");
         }
@@ -55,8 +55,10 @@ export function SlotMashine() {
       <div className={style.frame}>
         <MashineBody />
         <div id="shadow"></div>
+        <div id="explosion" style={{ display: "none" }}>
+          <img src="source/boom.png" alt="Explosion" />
+        </div>
       </div>
-     
     </>
   );
 }
