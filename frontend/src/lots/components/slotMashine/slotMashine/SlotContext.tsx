@@ -217,7 +217,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     if (mashineView && explosion ) {
       explosion.style.display = "block";
       explosion.classList.add(styles.explosion);
-      mashineView.classList.add(styles.mashineHide);
+      // mashineView.classList.add(styles.mashineHide);
      
       mashineView.style.opacity = "0"; 
       setTimeout(() => {
