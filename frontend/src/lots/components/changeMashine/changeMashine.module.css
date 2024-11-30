@@ -215,13 +215,15 @@
   background-size: 100% 100%;
   background-position: center;
   top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
   width: 50vw;
   height: 50vw;
   transform: scale(0.5);
   opacity: 0;
   z-index: 1000;
   pointer-events: none; 
-  animation: growExplosion 0.4s forwards;
+  animation: growExplosion 0.3s forwards;
 
 }
 
