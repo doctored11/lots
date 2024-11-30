@@ -67,9 +67,10 @@ export function useMashineLogic() {
     console.log("💥 Новый автомат:", data);
     slotMashine.startExplosionAnimation()
 
-    slotMashine.setIsSpinning(false);
-
-    slotMashine.endAnimation();
+    setTimeout(() => {
+      slotMashine.setIsSpinning(false);
+      slotMashine.endAnimation();
+    }, 500)
   }
   function onSpinEnd() {
     if (pendingBalance !== null && player) {

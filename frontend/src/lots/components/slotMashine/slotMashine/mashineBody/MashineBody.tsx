@@ -30,9 +30,8 @@ export function MashineBody() {
           mashineElement.classList.add(styles.working);
         }, 300);
       } else {
-        setTimeout(() => {
-          mashineElement.classList.remove(styles.working);
-        }, 350);  //придумать что то (пока нет анимации взрыва бывает что машина продолдает трястись без ээтой задержки todo)
+        // !3
+        mashineElement.classList.remove(styles.working);
       }
     }
   }, [isSpinning]);
