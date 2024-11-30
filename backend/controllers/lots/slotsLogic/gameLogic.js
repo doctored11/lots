@@ -151,7 +151,7 @@ function generateRandomBetStep() {
 
 function generateRandomLives() {
     // return getRandomInt(30, 100);
-    return getRandomInt(5, 10);
+    return getRandomInt(1,3);
 }
 
 function getRandomInt(min, max) {
