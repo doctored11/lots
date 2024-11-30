@@ -11,68 +11,18 @@ import { getRandomInt } from "../../../../tools/tools";
 import { useGameAPI } from "../../../../api/useLotsAPI";
 import { usePlayerContext } from "../../../../PlayerContext";
 import styles from "../../changeMashine/changeMashine.module.css" //да стили для смены машины
-// Todo потом разбить это, максимум 150 строк в контексте 
+import {
+  startAnimation,
+  startExplosionAnimation,
+  endAnimation,
+} from "./SlotContext.animations";
+import { SlotContextType, PendingStateType } from "./SlotContext.types";
 
-interface PendingStateType {
-  newReel: Array<keyof typeof REWARDS>;
-  newBalance: number;
-  newColor: string;
-  newBetStep: number;
-  newLives: number;
-}
 
+//todo мб в хелперы вынести часть логики
 type DrumItem = keyof typeof DRUM_CHANCES;
 
-// прости я в будущем
-interface SlotContextType {
-  betStep: number;
-  betInGame: number;
-  combination: Array<number | null>;
-  mode: string;
-  reel: Array<keyof typeof REWARDS>;
-  color: string;
-  lastWin: number;
-  maxWin: number;
-  rollCount: number;
-  isSpinning: boolean;
-  isAnimating: boolean;
-  machineLives: number;
-  setMachineLives: (lives: number) => void;
-  setIsSpinning: (value: boolean) => void;
-  setIsAnimating: (value: boolean) => void;
-  setCombination: (combination: Array<number | null>) => void;
-  setBetStep: (betStep: number) => void;
-  setBetInGame: (betInGame: number) => void;
-  setMode: (mode: string) => void;
-  setReel: (reel: Array<keyof typeof REWARDS>) => void;
-  setRollCount: (rollCount: number) => void;
-  setColor: (color: string) => void;
-  setLastWin: (win: number) => void;
-  pendingState: PendingStateType | null; 
-  setPendingState: React.Dispatch<React.SetStateAction<PendingStateType | null>>;
-  
-  setMaxWin: (win: number) => void;
-  reelUpdate: () => void;
-  updateSlotScore: (win: number) => void;
-  getNewMachine: (
-    chatId: string,
-    balance: number
-  ) => Promise<{
-    success: boolean;
-    data?: {
-      newReel: Array<keyof typeof REWARDS>;
-      newBalance: number;
-      newColor: string;
-      newBetStep: number;
-      newLives: number;
-    };
-    error?: string;
-  }>;
-  loading: boolean;
-  startAnimation: () => void;
-  startExplosionAnimation:()=>void;
-  endAnimation: () => void;
-}
+
 
 export const SlotContext = createContext<SlotContextType | undefined>(
   undefined
@@ -186,74 +136,6 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   }
 
   
-  
-
-
-  const startAnimation = () => {
-    setIsAnimating(true);
-    const shadowView = document.getElementById("shadow");
-    const mashineView = document.getElementById("mashine");
-
-    shadowView?.classList.add(styles.shadow);
-   
-
-    if (mashineView) {
-      mashineView.style.opacity = "1"; 
-      setTimeout(() => {
-        mashineView.classList.add(styles.mashineHide);
-        shadowView?.classList.add(styles.shadowGrow);
-       
-      }, 100);
-    }
-  };
-  
-
-  const startExplosionAnimation = () => {
-    const timing = 300 //todo вынести все тайминг константы в файли ли объект
-    setIsAnimating(true);
-    const explosion = document.getElementById("explosion");
-    const mashineView = document.getElementById("mashine");
-
-   
-    if (mashineView && explosion ) {
-      explosion.style.display = "block";
-      explosion.classList.add(styles.explosion);
-      // mashineView.classList.add(styles.mashineHide);
-      setTimeout(() => {
-        mashineView.style.opacity = "0"; 
-      },timing/2)
-     
-      
-      setTimeout(() => {
-        explosion.style.display = "none"; 
-        explosion.classList.remove(styles.explosion);
-        
-       
-      }, timing);
-    }
-  };
-  
-
-  const endAnimation = () => {
-    const shadowView = document.getElementById("shadow");
-    const mashineView = document.getElementById("mashine");
-    
-    if(!mashineView) return
-    mashineView?.classList.remove(styles.mashineHide);
-    shadowView?.classList.remove(styles.shadowGrow);
-    mashineView.style.opacity = "1"; 
-
-    applyPendingState()
-
-    mashineView?.classList.add(styles.mashineShow);
-    shadowView?.classList.add(styles.shadowAppearance);
-
-    setTimeout(() => {
-      mashineView?.classList.remove(styles.mashineShow);
-      shadowView?.classList.remove(styles.shadowAppearance);
-      setIsAnimating(false);
-    }, 1300);
-  };
 
   function reelUpdate() {
     const newReel: DrumItem[] = [];
