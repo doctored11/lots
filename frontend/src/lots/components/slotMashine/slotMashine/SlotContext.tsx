@@ -209,6 +209,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   
 
   const startExplosionAnimation = () => {
+    const timing = 400 //todo вынести все тайминг константы в файли ли объект
     setIsAnimating(true);
     const explosion = document.getElementById("explosion");
     const mashineView = document.getElementById("mashine");
@@ -218,14 +219,17 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
       explosion.style.display = "block";
       explosion.classList.add(styles.explosion);
       // mashineView.classList.add(styles.mashineHide);
+      setTimeout(() => {
+        mashineView.style.opacity = "0"; 
+      },timing/2)
      
-      mashineView.style.opacity = "0"; 
+      
       setTimeout(() => {
         explosion.style.display = "none"; 
         explosion.classList.remove(styles.explosion);
         
        
-      }, 400);
+      }, timing);
     }
   };
   
