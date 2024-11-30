@@ -31,7 +31,7 @@ export function useMashineLogic() {
           return;
         }
         const { combination, newBalance, machineLives } = response.data;
-        //давай и тут сетить жизни автомата - позже к ним анимации добавлю
+        slotMashine.startExplosionAnimation()
 
         console.log("🤔 Новая комбинация:", combination);
         console.log("Новый баланс (ожидается):", newBalance);

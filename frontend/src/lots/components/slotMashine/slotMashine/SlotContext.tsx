@@ -70,6 +70,7 @@ interface SlotContextType {
   }>;
   loading: boolean;
   startAnimation: () => void;
+  startExplosionAnimation:()=>void;
   endAnimation: () => void;
 }
 
@@ -312,6 +313,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     loading,
     startAnimation,
     endAnimation,
+    startExplosionAnimation,
   };
 
   async function getNewMachine(
