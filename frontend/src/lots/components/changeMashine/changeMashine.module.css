@@ -223,7 +223,7 @@
   opacity: 0;
   z-index: 1000;
   pointer-events: none; 
-  animation: growExplosion 0.3s forwards;
+  animation: growExplosion 0.2s forwards;
 
 }
 

@@ -209,7 +209,7 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
   
 
   const startExplosionAnimation = () => {
-    const timing = 400 //todo вынести все тайминг константы в файли ли объект
+    const timing = 300 //todo вынести все тайминг константы в файли ли объект
     setIsAnimating(true);
     const explosion = document.getElementById("explosion");
     const mashineView = document.getElementById("mashine");
