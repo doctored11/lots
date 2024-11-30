@@ -90,7 +90,7 @@ const spinSlot = async (req, res) => {
                 max_win: 0,
                 color: newColor,
             });
-
+            await updateUserBalance(chatId, currentBalance - bet);
             return res.status(200).json({
                 success: true,
                 action: "changeMachine",
