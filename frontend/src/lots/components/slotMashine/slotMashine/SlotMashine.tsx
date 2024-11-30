@@ -56,7 +56,7 @@ export function SlotMashine() {
         <MashineBody />
         <div id="shadow"></div>
         <div id="explosion" style={{ display: "none" }}>
-          <img src="../../../source/boom.png" alt="Explosion" />
+         
         </div>
       </div>
     </>
