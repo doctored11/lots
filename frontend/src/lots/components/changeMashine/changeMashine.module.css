@@ -4,6 +4,10 @@
   transform-origin: bottom center;
   /* transform: perspective(200px) rotateX(-5deg); */
 }
+.mashineHide.mashineHideNoAni{
+  animation:none;
+
+}
 
 .mashineShow {
   /* outline: 2px solid green; */

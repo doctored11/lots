@@ -214,12 +214,13 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     if (mashineView && explosion ) {
       explosion.style.display = "block";
       explosion.classList.add(styles.explosion);
-      // mashineView.classList.add(styles.mashineHide);
+      mashineView.classList.add(styles.mashineHide);
+      mashineView.classList.add(styles.mashineHideNoAni);
       mashineView.style.opacity = "0"; 
       setTimeout(() => {
         explosion.style.display = "none"; 
         explosion.classList.remove(styles.explosion);
-        mashineView.style.opacity = "1"; 
+        mashineView.classList.remove(styles.mashineHideNoAni);
        
       }, 400);
     }
