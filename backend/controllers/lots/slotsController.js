@@ -74,6 +74,8 @@ const spinSlot = async (req, res) => {
         console.log('slotGame:', slotGame);
         console.log('reel field:', slotGame.reel);
 
+        const newBalance = currentBalance - bet + winnings;
+
         if (slotGame.machine_lives <= 0) {
             console.log("HP автомата достигло 0. Смена автомата.");
             const newReel = generateNewReel();
@@ -99,7 +101,7 @@ const spinSlot = async (req, res) => {
                     newLives,
                     newColor,
                     newBetStep,
-                    balance: currentBalance,
+                    balance: newBalance,
                 },
             });
         }
@@ -121,7 +123,7 @@ const spinSlot = async (req, res) => {
         console.log("\n пришло: ", balance, bet, "|", currentBalance)
         console.log("_____")
         const winnings = calculateWinnings(bet, results);
-        const newBalance = currentBalance - bet + winnings;
+        
         await updateUserBalance(chatId, newBalance);
         const newLives = slotGame.machine_lives - 1;
 
