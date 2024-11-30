@@ -55,10 +55,8 @@ export function SlotMashine() {
       <div className={style.frame}>
         <MashineBody />
         <div id="shadow"></div>
-        <div id="explosion" style={{ display: "none" }}>
-         
-        </div>
       </div>
+      <div id="explosion" style={{ display: "none" }}></div>
     </>
   );
 }
