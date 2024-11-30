@@ -221,21 +221,21 @@
   opacity: 0;
   z-index: 1000;
   pointer-events: none; 
-  animation: growExplosion 4s forwards;
+  animation: growExplosion 0.4s forwards;
 
 }
 
 
 @keyframes growExplosion {
   0% {
-    transform: scale(0.5);
+    transform: scale(1);
     opacity: 1;
   }
   70%{
     opacity: 1;
   }
   98% {
-    transform: scale(2);
+    transform: scale(5);
     opacity: 0;
   }
   100%{
