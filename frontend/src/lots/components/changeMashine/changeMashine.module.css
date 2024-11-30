@@ -207,18 +207,16 @@
 
 .explosion {
   position: absolute;
-  background-image: url('../../source/boom.jpg');
-  width: 50px;
-  height: 50px;
+  background-image: url('../../source/boom.png');
+  background-position: center;
+  width: 50vw;
+  height: 50vw;
   transform: scale(0.5);
   opacity: 0;
   z-index: 1000;
   pointer-events: none; 
   animation: growExplosion 4s forwards;
 
-}
-.explosion.animate {
-  animation: growExplosion 4s forwards;
 }
 
 
