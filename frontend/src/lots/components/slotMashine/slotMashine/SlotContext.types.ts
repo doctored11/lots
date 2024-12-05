@@ -55,10 +55,7 @@ export interface SlotContextType {
     error?: string;
   }>;
   loading: boolean;
-  startAnimation: (setIsAnimating: (value: boolean) => void) => void; 
-  startExplosionAnimation: (setIsAnimating: (value: boolean) => void) => void;
-  endAnimation: (
-    setIsAnimating: (value: boolean) => void,
-    applyPendingState: () => void
-  ) => void;
+  startAnimation: () => void;
+  startExplosionAnimation: () => void;
+  endAnimation: (applyPendingState: () => void) => void;
 }

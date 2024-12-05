@@ -101,6 +101,7 @@ export function ChangeMashine() {
 
     slot.startAnimation();
 
+
     await changeMachineLogic();
     setTimeout(() => {
       setIsReadyToApply(true);
@@ -109,7 +110,7 @@ export function ChangeMashine() {
   useEffect(() => {
     if (isReadyToApply) {
       applyPendingState();
-      slot.endAnimation();
+      slot.endAnimation(applyPendingState);
       setIsReadyToApply(false);
     }
   }, [isReadyToApply]);

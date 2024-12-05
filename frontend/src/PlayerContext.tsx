@@ -17,7 +17,7 @@ interface PlayerContextType {
   minusBalance: (amount: number) => boolean;
   canSpend: (amount: number) => boolean;
   loading: boolean;
-  setBalance:Dispatch<SetStateAction<number>>;
+  setBalance: Dispatch<SetStateAction<number>>;
 }
 
 export const PlayerContext = createContext<PlayerContextType | undefined>(
@@ -64,7 +64,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       try {
         if (chatId) {
-          const response = await initializePlayer(chatId,userName);
+          const response = await initializePlayer(chatId, userName);
           if (response.success) {
             console.log("Пользователь успешно инициализирован:", response.data);
             setBalance(response.data.balance);
@@ -97,7 +97,10 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <PlayerContext.Provider value={playerContextValue}>
-      {loading ? <div>Загрузка...</div> : children}
+      {/* TODO */}
+      {/* пока в dev - так то раскоментить + лоадер или страница адрес -> tg */}
+      {/* {loading ? <div>Загрузка...</div> : children} */}
+      {children} 
     </PlayerContext.Provider>
   );
 };
