@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { SlotContext } from "../SlotContext";
+import { SlotContext, useSlotContext } from "../SlotContext";
 import { PlayerContext } from "../../../../../PlayerContext";
 import { useGameAPI } from "../../../../../api/useLotsAPI";
 import { ChangeMashine } from "../../../../../lots/components/changeMashine/ChangeMashine";
@@ -13,6 +13,32 @@ export function useMashineLogic() {
   const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
 
   const [pendingBalance, setPendingBalance] = useState<number | null>(null);
+  const slot = useSlotContext();
+  
+  const applyPendingState = () => {
+    console.log("автомат pending = ", slot.pendingState);
+    if (slot.pendingState) {
+      slot.setReel(slot.pendingState.newReel);
+      slot.setBetStep(slot.pendingState.newBetStep);
+      slot.setLastWin(0);
+      slot.setMaxWin(0);
+      slot.setColor(slot.pendingState.newColor);
+      slot.setRollCount(slot.pendingState.newLives);
+      player?.setBalance(slot.pendingState.newBalance);
+      console.log("Новая лента автомата:", slot.pendingState.newReel);
+      slot.setPendingState(null);
+    }
+  };
+
+  const restorePreviousState = () => {
+    console.warn("🤡 Восстановлено предыдущее состояние автомата ", slot.reel);
+    slot.setReel(slot.reel);
+    slot.setBetStep(slot.betStep);
+    slot.setLastWin(slot.lastWin);
+    slot.setMaxWin(slot.maxWin);
+    slot.setColor(slot.color);
+    slot.setIsAnimating(false);
+  };
 
   async function startSpin() {
     try {
@@ -69,21 +95,8 @@ export function useMashineLogic() {
 
     setTimeout(() => {
       slotMashine.setIsSpinning(false);
-      slotMashine.endAnimation(() => {
-        //todo (поправить)
-        if (slotMashine.pendingState) {
-          slotMashine.setReel(slotMashine.pendingState.newReel);
-          slotMashine.setBetStep(slotMashine.pendingState.newBetStep);
-          slotMashine.setLastWin(0);
-          slotMashine.setMaxWin(0);
-          slotMashine.setColor(slotMashine.pendingState.newColor);
-          slotMashine.setMachineLives(slotMashine.pendingState.newLives);
-          player?.setBalance(slotMashine.pendingState.newBalance);
-  
-          console.log("✅ Применено новое состояние автомата:", slotMashine.pendingState);
-          slotMashine.setPendingState(null);
-        }
-      });
+      slotMashine.endAnimation(applyPendingState);
+     
     }, 1000)
   }
   function onSpinEnd() {
