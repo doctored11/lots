@@ -69,7 +69,21 @@ export function useMashineLogic() {
 
     setTimeout(() => {
       slotMashine.setIsSpinning(false);
-      slotMashine.endAnimation();
+      slotMashine.endAnimation(() => {
+        //todo (поправить)
+        if (slotMashine.pendingState) {
+          slotMashine.setReel(slotMashine.pendingState.newReel);
+          slotMashine.setBetStep(slotMashine.pendingState.newBetStep);
+          slotMashine.setLastWin(0);
+          slotMashine.setMaxWin(0);
+          slotMashine.setColor(slotMashine.pendingState.newColor);
+          slotMashine.setMachineLives(slotMashine.pendingState.newLives);
+          player?.setBalance(slotMashine.pendingState.newBalance);
+  
+          console.log("✅ Применено новое состояние автомата:", slotMashine.pendingState);
+          slotMashine.setPendingState(null);
+        }
+      });
     }, 1000)
   }
   function onSpinEnd() {
