@@ -205,9 +205,10 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     updateSlotScore,
     getNewMachine,
     loading,
-    startAnimation,
-    endAnimation,
-    startExplosionAnimation,
+    startAnimation: () => startAnimation(setIsAnimating),
+    endAnimation: (applyPendingState: () => void) =>
+      endAnimation(setIsAnimating, applyPendingState),
+    startExplosionAnimation: () => startExplosionAnimation(setIsAnimating),
   };
 
   async function getNewMachine(

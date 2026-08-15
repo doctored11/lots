@@ -2,7 +2,6 @@ import { useState, useContext } from "react";
 import { SlotContext, useSlotContext } from "../SlotContext";
 import { PlayerContext } from "../../../../../PlayerContext";
 import { useGameAPI } from "../../../../../api/useLotsAPI";
-import { ChangeMashine } from "../../../../../lots/components/changeMashine/ChangeMashine";
 import { REWARDS } from "../../../../../lots/constants/drumConstants";
 
 export function useMashineLogic() {

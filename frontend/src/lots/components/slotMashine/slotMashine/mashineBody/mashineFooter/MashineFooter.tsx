@@ -6,8 +6,26 @@ export function MashineFooter() {
   const slotMashine = useContext(SlotContext);
   const player = useContext(PlayerContext);
 
+  const lastWin = slotMashine?.lastWin ?? 0;
+  const [flash, setFlash] = useState(false);
+
+  useEffect(() => {
+    if (lastWin > 0) {
+      setFlash(true);
+      const t = setTimeout(() => setFlash(false), 1200);
+      return () => clearTimeout(t);
+    }
+  }, [lastWin]);
+
   return (
     <div className={styles.mashineFooter}>
+      <div
+        className={`${styles.winPlaque} ${
+          lastWin > 0 ? styles.winPlaqueActive : ""
+        } ${flash ? styles.winPlaqueFlash : ""}`}
+      >
+        {lastWin > 0 ? `ВЫИГРЫШ +${lastWin}` : "— нет выигрыша —"}
+      </div>
       {/* <p className={styles.betInGame}>{slotMashine?.betInGame}</p> */}
 
       <ul className={styles.statsLine}>

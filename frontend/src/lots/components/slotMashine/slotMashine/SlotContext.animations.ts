@@ -1,8 +1,8 @@
 import styles from "../../changeMashine/changeMashine.module.css";
-import { useSlotContext } from "./SlotContext";
-import { SlotContextType, PendingStateType } from "./SlotContext.types";
-export const startAnimation = () => {
-  const { setIsAnimating } = useSlotContext()
+
+type SetIsAnimating = (value: boolean) => void;
+
+export const startAnimation = (setIsAnimating: SetIsAnimating) => {
   setIsAnimating(true);
   const shadowView = document.getElementById("shadow");
   const mashineView = document.getElementById("mashine");
@@ -18,11 +18,8 @@ export const startAnimation = () => {
   }
 };
 
-export const startExplosionAnimation = (
- 
-) => {
-  const { setIsAnimating } = useSlotContext(); 
-  const timing = 300; //todo вынести все тайминг константы в файли ли объект
+export const startExplosionAnimation = (setIsAnimating: SetIsAnimating) => {
+  const timing = 300; //todo вынести все тайминг константы в файл или объект
   setIsAnimating(true);
   const explosion = document.getElementById("explosion");
   const mashineView = document.getElementById("mashine");
@@ -43,10 +40,9 @@ export const startExplosionAnimation = (
 };
 
 export const endAnimation = (
-
+  setIsAnimating: SetIsAnimating,
   applyPendingState: () => void
 ) => {
-  const { setIsAnimating } = useSlotContext();
   const shadowView = document.getElementById("shadow");
   const mashineView = document.getElementById("mashine");
 

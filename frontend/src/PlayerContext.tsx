@@ -56,6 +56,12 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setUserName(tg.initDataUnsafe.user.username || null);
     } else {
       console.error("Ошибка инициализации Telegram WebApp");
+      if (process.env.NODE_ENV === "development") {
+        // dev-фолбэк: локальный запуск вне Telegram
+        console.warn("DEV-режим: используется тестовый chatId");
+        setChatId("12345678");
+        setUserName("devTester");
+      }
     }
   }, []);
 

@@ -50,7 +50,7 @@ export function ChangeMashine() {
       slot.setRollCount(slot.pendingState.newLives);
       player.setBalance(slot.pendingState.newBalance);
       console.log("Новая лента автомата:", slot.pendingState.newReel);
-      slot.pendingState = null;
+      slot.setPendingState(null);
     }
   };
 
@@ -109,7 +109,6 @@ export function ChangeMashine() {
   };
   useEffect(() => {
     if (isReadyToApply) {
-      applyPendingState();
       slot.endAnimation(applyPendingState);
       setIsReadyToApply(false);
     }

@@ -42,6 +42,43 @@
   background-color: rgba(71, 87, 93, 0.937);
   box-shadow: 0 0 9px 1px #2e2e2ef1 inset;
 }
+
+.winPlaque {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #6d6e74f8;
+  background-color: rgba(46, 52, 56, 0.937);
+  border: 1px solid #1d1d1dec;
+  border-radius: 4px;
+  box-shadow: 0 0 9px 1px #2e2e2ef1 inset;
+  transition: color 0.3s, background-color 0.3s;
+}
+
+.winPlaqueActive {
+  color: #ffd54a;
+  background-color: rgba(72, 94, 60, 0.937);
+}
+
+.winPlaqueFlash {
+  animation: winFlash 0.4s ease-in-out 3;
+}
+
+@keyframes winFlash {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.04);
+    filter: brightness(1.6);
+  }
+}
 /* .betInGame {
   display: inline-block;
   background-color: rgba(113, 114, 116, 0.927);

@@ -7,7 +7,7 @@ async function getUserByChatId(chatId) {
 
 async function createUser(chatId, username, initialData = {}) {
     const {
-        balance = 150, 
+        balance = 1000, 
         status = [], 
         exp = 0,       
         rank = null,   

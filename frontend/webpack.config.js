@@ -68,7 +68,9 @@ module.exports = {
             ],
         }),
         new webpack.DefinePlugin({
-            'process.env': JSON.stringify(process.env),
+            // в dev ходим через proxy dev-сервера, адрес бэкенда нужен только в prod-сборке
+            'process.env.REACT_APP_TARGET_ADDRESS': JSON.stringify(IS_DEV ? '' : (process.env.REACT_APP_TARGET_ADDRESS || '')),
+            'process.env.NODE_ENV': JSON.stringify(NODE_ENV || 'development'),
         })
 
     ],
@@ -79,6 +81,13 @@ module.exports = {
         open: true,
         hot: IS_DEV,
         historyApiFallback: true,
+        proxy: [
+            {
+                context: ['/api'],
+                target: 'http://localhost:8000',
+                changeOrigin: true,
+            },
+        ],
     }
 
 };

@@ -66,7 +66,7 @@ const spinSlot = async (req, res) => {
             return res.status(400).json({ success: false, error: 'Некорректная ставка 🤨' });
         }
 
-        const slotGame = await getSlotGameByUserId(user.id);
+        let slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
             slotGame = await createSlotGame(user.id);
         }
