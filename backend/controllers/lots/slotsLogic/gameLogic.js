@@ -181,11 +181,16 @@ function generateRandomBetStep() {
 }
 
 function generateRandomLives() {
-    // return getRandomInt(30, 100);
-    return getRandomInt(1,3);
+    // HP нового автомата — всегда полный бар
+    return 100;
+}
+
+// урон автомату за один прокрут: 0..5 HP
+function rollSpinDamage() {
+    return getRandomInt(0, 5);
 }
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-module.exports = { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel, rollItemDrop, ITEM_RARITY };
+module.exports = { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel, rollItemDrop, rollSpinDamage, ITEM_RARITY };

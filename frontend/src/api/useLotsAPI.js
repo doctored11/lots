@@ -77,6 +77,14 @@ export function useGameAPI() {
     return await request('/api/slots/build-machine', 'POST', { chatId, reel });
   };
 
+  const repairMachine = async (chatId, balance) => {
+    return await request('/api/slots/repair', 'POST', { chatId, balance });
+  };
+
+  const shopRoll = async (chatId, balance) => {
+    return await request('/api/slots/shop-roll', 'POST', { chatId, balance });
+  };
+
 
   return {
     getPlayerInfo,
@@ -87,6 +95,8 @@ export function useGameAPI() {
     getInventory,
     getRecipeBook,
     buildMachine,
+    repairMachine,
+    shopRoll,
     loading,
     error,
   };

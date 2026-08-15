@@ -47,7 +47,6 @@ export function SlotMashine() {
     initializeChatId();
   }, [player]);
 
-  useEffect(() => mashine?.reelUpdate(), []);
   return (
     <>
       {/* <p>Баланс: {player?.balance}</p> */}

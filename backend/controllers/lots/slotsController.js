@@ -2,9 +2,17 @@ const pool = require('../../db');
 
 
 const { getSlotGameByUserId, createSlotGame, updateSlotState } = require('./slotsLogic/slotsModel');
-const { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel, rollItemDrop, ITEM_RARITY } = require('./slotsLogic/gameLogic');
+const { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel, rollItemDrop, rollSpinDamage, ITEM_RARITY } = require('./slotsLogic/gameLogic');
 const { getUserByChatId, updateUserBalance, getUserBalance } = require('../userController');
 const { addItem, getItems, tryConsumeItems, unlockRecipe, getUnlockedRecipes } = require('./slotsLogic/inventoryModel');
+
+const MACHINE_MAX_HP = 100;
+const REPAIR_COST = 50;
+const REPAIR_AMOUNT = 10;
+const SHOP_ROLL_COST = 1000;
+
+// стартовый набор предметов, чтобы новичку было из чего собрать первый автомат
+const STARTER_ITEMS = ['grape', 'grape', 'cherry', 'cherry', 'banana'];
 
 
 async function getSlotInfo(req, res) {
@@ -70,39 +78,19 @@ const spinSlot = async (req, res) => {
         let slotGame = await getSlotGameByUserId(user.id);
         if (!slotGame) {
             slotGame = await createSlotGame(user.id);
+            // стартовый набор предметов для первой сборки
+            for (const item of STARTER_ITEMS) {
+                await addItem(user.id, item, 1);
+            }
         }
         console.log('*__ .')
         console.log('slotGame:', slotGame);
         console.log('reel field:', slotGame.reel);
 
+        // сломанный автомат не крутится — сначала ремонт
         if (slotGame.machine_lives <= 0) {
-            console.log("HP автомата достигло 0. Смена автомата.");
-            const newReel = generateNewReel();
-            const newLives = generateRandomLives();
-            const newColor = generateRandomColor();
-            const newBetStep = generateRandomBetStep();
-
-            await updateSlotState(user.id, {
-                ...slotGame,
-                reel: newReel,
-                machine_lives: newLives,
-                bet_step: newBetStep,
-                last_win: 0,
-                max_win: 0,
-                color: newColor,
-            });
-            await updateUserBalance(chatId, currentBalance - bet);
-            return res.status(200).json({
-                success: true,
-                action: "changeMachine",
-                data: {
-                    newReel,
-                    newLives,
-                    newColor,
-                    newBetStep,
-                    balance: currentBalance - bet,
-                },
-            });
+            console.log("Автомат сломан (0 HP), нужен ремонт");
+            return res.status(400).json({ success: false, error: 'Автомат сломан! Почини его за ' + REPAIR_COST, broken: true });
         }
 
 
@@ -124,7 +112,10 @@ const spinSlot = async (req, res) => {
         const winnings = calculateWinnings(bet, results);
         const newBalance = currentBalance - bet + winnings;
         await updateUserBalance(chatId, newBalance);
-        const newLives = slotGame.machine_lives - 1;
+        // урон автомату за прокрут: 0..5 HP, не ниже нуля
+        const spinDamage = rollSpinDamage();
+        const newLives = Math.max(0, slotGame.machine_lives - spinDamage);
+        console.log(`🔧 урон автомату: -${spinDamage} HP (${slotGame.machine_lives} -> ${newLives})`);
 
 
         console.log("баданс обновлен", currentBalance, bet, winnings, newBalance)
@@ -160,6 +151,9 @@ const spinSlot = async (req, res) => {
                 combination,
                 newBalance,
                 machineLives: newLives,
+                machineMaxLives: MACHINE_MAX_HP,
+                spinDamage,
+                broken: newLives <= 0,
                 droppedItem,
                 droppedItemRarity: ITEM_RARITY[droppedItem],
                 unlockedRecipeItem,
@@ -292,8 +286,8 @@ const getRecipeBook = async (req, res) => {
 const buildMachine = async (req, res) => {
     const { chatId, reel } = req.body;
 
-    if (!chatId || !Array.isArray(reel) || reel.length < 3 || reel.length > 10) {
-        return res.status(400).json({ success: false, error: 'Лента должна содержать от 3 до 10 предметов' });
+    if (!chatId || !Array.isArray(reel) || reel.length < 4 || reel.length > 8) {
+        return res.status(400).json({ success: false, error: 'Лента должна содержать от 4 до 8 предметов' });
     }
     const invalid = reel.filter(item => !(item in ITEM_RARITY));
     if (invalid.length > 0) {
@@ -333,8 +327,92 @@ const buildMachine = async (req, res) => {
     }
 };
 
+// ремонт автомата: +10 HP за 50 монет
+const repairMachine = async (req, res) => {
+    const { chatId, balance } = req.body;
+
+    if (!chatId || typeof balance === 'undefined') {
+        return res.status(400).json({ success: false, error: 'Чего то не хватает' });
+    }
+
+    try {
+        const user = await getUserByChatId(chatId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        const currentBalance = await validateBalance(chatId, balance);
+
+        if (currentBalance - REPAIR_COST < 0) {
+            return res.status(400).json({ success: false, error: 'Недостаточно средств для ремонта' });
+        }
+
+        const slotGame = await getSlotGameByUserId(user.id);
+        if (!slotGame) {
+            return res.status(404).json({ success: false, error: 'Слот-машина не найдена' });
+        }
+
+        if (slotGame.machine_lives >= MACHINE_MAX_HP) {
+            return res.status(400).json({ success: false, error: 'Автомат полностью исправен' });
+        }
+
+        const newLives = Math.min(MACHINE_MAX_HP, slotGame.machine_lives + REPAIR_AMOUNT);
+        const newBalance = currentBalance - REPAIR_COST;
+
+        await updateUserBalance(chatId, newBalance);
+        await updateSlotState(user.id, {
+            ...slotGame,
+            machine_lives: newLives,
+            color: slotGame.color,
+        });
+
+        console.log(`🔧 ремонт: ${slotGame.machine_lives} -> ${newLives} HP`);
+        res.status(200).json({
+            success: true,
+            data: { newLives, newBalance, maxLives: MACHINE_MAX_HP },
+        });
+    } catch (error) {
+        console.error('Ошибка в repairMachine:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// магазин: прокрут гачи за 1000 — случайный предмет в коллекцию
+const shopRoll = async (req, res) => {
+    const { chatId, balance } = req.body;
+
+    if (!chatId || typeof balance === 'undefined') {
+        return res.status(400).json({ success: false, error: 'Чего то не хватает' });
+    }
+
+    try {
+        const user = await getUserByChatId(chatId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        const currentBalance = await validateBalance(chatId, balance);
+
+        if (currentBalance - SHOP_ROLL_COST < 0) {
+            return res.status(400).json({ success: false, error: 'Недостаточно средств (нужно ' + SHOP_ROLL_COST + ')' });
+        }
+
+        const item = rollItemDrop();
+        await addItem(user.id, item, 1);
+        const newBalance = currentBalance - SHOP_ROLL_COST;
+        await updateUserBalance(chatId, newBalance);
+
+        console.log(`🎰 гача: выпал ${item} (${ITEM_RARITY[item]})`);
+        res.status(200).json({
+            success: true,
+            data: { item, rarity: ITEM_RARITY[item], newBalance },
+        });
+    } catch (error) {
+        console.error('Ошибка в shopRoll:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
 
 
 
 
-module.exports = { spinSlot, changeMachine, getSlotInfo, getInventory, getRecipeBook, buildMachine };
+
+module.exports = { spinSlot, changeMachine, getSlotInfo, getInventory, getRecipeBook, buildMachine, repairMachine, shopRoll };

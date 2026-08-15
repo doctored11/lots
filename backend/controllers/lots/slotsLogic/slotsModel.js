@@ -17,12 +17,12 @@ async function createSlotGame(userId) {
     }
 
     const initialReel = JSON.stringify([
-        "bomb", "grape", "clover", "bomb", "grape", "grape",
+        "grape", "cherry", "banana", "grape",
     ]);
 
     const randomColor = generateRandomColor();
     const betStep = 10;
-    const lives = 10;
+    const lives = 100; // полный HP-бар нового автомата
 
     const result = await pool.query(
         `INSERT INTO slot_game (user_id, reel, bet_step, last_win, max_win, machine_lives, color) 

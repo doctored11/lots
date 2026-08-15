@@ -13,7 +13,7 @@ export function useMashineLogic() {
 
   const [pendingBalance, setPendingBalance] = useState<number | null>(null);
   const slot = useSlotContext();
-  
+
   const applyPendingState = () => {
     console.log("автомат pending = ", slot.pendingState);
     if (slot.pendingState) {
@@ -29,16 +29,6 @@ export function useMashineLogic() {
     }
   };
 
-  const restorePreviousState = () => {
-    console.warn("🤡 Восстановлено предыдущее состояние автомата ", slot.reel);
-    slot.setReel(slot.reel);
-    slot.setBetStep(slot.betStep);
-    slot.setLastWin(slot.lastWin);
-    slot.setMaxWin(slot.maxWin);
-    slot.setColor(slot.color);
-    slot.setIsAnimating(false);
-  };
-
   async function startSpin() {
     try {
       if (!player || !slotMashine || slotMashine.isSpinning) return;
@@ -49,15 +39,14 @@ export function useMashineLogic() {
         player.balance + slotMashine.betInGame
       );
       if (response.success) {
-        if (response.action === "changeMachine") {
-          setPendingBalance(null);
-          console.log("⚙️ смена автомата инициирована сервером");
-          handleMachineChange(response.data);
-
-          return;
-        }
-        const { combination, newBalance, machineLives, droppedItem, unlockedRecipeItem } = response.data;
-
+        const {
+          combination,
+          newBalance,
+          machineLives,
+          droppedItem,
+          unlockedRecipeItem,
+          broken,
+        } = response.data;
 
         console.log("🤔 Новая комбинация:", combination);
         console.log("Новый баланс (ожидается):", newBalance);
@@ -67,39 +56,37 @@ export function useMashineLogic() {
         slotMashine.setMachineLives(machineLives);
         if (droppedItem) slotMashine.setLastDrop(droppedItem);
         if (unlockedRecipeItem) slotMashine.setLastUnlock(unlockedRecipeItem);
-        console.log("жизни автомата", machineLives);
+        if (broken) {
+          console.log("💥 Автомат сломался (0 HP), нужен ремонт");
+          playBreakAnimation();
+        }
+        console.log("HP автомата", machineLives);
       } else {
+        if (response.broken) {
+          playBreakAnimation();
+        }
         alert("Ошибка: " + response.error);
+        slotMashine.setIsSpinning(false);
       }
     } catch (err) {
       console.error("Ошибка спина:", err);
+      slotMashine?.setIsSpinning(false);
     } finally {
       slotMashine?.setBetInGame(0);
     }
   }
-  function handleMachineChange(data: {
-    newReel:  Array<keyof typeof REWARDS>;
-    newLives: number;
-    newBetStep: number;
-    newColor: string;
-    balance: number;
-  }) {
-    if(!slotMashine) return
-    slotMashine.setReel(data.newReel);
-    slotMashine.setMachineLives(data.newLives);
-    slotMashine.setBetStep(data.newBetStep);
-    slotMashine.setColor(data.newColor);
-    player?.setBalance(data.balance);
 
-    console.log("💥 Новый автомат:", data);
-    slotMashine.startExplosionAnimation()
-
+  // взрыв при поломке: показываем анимацию и возвращаем автомат на место
+  function playBreakAnimation() {
+    if (!slotMashine) return;
+    slotMashine.startExplosionAnimation();
     setTimeout(() => {
-      slotMashine.setIsSpinning(false);
-      slotMashine.endAnimation(applyPendingState);
-     
-    }, 1000)
+      const mashineView = document.getElementById("mashine");
+      if (mashineView) mashineView.style.opacity = "1";
+      slotMashine.setIsAnimating(false);
+    }, 1500);
   }
+
   function onSpinEnd() {
     if (pendingBalance !== null && player) {
       console.log("✔️ Анимация завершена. Обновляем баланс и слот.");

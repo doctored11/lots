@@ -45,3 +45,17 @@
     banana: "Банан. Скользкий фрукт: пара даёт +0.5, тройка — целых +10.",
     blueBerrie: "Редкая черника. Три ягоды — +16.6 к ставке. Охотники за ягодами понимают.",
   };
+
+  // человекочитаемое описание наград предмета: "1: +0.3 · 2: +0.8 · 3: ×8.8"
+  export function formatRewards(item: keyof typeof REWARDS): string {
+    const values = REWARDS[item].values;
+    return ([1, 2, 3] as const)
+      .map((count) => {
+        const v = values[count];
+        const text =
+          v.type === "plus" ? `+${v.amount}` : `×${v.factor}`;
+        return `${count}: ${text}`;
+      })
+      .join(" · ");
+  }
+

@@ -36,7 +36,7 @@ interface RewardValuePlus {
       values: {
         1: { type: "plus", amount: 0.3 },
         2: { type: "plus", amount: 0.8 },
-        3: { type: "plus", amount: 8.8 }
+        3: { type: "multiply", factor: 8.8 }
       }
     },
     clover: {
@@ -44,7 +44,7 @@ interface RewardValuePlus {
       values: {
         1: { type: "multiply", factor: 3 },
         2: { type: "multiply", factor: 7 },
-        3: { type: "plus", amount: 60 }
+        3: { type: "plus", amount: 72 }
       }
     },
     grape: {

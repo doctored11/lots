@@ -99,6 +99,9 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
         setLastWin(response.data.lastWin);
         setMaxWin(response.data.maxWin);
         setColor(response.data.color || "#6294a4f0");
+        if (typeof response.data.machineLives === "number") {
+          setMachineLives(response.data.machineLives);
+        }
         console.log("Слот успешно инициализирован:", response.data);
       } else {
         console.error("Ошибка загрузки слота:", response.error);

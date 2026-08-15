@@ -15,7 +15,7 @@ CREATE TABLE slot_game (
     bet_step INTEGER DEFAULT 10,
     last_win INTEGER DEFAULT 0,
     max_win INTEGER DEFAULT 0,
-    machine_lives INTEGER DEFAULT 50,
+    machine_lives INTEGER DEFAULT 100,
     color TEXT
 );
 

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { PlayerContext } from "../../../PlayerContext";
 import { useGameAPI } from "../../../api/useLotsAPI";
 import { REWARDS } from "../../constants/drumConstants";
@@ -7,6 +8,7 @@ import {
   RARITY_LABELS,
   ITEM_LABELS,
   RECIPE_DESCRIPTIONS,
+  formatRewards,
   Rarity,
 } from "../../constants/itemMeta";
 import styles from "./workshopPage.module.css";
@@ -27,12 +29,14 @@ interface BookEntry {
 
 export function WorkshopPage() {
   const player = useContext(PlayerContext);
-  const { getInventory, getRecipeBook, buildMachine } = useGameAPI();
+  const { getInventory, getRecipeBook, buildMachine, shopRoll } = useGameAPI();
 
   const [inventory, setInventory] = useState<InventoryEntry[]>([]);
   const [book, setBook] = useState<BookEntry[]>([]);
   const [draft, setDraft] = useState<ItemKey[]>([]);
   const [message, setMessage] = useState("");
+  const [shopResult, setShopResult] = useState<ItemKey | null>(null);
+  const [shopRolling, setShopRolling] = useState(false);
 
   const chatId = player?.chatId;
 
@@ -56,7 +60,7 @@ export function WorkshopPage() {
   const draftCount = (item: ItemKey) => draft.filter((d) => d === item).length;
 
   const addToDraft = (item: ItemKey) => {
-    if (draft.length >= 10) return;
+    if (draft.length >= 8) return;
     if (draftCount(item) >= invCount(item)) return;
     setDraft([...draft, item]);
   };
@@ -66,7 +70,7 @@ export function WorkshopPage() {
   };
 
   const handleBuild = async () => {
-    if (!chatId || draft.length < 3) return;
+    if (!chatId || draft.length < 4) return;
     const resp = await buildMachine(chatId, draft);
     if (resp.success) {
       setMessage("✅ Автомат собран! Новая лента установлена.");
@@ -77,10 +81,33 @@ export function WorkshopPage() {
     }
   };
 
+  const handleShopRoll = async () => {
+    if (!chatId || !player || shopRolling) return;
+    setShopRolling(true);
+    setShopResult(null);
+    const resp = await shopRoll(chatId, player.balance);
+    if (resp.success) {
+      player.setBalance(resp.data.newBalance);
+      setShopResult(resp.data.item as ItemKey);
+      await loadData();
+    } else {
+      setMessage("❌ " + (resp.error || "Ошибка прокрута магазина"));
+    }
+    setShopRolling(false);
+  };
+
   const allItems = Object.keys(REWARDS) as ItemKey[];
 
   return (
     <div className={styles.workshop}>
+      <div className={styles.topBar}>
+        <Link to="/lots" className={styles.backLink}>
+          ← к автомату
+        </Link>
+        <Link to="/" className={styles.backLink}>
+          ⌂ на главную
+        </Link>
+      </div>
       <h1>🔧 Мастерская</h1>
 
       <section>
@@ -115,6 +142,11 @@ export function WorkshopPage() {
                     ? RECIPE_DESCRIPTIONS[item]
                     : "Выбей три таких подряд, чтобы узнать свойства."}
                 </div>
+                {unlocked && (
+                  <div className={styles.cardRewards}>
+                    {formatRewards(item)}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -136,7 +168,7 @@ export function WorkshopPage() {
                 styles["rarity_" + rarity]
               }`}
               onClick={() => addToDraft(item)}
-              disabled={draftCount(item) >= count || draft.length >= 10}
+              disabled={draftCount(item) >= count || draft.length >= 8}
               title="Нажми, чтобы добавить в ленту"
             >
               <img
@@ -154,7 +186,8 @@ export function WorkshopPage() {
       <section>
         <h2>🎰 Сборка автомата</h2>
         <p className={styles.hint}>
-          Лента из 3–10 предметов. Предметы расходуются.
+          Лента из 4–8 предметов. Предметы расходуются. Автомат крутится
+          только из твоих предметов.
         </p>
         <div className={styles.draftLine}>
           {draft.length === 0 && (
@@ -175,12 +208,42 @@ export function WorkshopPage() {
         </div>
         <button
           className={styles.buildBtn}
-          disabled={draft.length < 3}
+          disabled={draft.length < 4}
           onClick={handleBuild}
         >
-          Собрать автомат ({draft.length}/10)
+          Собрать автомат ({draft.length}/8)
         </button>
         {message && <p className={styles.message}>{message}</p>}
+      </section>
+
+      <section>
+        <h2>🛒 Магазин</h2>
+        <p className={styles.hint}>
+          Прокрут за 1000 монет — случайный предмет в коллекцию. Редкие
+          падают реже.
+        </p>
+        <button
+          className={styles.buildBtn}
+          onClick={handleShopRoll}
+          disabled={shopRolling || !player || player.balance < 1000}
+        >
+          {shopRolling ? "Крутится…" : "🎲 Крутануть (1000)"}
+        </button>
+        {shopResult && (
+          <div
+            className={`${styles.shopResult} ${
+              styles["rarity_" + ITEM_RARITY[shopResult]]
+            }`}
+          >
+            Выпал:
+            <img
+              src={REWARDS[shopResult].image}
+              alt={ITEM_LABELS[shopResult]}
+              className={styles.dropImg}
+            />
+            {ITEM_LABELS[shopResult]} ({RARITY_LABELS[ITEM_RARITY[shopResult]]})
+          </div>
+        )}
       </section>
     </div>
   );

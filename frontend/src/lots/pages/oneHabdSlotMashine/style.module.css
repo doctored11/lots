@@ -3,3 +3,20 @@
     padding: 0 0;
     overflow: hidden;
 }
+
+.workshopLink {
+    display: block;
+    margin: 10px auto 0;
+    width: fit-content;
+    padding: 6px 14px;
+    border: 1px solid #1d1d1dec;
+    border-radius: 6px;
+    background-color: rgba(46, 52, 56, 0.937);
+    color: #6fa8ff;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.workshopLink:hover {
+    filter: brightness(1.3);
+}
