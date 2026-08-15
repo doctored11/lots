@@ -2,8 +2,9 @@ const pool = require('../../db');
 
 
 const { getSlotGameByUserId, createSlotGame, updateSlotState } = require('./slotsLogic/slotsModel');
-const { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel } = require('./slotsLogic/gameLogic');
+const { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel, rollItemDrop, ITEM_RARITY } = require('./slotsLogic/gameLogic');
 const { getUserByChatId, updateUserBalance, getUserBalance } = require('../userController');
+const { addItem, getItems, tryConsumeItems, unlockRecipe, getUnlockedRecipes } = require('./slotsLogic/inventoryModel');
 
 
 async function getSlotInfo(req, res) {
@@ -137,9 +138,32 @@ const spinSlot = async (req, res) => {
             
         });
         console.log("обновили слоты")
+
+        // дроп случайного предмета за спин
+        const droppedItem = rollItemDrop();
+        await addItem(user.id, droppedItem, 1);
+        console.log("🎁 дроп:", droppedItem, "(", ITEM_RARITY[droppedItem], ")");
+
+        // тройка одинаковых — открывает описание в книге рецептов
+        let unlockedRecipeItem = null;
+        if (results[0] === results[1] && results[1] === results[2]) {
+            const isNew = await unlockRecipe(user.id, results[0]);
+            if (isNew) {
+                unlockedRecipeItem = results[0];
+                console.log("📖 открыт рецепт:", unlockedRecipeItem);
+            }
+        }
+
         res.status(200).json({
             success: true,
-            data: { combination, newBalance, machineLives: newLives },
+            data: {
+                combination,
+                newBalance,
+                machineLives: newLives,
+                droppedItem,
+                droppedItemRarity: ITEM_RARITY[droppedItem],
+                unlockedRecipeItem,
+            },
         });
     } catch (error) {
         console.error('Ошибка в spinSlot:', error);
@@ -219,7 +243,98 @@ async function validateBalance(chatId, providedBalance) {
 }
 
 
+// инвентарь игрока (выбитые предметы)
+const getInventory = async (req, res) => {
+    const { chatId } = req.params;
+    try {
+        const user = await getUserByChatId(chatId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        const items = await getItems(user.id);
+        res.status(200).json({
+            success: true,
+            data: items.map(({ item_key, count }) => ({
+                item: item_key,
+                count,
+                rarity: ITEM_RARITY[item_key] || 'common',
+            })),
+        });
+    } catch (error) {
+        console.error('Ошибка в getInventory:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// книга рецептов: какие предметы открыты (тройкой одинаковых)
+const getRecipeBook = async (req, res) => {
+    const { chatId } = req.params;
+    try {
+        const user = await getUserByChatId(chatId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        const unlocked = await getUnlockedRecipes(user.id);
+        const book = Object.entries(ITEM_RARITY).map(([item, rarity]) => ({
+            item,
+            rarity,
+            unlocked: unlocked.includes(item),
+        }));
+        res.status(200).json({ success: true, data: book });
+    } catch (error) {
+        console.error('Ошибка в getRecipeBook:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// сборка своего автомата из предметов инвентаря.
+// body: { chatId, reel: ["bomb", "grape", ...] } — предметы списываются 1:1
+const buildMachine = async (req, res) => {
+    const { chatId, reel } = req.body;
+
+    if (!chatId || !Array.isArray(reel) || reel.length < 3 || reel.length > 10) {
+        return res.status(400).json({ success: false, error: 'Лента должна содержать от 3 до 10 предметов' });
+    }
+    const invalid = reel.filter(item => !(item in ITEM_RARITY));
+    if (invalid.length > 0) {
+        return res.status(400).json({ success: false, error: 'Неизвестные предметы: ' + invalid.join(', ') });
+    }
+
+    try {
+        const user = await getUserByChatId(chatId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+
+        const consumed = await tryConsumeItems(user.id, reel);
+        if (!consumed) {
+            return res.status(400).json({ success: false, error: 'Не хватает предметов в инвентаре' });
+        }
+
+        let slotGame = await getSlotGameByUserId(user.id);
+        if (!slotGame) {
+            slotGame = await createSlotGame(user.id);
+        }
+
+        await updateSlotState(user.id, {
+            ...slotGame,
+            reel,
+            last_win: 0,
+            max_win: 0,
+            machine_lives: generateRandomLives(),
+            color: slotGame.color,
+        });
+
+        console.log('🔧 собран свой автомат:', reel);
+        res.status(200).json({ success: true, data: { newReel: reel } });
+    } catch (error) {
+        console.error('Ошибка в buildMachine:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
 
 
 
-module.exports = { spinSlot, changeMachine, getSlotInfo };
+
+
+module.exports = { spinSlot, changeMachine, getSlotInfo, getInventory, getRecipeBook, buildMachine };

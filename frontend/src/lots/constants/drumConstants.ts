@@ -99,7 +99,6 @@ interface RewardValuePlus {
   
 
   export const DRUM_CHANCES ={
-    
     bomb: {
      priority:2,
      maxCount:1

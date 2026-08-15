@@ -2,11 +2,18 @@ import React, { useContext, useEffect, useState } from "react";
 import styles from "./mashineFooter.module.css";
 import { SlotContext } from "../../SlotContext";
 import { PlayerContext } from "../../../../../../PlayerContext";
+import { REWARDS } from "../../../../../constants/drumConstants";
+import {
+  ITEM_RARITY,
+  ITEM_LABELS,
+} from "../../../../../constants/itemMeta";
 export function MashineFooter() {
   const slotMashine = useContext(SlotContext);
   const player = useContext(PlayerContext);
 
   const lastWin = slotMashine?.lastWin ?? 0;
+  const lastDrop = slotMashine?.lastDrop ?? null;
+  const lastUnlock = slotMashine?.lastUnlock ?? null;
   const [flash, setFlash] = useState(false);
 
   useEffect(() => {
@@ -17,6 +24,13 @@ export function MashineFooter() {
     }
   }, [lastWin]);
 
+  useEffect(() => {
+    if (lastUnlock) {
+      const t = setTimeout(() => slotMashine?.setLastUnlock(null), 4000);
+      return () => clearTimeout(t);
+    }
+  }, [lastUnlock]);
+
   return (
     <div className={styles.mashineFooter}>
       <div
@@ -26,6 +40,26 @@ export function MashineFooter() {
       >
         {lastWin > 0 ? `ВЫИГРЫШ +${lastWin}` : "— нет выигрыша —"}
       </div>
+
+      {lastUnlock && (
+        <div className={styles.unlockPlaque}>
+          📖 Открыт рецепт: {ITEM_LABELS[lastUnlock]}!
+        </div>
+      )}
+
+      {lastDrop && (
+        <div className={styles.dropLine}>
+          дроп:
+          <img
+            src={REWARDS[lastDrop].image}
+            alt={ITEM_LABELS[lastDrop]}
+            className={styles.dropImg}
+          />
+          <span className={styles["rarity_" + ITEM_RARITY[lastDrop]]}>
+            {ITEM_LABELS[lastDrop]}
+          </span>
+        </div>
+      )}
       {/* <p className={styles.betInGame}>{slotMashine?.betInGame}</p> */}
 
       <ul className={styles.statsLine}>

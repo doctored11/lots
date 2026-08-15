@@ -35,6 +35,37 @@ const REWARDS = {
     },
 };
 
+// редкость предметов: влияет на шанс дропа и отображение в книге рецептов
+const ITEM_RARITY = {
+    grape: 'common',
+    cherry: 'common',
+    mushroom: 'uncommon',
+    melon: 'uncommon',
+    banana: 'uncommon',
+    clover: 'rare',
+    blueBerrie: 'rare',
+    bomb: 'legendary',
+};
+
+// вес дропа по редкости (чем реже, тем меньше шанс)
+const RARITY_DROP_WEIGHT = {
+    common: 50,
+    uncommon: 28,
+    rare: 16,
+    legendary: 6,
+};
+
+// случайный предмет с учётом редкости
+function rollItemDrop() {
+    const pool = [];
+    Object.entries(ITEM_RARITY).forEach(([item, rarity]) => {
+        for (let i = 0; i < RARITY_DROP_WEIGHT[rarity]; i++) {
+            pool.push(item);
+        }
+    });
+    return pool[getRandomInt(0, pool.length - 1)];
+}
+
 
 
 function calculateWinnings(bet, results) {
@@ -157,4 +188,4 @@ function generateRandomLives() {
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-module.exports = { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel };
+module.exports = { calculateWinnings, generateRandomColor, generateRandomBetStep, generateRandomLives, generateNewReel, rollItemDrop, ITEM_RARITY };

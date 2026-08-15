@@ -25,3 +25,19 @@ CREATE TABLE gifts (
     last_collected TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
 );
+
+-- инвентарь: выбитые предметы для сборки автомата
+CREATE TABLE user_items (
+    user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    item_key TEXT NOT NULL,
+    count INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, item_key)
+);
+
+-- книга рецептов: предметы, чьё описание открыто (тройка одинаковых на барабанах)
+CREATE TABLE user_recipes (
+    user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    item_key TEXT NOT NULL,
+    unlocked_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, item_key)
+);

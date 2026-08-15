@@ -38,6 +38,10 @@ export interface SlotContextType {
   >;
 
   setMaxWin: (win: number) => void;
+  lastDrop: keyof typeof REWARDS | null;
+  setLastDrop: (item: keyof typeof REWARDS | null) => void;
+  lastUnlock: keyof typeof REWARDS | null;
+  setLastUnlock: (item: keyof typeof REWARDS | null) => void;
   reelUpdate: () => void;
   updateSlotScore: (win: number) => void;
   getNewMachine: (

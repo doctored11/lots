@@ -8,6 +8,7 @@ import "./index.css";
 import "./normalize.css";
 import styles from "./homePage.module.css";
 import { GiftsPage } from "./gifts/pages/GiftsPage";
+import { WorkshopPage } from "./lots/pages/workshop/WorkshopPage";
 
 function HomePage() {
   const player = useContext(PlayerContext);
@@ -23,6 +24,9 @@ function HomePage() {
         <Link className={styles.card} to="/gifts">
           🎁 Гифты
         </Link>
+        <Link className={styles.card} to="/workshop">
+          🔧 Мастерская
+        </Link>
       </div>
     </div>
   );
@@ -36,6 +40,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/lots" element={<OneHandSlotMashine />} />
           <Route path="/gifts" element={<GiftsPage />} />
+          <Route path="/workshop" element={<WorkshopPage />} />
         </Routes>
       </Router>
     </PlayerProvider>

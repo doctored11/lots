@@ -56,8 +56,8 @@ export function useMashineLogic() {
 
           return;
         }
-        const { combination, newBalance, machineLives } = response.data;
-        
+        const { combination, newBalance, machineLives, droppedItem, unlockedRecipeItem } = response.data;
+
 
         console.log("🤔 Новая комбинация:", combination);
         console.log("Новый баланс (ожидается):", newBalance);
@@ -65,6 +65,8 @@ export function useMashineLogic() {
         setSpinValues(combination);
         setPendingBalance(newBalance);
         slotMashine.setMachineLives(machineLives);
+        if (droppedItem) slotMashine.setLastDrop(droppedItem);
+        if (unlockedRecipeItem) slotMashine.setLastUnlock(unlockedRecipeItem);
         console.log("жизни автомата", machineLives);
       } else {
         alert("Ошибка: " + response.error);

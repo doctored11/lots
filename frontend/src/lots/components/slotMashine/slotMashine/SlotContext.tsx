@@ -67,6 +67,9 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
 
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const [lastDrop, setLastDrop] = useState<keyof typeof REWARDS | null>(null);
+  const [lastUnlock, setLastUnlock] = useState<keyof typeof REWARDS | null>(null);
+
   const [pendingState, setPendingState] = useState<{
     newReel: Array<keyof typeof REWARDS>;
     newBalance: number;
@@ -201,6 +204,10 @@ export const SlotProvider = ({ children }: { children: ReactNode }) => {
     setColor,
     setLastWin,
     setMaxWin,
+    lastDrop,
+    setLastDrop,
+    lastUnlock,
+    setLastUnlock,
     reelUpdate,
     updateSlotScore,
     getNewMachine,

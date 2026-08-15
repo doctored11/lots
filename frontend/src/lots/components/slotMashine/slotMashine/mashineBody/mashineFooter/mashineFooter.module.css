@@ -79,6 +79,48 @@
     filter: brightness(1.6);
   }
 }
+
+.unlockPlaque {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: #6fa8ff;
+  background-color: rgba(40, 52, 78, 0.937);
+  border: 1px solid #3f8cff;
+  border-radius: 4px;
+}
+
+.dropLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 2px 6px;
+  font-size: 12px;
+  color: #98979ef8;
+}
+
+.dropImg {
+  width: 22px;
+  height: 22px;
+}
+
+.rarity_common {
+  color: #a8abb3;
+}
+.rarity_uncommon {
+  color: #6fd776;
+}
+.rarity_rare {
+  color: #6fa8ff;
+}
+.rarity_legendary {
+  color: #ffd54a;
+}
 /* .betInGame {
   display: inline-block;
   background-color: rgba(113, 114, 116, 0.927);

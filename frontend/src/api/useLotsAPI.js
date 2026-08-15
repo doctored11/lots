@@ -64,6 +64,19 @@ export function useGameAPI() {
     return await request('/api/slots/change-machine', 'POST', body);
 };
 
+  const getInventory = async (chatId) => {
+    return await request(`/api/slots/${chatId}/inventory`, 'GET');
+  };
+
+  const getRecipeBook = async (chatId) => {
+    return await request(`/api/slots/${chatId}/recipes`, 'GET');
+  };
+
+  const buildMachine = async (chatId, reel) => {
+    console.log('🔧 Сборка автомата из предметов:', reel);
+    return await request('/api/slots/build-machine', 'POST', { chatId, reel });
+  };
+
 
   return {
     getPlayerInfo,
@@ -71,6 +84,9 @@ export function useGameAPI() {
     getSlotInfo,
     spinSlots,
     changeMachine,
+    getInventory,
+    getRecipeBook,
+    buildMachine,
     loading,
     error,
   };
