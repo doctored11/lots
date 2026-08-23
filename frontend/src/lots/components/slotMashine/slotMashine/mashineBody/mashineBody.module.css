@@ -109,10 +109,9 @@
 
   display: flex;
   width: 95%;
-  max-width: 780px;
+  max-width: 639px;
   min-width: 260px;
   min-height: 260px;
-  max-width: 600px;
   /* height: 95%; */
 
   align-items: end;
