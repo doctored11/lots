@@ -1,78 +1,37 @@
-/* Рычаг-бандит: шар + стержень — единый блок .lever, анимируется целиком,
-   поэтому шар никогда не отлетает от стержня. */
-
-.handZone {
-  flex: 1;
-  display: flex;
-  position: relative;
-  height: 60%;
-  max-height: 450px;
-  min-height: 300px;
-  width: 100%;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: nowrap;
-  z-index: 20;
-}
-
-/* единый рычаг: шар сверху, стержень уходит вниз из центра шара */
-.lever {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%) translateY(0);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  z-index: 10;
-  /* плавный возврат после прокрута */
-  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.35, 1);
-}
-
-/* красный шар */
 .handBtn {
   background-image: url("../../../../../source/handHead.png");
   background-size: cover;
   background-color: transparent;
   border: none;
-  width: 56px;
-  height: 56px;
-  min-width: 36px;
-  min-height: 36px;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
+  width: 65%;
+  padding-top: 65%;
   position: relative;
-  z-index: 2;
+  /* height: 100%; */
+  min-width: 40px;
+  min-height: 40px;
+  /* padding: 0; */
+  margin: 0;
+
+  transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    transform 0.2s cubic-bezier(0.175, 0.885, 0.22, 1.575);
+
+  z-index: 10;
+
+  position: absolute;
+  top: 0;
+  left: 50%;
+  /* right: 50%; */
+  transform: scale(1) translateX(-50%) translateY(-50%);
 
   animation: blink 0.5s ease infinite;
 }
 
 .handBtn:disabled {
   filter: grayscale(20%) brightness(80%);
-  cursor: default;
-}
+  transform: scale(0.8) translateX(-60%) translateY(-60%);
 
-/* стержень: верхний конец утоплен в центр шара (margin-top = -радиус шара) */
-.stick {
-  width: 10px;
-  min-width: 6px;
-  height: 85px; /* короткий стержень (~50% от былого) */
-  margin-top: -28px;
-  background-color: rgb(116, 115, 118);
-  border: 4px solid rgb(54, 52, 52);
-  border-top: none;
-  box-sizing: border-box;
-  z-index: 1;
-  /* сгибание идёт от шара вниз */
-  transform-origin: top center;
-  /* плавное распрямление после прокрута */
-  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.35, 1);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
-/* горизонтальный кронштейн от корпуса автомата к рычагу */
 .hand {
   min-width: 5px;
   min-height: 80px;
@@ -87,7 +46,29 @@
   transform: translateY(-50%);
   z-index: 5;
 }
+.handZone::before {
+  content: "";
+  width: 10%;
+  min-width: 5px;
+  height: 50%;
+  background-color: rgb(116, 115, 118);
+  border-top-width: 0;
+  border-right-width: 5px;
+  border-bottom-width: 0;
+  border-left-width: 5px;
+  /* border: 0 20px 0 20px; */
+  border-style: solid;
 
+  border-color: rgb(54, 52, 52);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-100%) translateX(-50%);
+  transform-origin: top;
+  z-index: 3;
+
+  transition: transform 0.3s ease;
+}
 .handZone::after {
   content: "";
   width: 60%;
@@ -97,7 +78,9 @@
   border-right-width: 5px;
   border-bottom-width: 5px;
   border-left-width: 0;
+  /* border: 0 20px 0 20px; */
   border-style: solid;
+
   border-color: rgb(54, 52, 52);
   box-shadow: inset 0 -2px 8px rgba(13, 14, 22, 0.3);
   position: absolute;
@@ -107,54 +90,96 @@
   z-index: 2;
 }
 
-/* дёргание: весь рычаг едет вниз как одно целое,
-   а стержень при этом сгибается/пружинит (scaleY от центра шара вниз) */
-.active > .lever {
-  transform: translateX(-50%) translateY(45px);
-  animation: moveLever 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s;
+.handZone {
+  flex: 1;
+  display: flex;
+  position: relative;
+  height: 60%;
+  max-height: 450px;
+  min-height: 300px;
+  width: 100%;
+  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: nowrap;
+  z-index: 20;
+}
+.active > .handBtn {
+  top: 40%;
+  transform: scale(0.8) translateX(-60%) translateY(-55%);
+  transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s,
+    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: moveHandBtn 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s;
+}
+.active.handZone::before {
+  /* top: 40%;
+    transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); */
+
+  animation: moveHand 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s;
+  transform: scaleY(0.12) translateY(-100%) translateX(-50%);
+  transition: transform 0.01s ease 0.4s;
+
+  /* scale: 0.5; */
 }
 
-.active > .lever > .stick {
-  animation: bendStick 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s;
-}
-
-@keyframes moveLever {
+@keyframes moveHandBtn {
   0% {
-    transform: translateX(-50%) translateY(0);
+    top: 0;
   }
-  30% {
-    transform: translateX(-50%) translateY(95px);
+  3% {
+    top: 0;
+    transform: scale(0.7) translateX(-70%) translateY(-70%);
   }
-  55% {
-    transform: translateX(-50%) translateY(80px);
-  }
-  100% {
-    transform: translateX(-50%) translateY(45px);
-  }
-}
-
-/* сгибание рычага: тянется при рывке вниз, сжимается с перелётом на возврате */
-@keyframes bendStick {
-  0% {
-    transform: scaleY(1);
-  }
-  20% {
-    transform: scaleY(1.25); /* рывок вниз — стержень тянется */
+  16% {
+    transform: scale(0.8) translateX(-60%) translateY(-55%);
   }
   40% {
-    transform: scaleY(1.15);
-  }
-  60% {
-    transform: scaleY(0.55); /* пружина вверх — сжимается */
-  }
-  80% {
-    transform: scaleY(0.85);
+    top: 80%;
+    transform: scale(0.7) translateX(-70%) translateY(-70%);
   }
   100% {
-    transform: scaleY(0.7);
+    top: 40%;
+    transform: scale(0.8) translateX(-60%) translateY(-55%);
   }
 }
 
+@keyframes MoveHandBtn {
+  0% {
+    top: 0;
+  }
+  3% {
+    top: 0;
+    transform: scale(0.7) translateX(-70%) translateY(-70%);
+  }
+  16% {
+    transform: scale(0.8) translateX(-60%) translateY(-55%);
+  }
+  40% {
+    top: 80%;
+    transform: scale(0.7) translateX(-70%) translateY(-70%);
+  }
+  100% {
+    top: 40%;
+    transform: scale(0.8) translateX(-60%) translateY(-55%);
+  }
+}
+
+@keyframes moveHand {
+  0% {
+    transform: scaleY(1) translateY(-100%) translateX(-50%);
+  }
+  3% {
+    transform: scaleY(1) translateY(-100%) translateX(-50%);
+  }
+  40% {
+    transform: scaleY(-0.65) translateY(-100%) translateX(-50%);
+  }
+  100% {
+    transform: scaleY(0.12) translateY(-100%) translateX(-50%);
+  }
+}
 @keyframes blink {
   0% {
     filter: brightness(80%);
@@ -177,51 +202,109 @@
   .handZone {
     height: 35%;
     min-height: 140px;
+    transform: translateY(-40%);
   }
   .handBtn {
-    width: 40px;
-    height: 40px;
+    padding-top: 35%;
+    min-width: 30px;
+    min-height: 30px;
   }
-  .stick {
-    height: 55px;
-    margin-top: -20px;
-    border-width: 2px;
-    border-top: none;
-  }
-  .hand {
-    min-height: 50px;
-  }
+
   .handZone::after {
+    content: "";
+    width: 60%;
+    height: 5%;
+
     border-top-width: 2px;
     border-right-width: 2px;
     border-bottom-width: 2px;
+    border-left-width: 0;
+
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+
+  .handZone::before {
+    content: "";
+    width: 3%;
+    min-width: 5px;
+    height: 50%;
+
+    border-top-width: 0;
+    border-right-width: 2px;
+    border-bottom-width: 0;
+    border-left-width: 2px;
+
+    transform: translateY(-100%) translateX(-50%);
+    transform-origin: top;
+    z-index: 3;
+
+    transition: transform 0.3s ease;
   }
 }
+
 
 @media (max-width: 380px) {
   .handZone {
     height: 40%;
     min-height: 120px;
+    transform: translateY(-35%);
   }
-  .hand {
+  .hand{
     min-height: 50px;
   }
+  
 }
 
 @media (max-width: 330px) {
   .handZone {
     height: 35%;
     min-height: 120px;
+    transform: translateY(-30%);
   }
-  .hand {
+  .hand{
     min-height: 30px;
   }
   .handBtn {
-    width: 32px;
-    height: 32px;
+    padding-top: 25%;
+    min-width: 20px;
+    min-height: 20px;
   }
-  .stick {
-    height: 45px;
-    margin-top: -16px;
+
+  
+  .handZone::after {
+    content: "";
+    width: 60%;
+    height: 5%;
+
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 0;
+
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+
+  .handZone::before {
+    content: "";
+    width: 1%;
+    min-width: 4px;
+    height: 50%;
+
+    border-top-width: 0;
+    border-right-width: 2px;
+    border-bottom-width: 0;
+    border-left-width: 2px;
+
+    transform: translateY(-100%) translateX(-50%);
+    transform-origin: top;
+    z-index: 3;
+
+    transition: transform 0.3s ease;
   }
 }
