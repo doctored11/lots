@@ -164,6 +164,7 @@ export const ECONOMY = {
   repairCost: 50,     // цена ремонта
   repairAmount: 10,   // +HP за ремонт
   shopRollCost: 1000, // цена прокрута магазина (гача)
+  buildCost: 200,   // плата за сборку автомата — чтобы не перестраивали часто
   reelMin: 4,
   reelMax: 8,
   baseSpinCost: 5,    // базовая цена прокрута + сумма spinCost предметов

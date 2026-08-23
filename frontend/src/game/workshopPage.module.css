@@ -186,3 +186,52 @@
   font-size: 14px;
   font-weight: bold;
 }
+
+/* --- кейс --- */
+.caseViewport {
+  position: relative;
+  width: 252px; /* 3 карточки по 84px */
+  max-width: 100%;
+  height: 84px;
+  overflow: hidden;
+  border: 1px solid #1d1d1dec;
+  border-radius: 8px;
+  background: rgba(20, 22, 26, 0.9);
+  margin-bottom: 10px;
+}
+
+.caseMarker {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ffd54a;
+  transform: translateX(-50%);
+  z-index: 5;
+  box-shadow: 0 0 6px #ffd54a;
+}
+
+.caseStrip {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+
+.caseItem {
+  flex: 0 0 84px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
+}
+
+.caseItemLabel {
+  font-size: 10px;
+  color: inherit;
+  opacity: 0.85;
+}

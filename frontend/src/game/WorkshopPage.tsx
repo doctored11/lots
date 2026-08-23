@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useGame } from "./GameContext";
 import {
@@ -7,8 +7,14 @@ import {
   ECONOMY,
   RARITY_LABELS,
   formatItemRewards,
+  rollItemDrop,
 } from "./catalog";
 import styles from "./workshopPage.module.css";
+
+// случайный предмет для ленты кейса (визуально честный — те же веса)
+function randomCaseItem(): string {
+  return rollItemDrop();
+}
 
 function ItemVisual({ itemKey, size }: { itemKey: string; size: number }) {
   const item = ITEMS[itemKey];
@@ -44,6 +50,12 @@ export function WorkshopPage() {
   const [message, setMessage] = useState("");
   const [shopResult, setShopResult] = useState<string | null>(null);
 
+  // прокрутка кейса
+  const [caseItems, setCaseItems] = useState<string[]>([]);
+  const [caseRolling, setCaseRolling] = useState(false);
+  const [caseOffset, setCaseOffset] = useState(0);
+  const caseWinItem = useRef<string | null>(null);
+
   const invCount = (key: string) => game.inventory[key] ?? 0;
   const draftCount = (key: string) => draft.filter((d) => d === key).length;
 
@@ -67,15 +79,49 @@ export function WorkshopPage() {
     }
   };
 
+  const CASE_LENGTH = 40; // предметов в ленте
+  const CASE_WIN_INDEX = 34; // позиция выигрышного (под стоп-линией)
+  const CASE_ITEM_W = 84; // ширина карточки в ленте, px
+
   const handleShopRoll = () => {
-    const res = game.shopRoll();
+    if (caseRolling) return;
+    const res = game.shopRollPreview();
     if (res.error) {
       setShopResult(null);
       setMessage("❌ " + res.error);
-    } else if (res.item) {
-      setMessage("");
-      setShopResult(res.item);
+      return;
     }
+    setMessage("");
+    setShopResult(null);
+    caseWinItem.current = res.item!;
+
+    // лента: случайные предметы, на выигрышной позиции — наш
+    const strip: string[] = [];
+    for (let i = 0; i < CASE_LENGTH; i++) {
+      strip.push(i === CASE_WIN_INDEX ? res.item! : randomCaseItem());
+    }
+    setCaseItems(strip);
+    setCaseOffset(0);
+    setCaseRolling(true);
+
+    // старт анимации на следующий кадр, чтобы transition сработал
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // останавливаемся так, чтобы выигрышный был под центром + лёгкий разброс
+        const jitter = (Math.random() - 0.5) * (CASE_ITEM_W * 0.6);
+        const viewportW = 3 * CASE_ITEM_W; // видно ~3 карточки
+        const target =
+          CASE_WIN_INDEX * CASE_ITEM_W - (viewportW - CASE_ITEM_W) / 2 + jitter;
+        setCaseOffset(-target);
+      });
+    });
+
+    // применяем результат после остановки ленты (4.5s transition)
+    setTimeout(() => {
+      game.applyShopRoll(res.item!);
+      setShopResult(res.item!);
+      setCaseRolling(false);
+    }, 4700);
   };
 
   return (
@@ -164,8 +210,9 @@ export function WorkshopPage() {
         <h2>🎰 Сборка автомата</h2>
         <p className={styles.hint}>
           Лента из {ECONOMY.reelMin}–{ECONOMY.reelMax} предметов. Предметы
-          расходуются. Цена прокрута и выигрыши зависят от вставленных лотов.
-          Текущая лента: {game.reel.map((k) => ITEMS[k].label).join(", ")}
+          расходуются + сборка стоит {ECONOMY.buildCost} монет. Цена прокрута и
+          выигрыши зависят от вставленных лотов. Текущая лента:{" "}
+          {game.reel.map((k) => ITEMS[k].label).join(", ")}
         </p>
         <div className={styles.draftLine}>
           {draft.length === 0 && (
@@ -187,7 +234,8 @@ export function WorkshopPage() {
           disabled={draft.length < ECONOMY.reelMin}
           onClick={handleBuild}
         >
-          Собрать автомат ({draft.length}/{ECONOMY.reelMax})
+          Собрать автомат ({draft.length}/{ECONOMY.reelMax}) —{" "}
+          {ECONOMY.buildCost} 💰
         </button>
         {message && <p className={styles.message}>{message}</p>}
       </section>
@@ -195,17 +243,49 @@ export function WorkshopPage() {
       <section>
         <h2>🛒 Магазин</h2>
         <p className={styles.hint}>
-          Прокрут за {ECONOMY.shopRollCost} монет — случайный предмет в
-          коллекцию. Редкие падают реже.
+          Кейс за {ECONOMY.shopRollCost} монет — случайный предмет в коллекцию.
+          Редкие падают реже.
         </p>
+
+        {(caseRolling || caseItems.length > 0) && (
+          <div className={styles.caseViewport}>
+            <div className={styles.caseMarker}></div>
+            <div
+              className={styles.caseStrip}
+              style={{
+                transform: `translateX(${caseOffset}px)`,
+                transition: caseRolling
+                  ? "transform 4.5s cubic-bezier(0.08, 0.6, 0.08, 1)"
+                  : "none",
+              }}
+            >
+              {caseItems.map((key, i) => (
+                <div
+                  key={i}
+                  className={`${styles.caseItem} ${
+                    styles["rarity_" + ITEMS[key].rarity]
+                  }`}
+                >
+                  <ItemVisual itemKey={key} size={48} />
+                  <span className={styles.caseItemLabel}>
+                    {ITEMS[key].label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <button
           className={styles.buildBtn}
           onClick={handleShopRoll}
-          disabled={game.balance < ECONOMY.shopRollCost}
+          disabled={game.balance < ECONOMY.shopRollCost || caseRolling}
         >
-          🎲 Крутануть ({ECONOMY.shopRollCost})
+          {caseRolling
+            ? "Крутится…"
+            : `🎲 Открыть кейс (${ECONOMY.shopRollCost})`}
         </button>
-        {shopResult && (
+        {shopResult && !caseRolling && (
           <div
             className={`${styles.shopResult} ${
               styles["rarity_" + ITEMS[shopResult].rarity]

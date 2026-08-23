@@ -56,6 +56,9 @@ interface GameContextType extends GameState {
   shopRoll: () => { item?: string; error?: string };
   buildMachine: (reel: string[]) => string | null;
   addCoins: (amount: number) => void; // дев-кнопка для тестов
+  // гача разделена на два шага — чтобы применить результат после анимации кейса
+  shopRollPreview: () => { item?: string; error?: string };
+  applyShopRoll: (item: string) => void;
 }
 
 function initialState(): GameState {
@@ -201,10 +204,19 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   }
 
   function shopRoll(): { item?: string; error?: string } {
+    const preview = shopRollPreview();
+    if (preview.item) applyShopRoll(preview.item);
+    return preview;
+  }
+
+  function shopRollPreview(): { item?: string; error?: string } {
     if (state.balance < ECONOMY.shopRollCost) {
       return { error: `Нужно ${ECONOMY.shopRollCost} монет` };
     }
-    const item = rollItemDrop();
+    return { item: rollItemDrop() };
+  }
+
+  function applyShopRoll(item: string) {
     setState((prev) => ({
       ...prev,
       balance: prev.balance - ECONOMY.shopRollCost,
@@ -213,7 +225,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         [item]: (prev.inventory[item] || 0) + 1,
       },
     }));
-    return { item };
   }
 
   // дев-кнопка для тестов: накинуть монет
@@ -221,7 +232,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     setState((prev) => ({ ...prev, balance: prev.balance + amount }));
   }
 
-  function buildMachine(reel: string[]): string | null {    if (reel.length < ECONOMY.reelMin || reel.length > ECONOMY.reelMax) {
+  function buildMachine(reel: string[]): string | null {
+    if (reel.length < ECONOMY.reelMin || reel.length > ECONOMY.reelMax) {
       return `Лента должна быть ${ECONOMY.reelMin}–${ECONOMY.reelMax} предметов`;
     }
     // проверяем наличие
@@ -232,6 +244,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     for (const [k, n] of Object.entries(need)) {
       if ((state.inventory[k] || 0) < n) return `Не хватает: ${ITEMS[k]?.label || k}`;
     }
+    if (state.balance < ECONOMY.buildCost) {
+      return `Сборка стоит ${ECONOMY.buildCost} монет — не хватает`;
+    }
     setState((prev) => {
       const inventory = { ...prev.inventory };
       reel.forEach((k) => {
@@ -239,6 +254,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       });
       return {
         ...prev,
+        balance: prev.balance - ECONOMY.buildCost,
         inventory,
         reel: [...reel],
         hp: ECONOMY.maxHp, // новый автомат — полный HP
@@ -265,6 +281,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     applySpinResult,
     repair,
     shopRoll,
+    shopRollPreview,
+    applyShopRoll,
     buildMachine,
     addCoins,
   };
