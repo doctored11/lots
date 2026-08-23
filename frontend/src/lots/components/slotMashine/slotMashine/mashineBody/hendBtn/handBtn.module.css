@@ -19,7 +19,7 @@
   z-index: 10;
 
   position: absolute;
-  top: 0;
+  top: 25%; /* шар стоит на вершине укороченного стержня */
   left: 50%;
   /* right: 50%; */
   transform: scale(1) translateX(-50%) translateY(-50%);
@@ -129,10 +129,10 @@
 
 @keyframes moveHandBtn {
   0% {
-    top: 0;
+    top: 25%;
   }
   3% {
-    top: 0;
+    top: 25%;
     transform: scale(0.7) translateX(-70%) translateY(-70%);
   }
   16% {
@@ -150,10 +150,10 @@
 
 @keyframes MoveHandBtn {
   0% {
-    top: 0;
+    top: 25%;
   }
   3% {
-    top: 0;
+    top: 25%;
     transform: scale(0.7) translateX(-70%) translateY(-70%);
   }
   16% {

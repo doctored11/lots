@@ -14,7 +14,7 @@
   position: relative;
 
   /* /* height: 80%; */
-  min-height: 40%;
+  min-height: 320px; /* тело не ниже барабанов + воздух, как когда плашки были внутри */
   width: 100%;
   position: relative;
   transition: all 0.4s ease;
