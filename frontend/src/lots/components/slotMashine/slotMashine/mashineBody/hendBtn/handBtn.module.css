@@ -94,9 +94,9 @@
   flex: 1;
   display: flex;
   position: relative;
-  height: 60%;
-  max-height: 450px;
-  min-height: 300px;
+  height: 38%;
+  max-height: 300px;
+  min-height: 210px;
   width: 100%;
   justify-content: center;
   flex-direction: column;
@@ -105,8 +105,7 @@
   align-items: center;
   flex-wrap: nowrap;
   z-index: 20;
-  /* десктоп: рычаг опущен к телу автомата */
-  transform: translateY(25%);
+  align-self: flex-end;
 }
 .active > .handBtn {
   top: 40%;
