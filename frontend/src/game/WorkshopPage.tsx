@@ -16,6 +16,44 @@ function randomCaseItem(): string {
   return rollItemDrop();
 }
 
+// тултип с расширенной подсказкой по лоту (показывается при наведении)
+function ItemTooltip({
+  itemKey,
+  unlocked,
+}: {
+  itemKey: string;
+  unlocked: boolean;
+}) {
+  const item = ITEMS[itemKey];
+  if (!item) return null;
+  return (
+    <div className={styles.tooltip} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.tooltipTitle}>
+        {unlocked ? item.label : "???"}
+      </div>
+      <div className={`${styles.tooltipRarity} ${styles["rarity_" + item.rarity]}`}>
+        {RARITY_LABELS[item.rarity]}
+      </div>
+      <div className={styles.tooltipRow}>
+        Цена в прокруте: <b>+{item.spinCost}</b>
+      </div>
+      {unlocked ? (
+        <>
+          <div className={styles.tooltipRow}>
+            Награды: <b>{formatItemRewards(itemKey)}</b>
+          </div>
+          <div className={styles.tooltipDesc}>{item.desc}</div>
+        </>
+      ) : (
+        <div className={styles.tooltipDesc}>
+          Свойства скрыты. Выбей комбинацию из трёх таких на барабанах, чтобы
+          открыть описание и награды.
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ItemVisual({ itemKey, size }: { itemKey: string; size: number }) {
   const item = ITEMS[itemKey];
   if (!item) return null;
@@ -170,6 +208,7 @@ export function WorkshopPage() {
                     {formatItemRewards(key)}
                   </div>
                 )}
+                <ItemTooltip itemKey={key} unlocked={unlocked} />
               </div>
             );
           })}
@@ -201,6 +240,7 @@ export function WorkshopPage() {
               </div>
               <div className={styles.cardTitle}>{ITEMS[key].label}</div>
               <div className={styles.cardRarity}>×{count}</div>
+              <ItemTooltip itemKey={key} unlocked={true} />
             </button>
           ))}
         </div>

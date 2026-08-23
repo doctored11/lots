@@ -235,3 +235,76 @@
   color: inherit;
   opacity: 0.85;
 }
+
+/* --- тултипы --- */
+.card {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  width: 210px;
+  padding: 10px 12px;
+  background: rgba(20, 22, 26, 0.98);
+  border: 1px solid #444;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  pointer-events: none;
+  text-align: left;
+  font-size: 12px;
+  color: #d5d6dbf8;
+}
+
+.card:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
+}
+
+/* стрелка вниз */
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #444;
+}
+
+.tooltipTitle {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.tooltipRarity {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.tooltipRow {
+  margin: 3px 0;
+  color: #b9bac1f8;
+}
+
+.tooltipRow b {
+  color: #ffd54a;
+}
+
+.tooltipDesc {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #98979ef8;
+}
