@@ -35,12 +35,19 @@ function ItemTooltip({
         {RARITY_LABELS[item.rarity]}
       </div>
       <div className={styles.tooltipRow}>
-        Цена в прокруте: <b>+{item.spinCost}</b>
+        Вклад в ставку: <b>+{item.spinCost}</b>
+      </div>
+      <div className={styles.tooltipRow}>
+        Износ автомата: <b>+{item.wear}</b>
       </div>
       {unlocked ? (
         <>
           <div className={styles.tooltipRow}>
             Награды: <b>{formatItemRewards(itemKey)}</b>
+          </div>
+          <div className={styles.tooltipNote}>
+            +N — добавка к ставке, ×N — множитель ставки. Выигрыш = ставка ×
+            (сумма +) × (произведение ×).
           </div>
           <div className={styles.tooltipDesc}>{item.desc}</div>
         </>
@@ -138,13 +145,14 @@ export function WorkshopPage() {
     for (let i = 0; i < CASE_LENGTH; i++) {
       strip.push(i === CASE_WIN_INDEX ? res.item! : randomCaseItem());
     }
+    // мгновенный сброс ленты в начало (transition выключен, т.к. caseRolling=false)
     setCaseItems(strip);
     setCaseOffset(0);
-    setCaseRolling(true);
 
     // старт анимации на следующий кадр, чтобы transition сработал
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        setCaseRolling(true);
         // останавливаемся так, чтобы выигрышный был под центром + лёгкий разброс
         const jitter = (Math.random() - 0.5) * (CASE_ITEM_W * 0.6);
         const viewportW = 3 * CASE_ITEM_W; // видно ~3 карточки
@@ -219,7 +227,7 @@ export function WorkshopPage() {
         <h2>🎒 Инвентарь</h2>
         {Object.keys(game.inventory).length === 0 && (
           <p className={styles.hint}>
-            Пусто. Крути автомат — предметы падают за каждый спин.
+            Пусто. Открывай кейсы в магазине — предметы только оттуда.
           </p>
         )}
         <div className={styles.grid}>
@@ -233,7 +241,6 @@ export function WorkshopPage() {
               disabled={
                 draftCount(key) >= count || draft.length >= ECONOMY.reelMax
               }
-              title="Нажми, чтобы добавить в ленту"
             >
               <div className={styles.cardImg}>
                 <ItemVisual itemKey={key} size={56} />
@@ -249,9 +256,9 @@ export function WorkshopPage() {
       <section>
         <h2>🎰 Сборка автомата</h2>
         <p className={styles.hint}>
-          Лента из {ECONOMY.reelMin}–{ECONOMY.reelMax} предметов. Предметы
-          расходуются + сборка стоит {ECONOMY.buildCost} монет. Цена прокрута и
-          выигрыши зависят от вставленных лотов. Текущая лента:{" "}
+          Лента из {ECONOMY.reelMin}–{ECONOMY.reelMax} предметов, сборка стоит{" "}
+          {ECONOMY.buildCost} монет. Предметы остаются у тебя, но сгорают, если
+          автомат сломается (HP = 0). Текущая лента:{" "}
           {game.reel.map((k) => ITEMS[k].label).join(", ")}
         </p>
         <div className={styles.draftLine}>

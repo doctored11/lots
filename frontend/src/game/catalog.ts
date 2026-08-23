@@ -14,6 +14,7 @@ export interface ItemDef {
   image?: string; // путь до png (dist/source/*)
   rarity: Rarity;
   spinCost: number; // вклад предмета в цену прокрута автомата
+  wear: number; // вклад предмета в износ автомата за прокрут
   values: { 1: RewardValue; 2: RewardValue; 3: RewardValue };
   desc: string; // открывается в книге рецептов после тройки
 }
@@ -25,48 +26,56 @@ export const ITEMS: Record<string, ItemDef> = {
   grape: {
     key: "grape", label: "Виноград", emoji: "🍇", image: img("grape"),
     rarity: "common", spinCost: 1,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.3 }, 3: { type: "plus", amount: 5.5 } },
     desc: "Скромный, но падает чаще всех. Три грозди — +5.5 к ставке.",
   },
   cherry: {
     key: "cherry", label: "Вишня", emoji: "🍒", image: img("cherry"),
     rarity: "common", spinCost: 1,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.5 }, 3: { type: "plus", amount: 2.2 } },
     desc: "Вишенка на барабане. Уже одна даёт +0.2, три — +2.2.",
   },
   banana: {
     key: "banana", label: "Банан", emoji: "🍌", image: img("banana"),
     rarity: "common", spinCost: 1,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.0 }, 2: { type: "plus", amount: 0.5 }, 3: { type: "plus", amount: 10 } },
     desc: "Скользкий фрукт: пара даёт +0.5, тройка — целых +10.",
   },
   mushroom: {
     key: "mushroom", label: "Гриб", emoji: "🍄", image: img("mushrum_v1"),
     rarity: "uncommon", spinCost: 2,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 4 } },
     desc: "Лесной гриб. Три штуки дают +4 к ставке.",
   },
   melon: {
     key: "melon", label: "Дыня", emoji: "🍈", image: img("melon"),
     rarity: "uncommon", spinCost: 2,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.0 }, 2: { type: "plus", amount: 0.2 }, 3: { type: "plus", amount: 7.7 } },
     desc: "Сочная дыня. Одна почти ничего не стоит, но три — это +7.7.",
   },
   clover: {
     key: "clover", label: "Клевер", emoji: "🍀", image: img("clover"),
     rarity: "rare", spinCost: 5,
+    wear: 1,
     values: { 1: { type: "multiply", factor: 1.3 }, 2: { type: "multiply", factor: 2 }, 3: { type: "plus", amount: 12 } },
     desc: "Счастливый клевер. Уже один множит ставку, а три приносят +12 сверху.",
   },
   blueBerrie: {
     key: "blueBerrie", label: "Черника", emoji: "🫐", image: img("blueBerrie"),
     rarity: "rare", spinCost: 5,
+    wear: 1,
     values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.5 }, 3: { type: "plus", amount: 16.6 } },
     desc: "Редкая черника. Три ягоды — +16.6 к ставке.",
   },
   bomb: {
     key: "bomb", label: "Бомба", emoji: "💣", image: img("bomb"),
     rarity: "legendary", spinCost: 10,
+    wear: 2,
     values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.8 }, 3: { type: "multiply", factor: 8.8 } },
     desc: "Сердце автомата. Три бомбы взрывают выигрыш до ×8.8.",
   },
@@ -75,72 +84,84 @@ export const ITEMS: Record<string, ItemDef> = {
   lemon: {
     key: "lemon", label: "Лимон", emoji: "🍋",
     rarity: "common", spinCost: 1,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 3 } },
     desc: "Кислый, но надёжный. Три лимона — +3 к ставке.",
   },
   apple: {
     key: "apple", label: "Яблоко", emoji: "🍎",
     rarity: "common", spinCost: 1,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 2.6 } },
     desc: "Простое яблоко. Одно уже даёт +0.2.",
   },
   coin: {
     key: "coin", label: "Монета", emoji: "🪙",
     rarity: "common", spinCost: 2,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.7 }, 3: { type: "plus", amount: 4 } },
     desc: "Звонкая монета. Дороже фруктов, но и отдача выше.",
   },
   bell: {
     key: "bell", label: "Колокол", emoji: "🔔",
     rarity: "common", spinCost: 2,
+    wear: 0,
     values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.8 }, 3: { type: "plus", amount: 5 } },
     desc: "Классика жанра. Три колокола звенят на +5.",
   },
   dice: {
     key: "dice", label: "Кость", emoji: "🎲",
     rarity: "uncommon", spinCost: 3,
+    wear: 1,
     values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "multiply", factor: 1.5 }, 3: { type: "plus", amount: 6 } },
     desc: "Игральная кость. Пара множит ставку на ×1.5.",
   },
   skull: {
     key: "skull", label: "Череп", emoji: "💀",
     rarity: "uncommon", spinCost: 3,
+    wear: 1,
     values: { 1: { type: "plus", amount: 0.0 }, 2: { type: "plus", amount: 1.0 }, 3: { type: "plus", amount: 9 } },
     desc: "Опасный символ. Одна штука пустая, зато тройка — +9.",
   },
   chili: {
     key: "chili", label: "Перец", emoji: "🌶",
     rarity: "uncommon", spinCost: 3,
+    wear: 1,
     values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.6 }, 3: { type: "multiply", factor: 3 } },
     desc: "Острый перец. Три штуки утраивают выигрыш.",
   },
   star: {
     key: "star", label: "Звезда", emoji: "⭐",
     rarity: "rare", spinCost: 6,
+    wear: 1,
     values: { 1: { type: "multiply", factor: 1.2 }, 2: { type: "plus", amount: 2 }, 3: { type: "plus", amount: 20 } },
     desc: "Счастливая звезда. Три звезды — +20 к ставке.",
   },
   gem: {
     key: "gem", label: "Самоцвет", emoji: "💎",
     rarity: "rare", spinCost: 6,
+    wear: 1,
     values: { 1: { type: "plus", amount: 0.4 }, 2: { type: "multiply", factor: 2.5 }, 3: { type: "multiply", factor: 5 } },
     desc: "Драгоценность. Пара множит ×2.5, тройка — ×5.",
   },
   rocket: {
     key: "rocket", label: "Ракета", emoji: "🚀",
     rarity: "rare", spinCost: 7,
+    wear: 1,
     values: { 1: { type: "plus", amount: 0.5 }, 2: { type: "plus", amount: 1.5 }, 3: { type: "plus", amount: 25 } },
     desc: "На луну! Три ракеты — +25 к ставке.",
   },
   seven: {
     key: "seven", label: "Семёрка", emoji: "7️⃣",
     rarity: "legendary", spinCost: 12,
+    wear: 2,
     values: { 1: { type: "plus", amount: 0.7 }, 2: { type: "multiply", factor: 3 }, 3: { type: "plus", amount: 77 } },
     desc: "Легендарная семёрка. Три семёрки — +77. Джекпот классики.",
   },
   crown: {
     key: "crown", label: "Корона", emoji: "👑",
     rarity: "legendary", spinCost: 15,
+    wear: 2,
     values: { 1: { type: "multiply", factor: 1.5 }, 2: { type: "multiply", factor: 4 }, 3: { type: "multiply", factor: 12 } },
     desc: "Королевская корона. Даже одна множит ставку ×1.5, тройка — ×12.",
   },
@@ -225,12 +246,13 @@ export function calculateWinnings(bet: number, results: string[]): number {
   return Math.floor(bet * (totalPlus || 1) * totalMultiply);
 }
 
-// урон автомату за прокрут: 0..5 + растущий износ от числа прокрутов
-export function rollSpinDamage(spinsDone: number): number {
+// урон автомату за прокрут: 0..5 + износ от предметов ленты + растущий износ
+export function rollSpinDamage(spinsDone: number, reel: string[] = []): number {
+  const itemsWear = reel.reduce((sum, key) => sum + (ITEMS[key]?.wear ?? 0), 0);
   const wear = Math.floor(spinsDone / ECONOMY.wearEverySpins);
   return Math.min(
     ECONOMY.spinDamageCap,
-    getRandomInt(0, ECONOMY.spinDamageBase) + wear
+    getRandomInt(0, ECONOMY.spinDamageBase) + itemsWear + wear
   );
 }
 
@@ -244,6 +266,7 @@ export function rollItemDrop(): string {
 }
 
 // строка наград для книги рецептов: "1: +0.1 · 2: +0.3 · 3: +5.5"
+// "+N" — добавка к ставке, "×N" — множитель ставки
 export function formatItemRewards(key: string): string {
   const values = ITEMS[key]?.values;
   if (!values) return "";

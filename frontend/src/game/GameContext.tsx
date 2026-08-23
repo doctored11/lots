@@ -144,7 +144,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     ];
     const results = combination.map((i) => state.reel[i]);
     const win = calculateWinnings(spinCost, results);
-    const damage = rollSpinDamage(state.spinsDone);
+    const damage = rollSpinDamage(state.spinsDone, state.reel);
     const hpAfter = Math.max(0, state.hp - damage);
 
     let unlockedRecipe: string | null = null;
@@ -180,11 +180,22 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         ? [...prev.unlockedRecipes, r.unlockedRecipe]
         : prev.unlockedRecipes;
       const roundedWin = Math.round(r.win);
+
+      // автомат сломался — предметы ленты сгорают
+      let inventory = prev.inventory;
+      if (r.broken) {
+        inventory = { ...prev.inventory };
+        prev.reel.forEach((k) => {
+          inventory[k] = Math.max(0, (inventory[k] || 0) - 1);
+        });
+      }
+
       return {
         ...prev,
         balance: prev.balance + roundedWin, // ставка уже списана в chargeSpinCost
         hp: r.hpAfter,
         spinsDone: prev.spinsDone + 1,
+        inventory,
         unlockedRecipes,
         lastWin: roundedWin,
         maxWin: Math.max(prev.maxWin, roundedWin),
@@ -236,7 +247,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (reel.length < ECONOMY.reelMin || reel.length > ECONOMY.reelMax) {
       return `Лента должна быть ${ECONOMY.reelMin}–${ECONOMY.reelMax} предметов`;
     }
-    // проверяем наличие
+    // проверяем наличие (предметы НЕ расходуются — сгорают только при взрыве автомата)
     const need: Record<string, number> = {};
     reel.forEach((k) => {
       need[k] = (need[k] || 0) + 1;
@@ -247,22 +258,15 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (state.balance < ECONOMY.buildCost) {
       return `Сборка стоит ${ECONOMY.buildCost} монет — не хватает`;
     }
-    setState((prev) => {
-      const inventory = { ...prev.inventory };
-      reel.forEach((k) => {
-        inventory[k] -= 1;
-      });
-      return {
-        ...prev,
-        balance: prev.balance - ECONOMY.buildCost,
-        inventory,
-        reel: [...reel],
-        hp: ECONOMY.maxHp, // новый автомат — полный HP
-        spinsDone: 0,      // износ сбрасывается
-        lastWin: 0,
-        maxWin: 0,
-      };
-    });
+    setState((prev) => ({
+      ...prev,
+      balance: prev.balance - ECONOMY.buildCost,
+      reel: [...reel],
+      hp: ECONOMY.maxHp, // новый автомат — полный HP
+      spinsDone: 0,      // износ сбрасывается
+      lastWin: 0,
+      maxWin: 0,
+    }));
     setJustBuilt(true); // для анимации прилёта нового автомата
     return null;
   }

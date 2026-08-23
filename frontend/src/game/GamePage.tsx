@@ -240,7 +240,9 @@ export function GamePage() {
         >
           +1000 💰
         </button>
-        <span className={styles.cost}>прокрут: {game.spinCost}</span>
+        <span className={styles.cost} title="Ставка = база 5 + сумма вкладов лотов в ленте. Выигрыш считается от ставки.">
+          ставка: {game.spinCost}
+        </span>
       </div>
 
       <div className={styles.machineStage}>

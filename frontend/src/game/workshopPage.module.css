@@ -308,3 +308,11 @@
   line-height: 1.4;
   color: #98979ef8;
 }
+
+.tooltipNote {
+  margin-top: 4px;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #6d6e74f8;
+  font-style: italic;
+}
