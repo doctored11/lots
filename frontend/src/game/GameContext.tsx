@@ -12,6 +12,7 @@ import {
   calculateWinnings,
   rollSpinDamage,
   rollItemDrop,
+  rollStarterRare,
   Rarity,
 } from "./catalog";
 
@@ -36,7 +37,6 @@ export interface SpinResult {
   damage: number;
   hpAfter: number;
   broken: boolean;
-  droppedItem: string;
   unlockedRecipe: string | null;
 }
 
@@ -63,6 +63,9 @@ function initialState(): GameState {
   ECONOMY.startInventory.forEach((k) => {
     inventory[k] = (inventory[k] || 0) + 1;
   });
+  // + 1 случайный редкий предмет в стартовый набор
+  const rare = rollStarterRare();
+  inventory[rare] = (inventory[rare] || 0) + 1;
   return {
     balance: ECONOMY.startBalance,
     inventory,
@@ -140,7 +143,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     const win = calculateWinnings(spinCost, results);
     const damage = rollSpinDamage(state.spinsDone);
     const hpAfter = Math.max(0, state.hp - damage);
-    const droppedItem = rollItemDrop();
 
     let unlockedRecipe: string | null = null;
     if (
@@ -159,7 +161,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       damage,
       hpAfter,
       broken: hpAfter <= 0,
-      droppedItem,
       unlockedRecipe,
     };
   }
@@ -172,8 +173,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   // применение результата после окончания анимации барабанов
   function applySpinResult(r: SpinResult) {
     setState((prev) => {
-      const inventory = { ...prev.inventory };
-      inventory[r.droppedItem] = (inventory[r.droppedItem] || 0) + 1;
       const unlockedRecipes = r.unlockedRecipe
         ? [...prev.unlockedRecipes, r.unlockedRecipe]
         : prev.unlockedRecipes;
@@ -183,7 +182,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         balance: prev.balance + roundedWin, // ставка уже списана в chargeSpinCost
         hp: r.hpAfter,
         spinsDone: prev.spinsDone + 1,
-        inventory,
         unlockedRecipes,
         lastWin: roundedWin,
         maxWin: Math.max(prev.maxWin, roundedWin),

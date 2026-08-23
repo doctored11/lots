@@ -170,9 +170,17 @@ export const ECONOMY = {
   spinDamageBase: 5,  // урон за прокрут: 0..5 + износ
   wearEverySpins: 25, // каждые N прокрутов +1 к износу
   spinDamageCap: 12,
-  startInventory: ["grape", "cherry", "banana", "lemon"] as string[],
-  startReel: ["grape", "cherry", "banana", "lemon"] as string[],
+  startInventory: ["grape", "grape", "cherry", "banana"] as string[],
+  startReel: ["grape", "grape", "cherry", "banana"] as string[],
 };
+
+// случайный редкий предмет в стартовый набор
+export function rollStarterRare(): string {
+  const rares = Object.values(ITEMS)
+    .filter((i) => i.rarity === "rare")
+    .map((i) => i.key);
+  return rares[getRandomInt(0, rares.length - 1)];
+}
 
 // вес дропа по редкости
 const RARITY_DROP_WEIGHT: Record<Rarity, number> = {
