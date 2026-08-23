@@ -55,6 +55,7 @@ interface GameContextType extends GameState {
   repair: () => string | null; // null = ок, иначе текст ошибки
   shopRoll: () => { item?: string; error?: string };
   buildMachine: (reel: string[]) => string | null;
+  addCoins: (amount: number) => void; // дев-кнопка для тестов
 }
 
 function initialState(): GameState {
@@ -217,8 +218,12 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     return { item };
   }
 
-  function buildMachine(reel: string[]): string | null {
-    if (reel.length < ECONOMY.reelMin || reel.length > ECONOMY.reelMax) {
+  // дев-кнопка для тестов: накинуть монет
+  function addCoins(amount: number) {
+    setState((prev) => ({ ...prev, balance: prev.balance + amount }));
+  }
+
+  function buildMachine(reel: string[]): string | null {    if (reel.length < ECONOMY.reelMin || reel.length > ECONOMY.reelMax) {
       return `Лента должна быть ${ECONOMY.reelMin}–${ECONOMY.reelMax} предметов`;
     }
     // проверяем наличие
@@ -263,6 +268,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     repair,
     shopRoll,
     buildMachine,
+    addCoins,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

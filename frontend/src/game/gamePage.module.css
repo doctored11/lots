@@ -32,6 +32,21 @@
   color: #98979ef8;
 }
 
+.devCoinsBtn {
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: 1px dashed #ffb02e;
+  background: rgba(72, 94, 60, 0.6);
+  color: #ffd54a;
+  cursor: pointer;
+}
+
+.devCoinsBtn:hover {
+  filter: brightness(1.3);
+}
+
 .machine {
   border: 1px solid #1d1d1dec;
   border-radius: 10px;

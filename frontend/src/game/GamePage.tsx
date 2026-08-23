@@ -218,6 +218,16 @@ export function GamePage() {
             ))}
           </span>
         </span>
+        <button
+          className={styles.devCoinsBtn}
+          onClick={() => {
+            game.addCoins(1000);
+            addFloat(1000);
+          }}
+          title="Дев-кнопка: +1000 монет (временно, для тестов)"
+        >
+          +1000 💰
+        </button>
         <span className={styles.cost}>прокрут: {game.spinCost}</span>
       </div>
 
