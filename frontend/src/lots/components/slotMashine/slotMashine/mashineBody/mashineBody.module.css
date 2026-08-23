@@ -126,7 +126,9 @@
   display: flex;
   width: 100%;
   position: relative;
-  overflow: hidden; /* обрезка по низу — эффект проваливания в дыру (как в оригинале) */
+  overflow: visible;
+  /* клип только снизу: автомат «проваливается в дыру», но анимации не режутся по бокам и сверху */
+  clip-path: inset(-100% -50% 0 -50%);
   min-height: 95%;
   z-index: 5;
   /*  */

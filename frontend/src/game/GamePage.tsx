@@ -89,7 +89,6 @@ export function GamePage() {
   // новый прилетает (sqwishFall + тень появляется)
   useEffect(() => {
     if (!game.justBuilt) return;
-    game.setJustBuilt(false);
     const el = mashineRef.current;
     const shadow = shadowRef.current;
     if (!el) return;
@@ -109,6 +108,8 @@ export function GamePage() {
     const t2 = setTimeout(() => {
       el.classList.remove(boomStyles.mashineShow);
       shadow?.classList.remove(boomStyles.shadowAppearance);
+      // флаг сбрасываем только в конце — иначе cleanup эффекта убьёт таймеры
+      game.setJustBuilt(false);
     }, 1800 + 1400);
 
     return () => {
