@@ -1,35 +1,55 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useGame, SpinResult } from "./GameContext";
-import { ITEMS, ECONOMY, RARITY_LABELS } from "./catalog";
+import { ITEMS, ECONOMY } from "./catalog";
 import { rollSpin } from "../lots/components/slotMashine/slotMashine/mashineBody/mashineDrum/rollSpin";
 import { getRandomInt } from "../tools/tools";
+import { HandBtn } from "../lots/components/slotMashine/slotMashine/mashineBody/hendBtn/HandBtn";
+import { BalanceChange } from "../globalComponents/header/balanceChange.tsx/BalanceChange";
 import styles from "./gamePage.module.css";
+import machineStyles from "../lots/components/slotMashine/slotMashine/mashineBody/mashineBody.module.css";
+import drumStyles from "../lots/components/slotMashine/slotMashine/mashineBody/mashineDrum/mashineDrum.module.css";
+import boomStyles from "../lots/components/changeMashine/changeMashine.module.css";
 
 const ITEM_HEIGHT = 96;
 
-function TapeContent({ reel, tapeRef }: { reel: string[]; tapeRef: React.RefObject<HTMLDivElement> }) {
+interface FloatNum {
+  id: number;
+  change: number;
+}
+let floatId = 0;
+
+function TapeContent({
+  reel,
+  tapeRef,
+}: {
+  reel: string[];
+  tapeRef: React.RefObject<HTMLDivElement>;
+}) {
   useEffect(() => {
     if (!tapeRef.current) return;
     tapeRef.current.innerHTML = "";
     reel.forEach((key) => {
       const item = ITEMS[key];
       if (!item) return;
+      let el: HTMLElement;
       if (item.image) {
-        const img = document.createElement("img");
-        img.src = item.image;
-        img.style.height = `${ITEM_HEIGHT}px`;
-        img.style.width = `${ITEM_HEIGHT}px`;
-        tapeRef.current?.appendChild(img);
+        el = document.createElement("img");
+        (el as HTMLImageElement).src = item.image;
       } else {
-        const span = document.createElement("div");
-        span.textContent = item.emoji;
-        span.style.cssText = `height:${ITEM_HEIGHT}px;width:${ITEM_HEIGHT}px;font-size:${ITEM_HEIGHT * 0.7}px;display:flex;align-items:center;justify-content:center;`;
-        tapeRef.current?.appendChild(span);
+        el = document.createElement("div");
+        el.textContent = item.emoji;
+        el.style.fontSize = `${ITEM_HEIGHT * 0.6}px`;
+        el.style.display = "flex";
+        el.style.alignItems = "center";
+        el.style.justifyContent = "center";
       }
+      el.style.height = `${ITEM_HEIGHT}px`;
+      el.style.width = `${ITEM_HEIGHT}px`;
+      tapeRef.current?.appendChild(el);
     });
   }, [reel]);
-  return <div ref={tapeRef} className={styles.tape}></div>;
+  return <div ref={tapeRef} className={drumStyles.tape}></div>;
 }
 
 export function GamePage() {
@@ -38,15 +58,31 @@ export function GamePage() {
   const [pending, setPending] = useState<SpinResult | null>(null);
   const [autoSpin, setAutoSpin] = useState(false);
   const [toast, setToast] = useState("");
+  const [floats, setFloats] = useState<FloatNum[]>([]);
+  const [exploding, setExploding] = useState(false);
 
   const tapeRefs = useRef<React.RefObject<HTMLDivElement>[]>(
     [0, 1, 2].map(() => React.createRef<HTMLDivElement>())
   );
+  const mashineRef = useRef<HTMLDivElement>(null);
 
   const showToast = (text: string, ms = 3000) => {
     setToast(text);
     setTimeout(() => setToast(""), ms);
   };
+
+  const addFloat = (change: number) => {
+    const id = ++floatId;
+    setFloats((prev) => [...prev, { id, change }]);
+  };
+  const removeFloat = (id: number) => {
+    setFloats((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  function playExplosion() {
+    setExploding(true);
+    setTimeout(() => setExploding(false), 900);
+  }
 
   function handleSpin() {
     if (game.isSpinning || game.isAnimating) return;
@@ -54,16 +90,32 @@ export function GamePage() {
     if ("error" in result) {
       if (result.error === "broken") {
         showToast("💥 Автомат сломан! Нужен ремонт");
+        playExplosion();
       } else {
         showToast("Не хватает монет на прокрут");
         setAutoSpin(false);
       }
       return;
     }
+    addFloat(-result.cost); // списание ставки — цифра вниз сразу
     game.setIsSpinning(true);
     setSpinValues(result.combination);
     setPending(result);
   }
+
+  // тряска автомата во время прокрута
+  useEffect(() => {
+    const el = mashineRef.current;
+    if (!el) return;
+    if (game.isSpinning) {
+      const t = setTimeout(() => el.classList.add(machineStyles.working), 300);
+      return () => {
+        clearTimeout(t);
+        el.classList.remove(machineStyles.working);
+      };
+    }
+    el.classList.remove(machineStyles.working);
+  }, [game.isSpinning]);
 
   // запуск анимации барабанов
   useEffect(() => {
@@ -78,14 +130,29 @@ export function GamePage() {
       )
     );
     Promise.all(promises).then(() => {
+      // подсветка выпавших символов
+      spinValues.forEach((targetIndex, reelIndex) => {
+        const tape = tapeRefs.current[reelIndex].current;
+        const el = tape?.children[targetIndex];
+        if (el instanceof HTMLElement) {
+          el.classList.add(drumStyles.winEl);
+          setTimeout(() => el.classList.remove(drumStyles.winEl), 700);
+        }
+      });
+
       game.applySpinResult(pending);
       game.setIsSpinning(false);
+      if (pending.win > 0) addFloat(pending.win); // выигрыш — цифра вверх
       if (pending.unlockedRecipe) {
-        showToast(`📖 Открыт рецепт: ${ITEMS[pending.unlockedRecipe].label}!`, 4000);
+        showToast(
+          `📖 Открыт рецепт: ${ITEMS[pending.unlockedRecipe].label}!`,
+          4000
+        );
       }
       if (pending.broken) {
         setAutoSpin(false);
-        setTimeout(() => showToast("💥 Автомат сломался (0 HP)!", 4000), 500);
+        playExplosion();
+        setTimeout(() => showToast("💥 Автомат сломался (0 HP)!", 4000), 600);
       }
       setPending(null);
     });
@@ -110,71 +177,102 @@ export function GamePage() {
   const handleRepair = () => {
     const err = game.repair();
     if (err) showToast(err);
+    else addFloat(-ECONOMY.repairCost);
   };
 
   return (
     <div className={styles.gamePage}>
       <div className={styles.topStats}>
-        <span className={styles.balance}>💰 {game.balance}</span>
+        <span className={styles.balance}>
+          💰 {game.balance}
+          <span className={styles.floatZone}>
+            {floats.map((f) => (
+              <BalanceChange
+                key={f.id}
+                change={f.change}
+                onRemove={() => removeFloat(f.id)}
+              />
+            ))}
+          </span>
+        </span>
         <span className={styles.cost}>прокрут: {game.spinCost}</span>
       </div>
 
-      <div className={styles.machine}>
-        <div className={styles.drumRow}>
-          {spinValues.map((_, index) => (
-            <div key={index} className={styles.roll}>
-              <TapeContent reel={game.reel} tapeRef={tapeRefs.current[index]} />
+      <div className={machineStyles.mashineContainer}>
+        <div className={machineStyles.mashine} id="mashine" ref={mashineRef}>
+          <div className={machineStyles.out}>
+            <div className={machineStyles.mashineHead}>
+              <div className={machineStyles.headUp}></div>
+              <div className={machineStyles.headMid}></div>
+              <div className={machineStyles.headLow}></div>
             </div>
-          ))}
-        </div>
+            <div className={machineStyles.mashineBody}>
+              <div className={machineStyles.dramFrame}>
+                <div className={drumStyles.slotDrum}>
+                  {spinValues.map((_, index) => (
+                    <div
+                      key={index}
+                      className={drumStyles.roll}
+                      style={{
+                        height: `${ITEM_HEIGHT * 2.2}px`,
+                        width: `${ITEM_HEIGHT * 1.2}px`,
+                      }}
+                    >
+                      <TapeContent
+                        reel={game.reel}
+                        tapeRef={tapeRefs.current[index]}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-        <div
-          className={`${styles.winPlaque} ${
-            game.lastWin > 0 ? styles.winPlaqueActive : ""
-          }`}
-        >
-          {game.lastWin > 0
-            ? `ВЫИГРЫШ +${game.lastWin} (макс: ${game.maxWin})`
-            : "— нет выигрыша —"}
-        </div>
+              <div
+                className={`${styles.winPlaque} ${
+                  game.lastWin > 0 ? styles.winPlaqueActive : ""
+                }`}
+              >
+                {game.lastWin > 0
+                  ? `ВЫИГРЫШ +${game.lastWin} (макс: ${game.maxWin})`
+                  : "— нет выигрыша —"}
+              </div>
 
-        <div className={styles.hpRow}>
-          <div className={styles.hpBar}>
-            <div
-              className={`${styles.hpFill} ${hpClass}`}
-              style={{ width: `${hpPercent}%` }}
-            ></div>
-            <span className={styles.hpText}>
-              HP {game.hp}/{ECONOMY.maxHp}
-            </span>
+              <div className={styles.hpRow}>
+                <div className={styles.hpBar}>
+                  <div
+                    className={`${styles.hpFill} ${hpClass}`}
+                    style={{ width: `${hpPercent}%` }}
+                  ></div>
+                  <span className={styles.hpText}>
+                    HP {game.hp}/{ECONOMY.maxHp}
+                  </span>
+                </div>
+                <button
+                  className={styles.repairBtn}
+                  onClick={handleRepair}
+                  disabled={game.hp >= ECONOMY.maxHp || game.isSpinning}
+                >
+                  🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
+                </button>
+              </div>
+            </div>
           </div>
-          <button
-            className={styles.repairBtn}
-            onClick={handleRepair}
-            disabled={game.hp >= ECONOMY.maxHp || game.isSpinning}
-          >
-            🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
-          </button>
-        </div>
 
-        <div className={styles.controls}>
-          <button
-            className={styles.spinBtn}
-            onClick={handleSpin}
-            disabled={game.isSpinning || game.isAnimating || game.hp <= 0}
-          >
-            🎰 Крутить ({game.spinCost})
-          </button>
-          <label className={styles.autoLabel}>
-            <input
-              type="checkbox"
-              checked={autoSpin}
-              onChange={(e) => setAutoSpin(e.target.checked)}
-            />
-            авто
-          </label>
-        </div>
+          <HandBtn spin={handleSpin} isSpinning={game.isSpinning}></HandBtn>
 
+          {exploding && <div className={boomStyles.explosion}></div>}
+        </div>
+      </div>
+
+      <div className={styles.controls}>
+        <label className={styles.autoLabel}>
+          <input
+            type="checkbox"
+            checked={autoSpin}
+            onChange={(e) => setAutoSpin(e.target.checked)}
+          />
+          автокрут
+        </label>
         <Link to="/workshop" className={styles.workshopLink}>
           🔧 Мастерская
         </Link>
