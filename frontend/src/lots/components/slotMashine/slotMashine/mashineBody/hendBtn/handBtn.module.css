@@ -94,9 +94,9 @@
   flex: 1;
   display: flex;
   position: relative;
-  height: 38%;
+  height: 28%;
   max-height: 300px;
-  min-height: 210px;
+  min-height: 190px;
   width: 100%;
   justify-content: center;
   flex-direction: column;
