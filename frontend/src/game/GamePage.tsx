@@ -98,6 +98,7 @@ export function GamePage() {
       return;
     }
     addFloat(-result.cost); // списание ставки — цифра вниз сразу
+    game.chargeSpinCost(result.cost);
     game.setIsSpinning(true);
     setSpinValues(result.combination);
     setPending(result);
@@ -226,41 +227,43 @@ export function GamePage() {
                   ))}
                 </div>
               </div>
-
-              <div
-                className={`${styles.winPlaque} ${
-                  game.lastWin > 0 ? styles.winPlaqueActive : ""
-                }`}
-              >
-                {game.lastWin > 0
-                  ? `ВЫИГРЫШ +${game.lastWin} (макс: ${game.maxWin})`
-                  : "— нет выигрыша —"}
-              </div>
-
-              <div className={styles.hpRow}>
-                <div className={styles.hpBar}>
-                  <div
-                    className={`${styles.hpFill} ${hpClass}`}
-                    style={{ width: `${hpPercent}%` }}
-                  ></div>
-                  <span className={styles.hpText}>
-                    HP {game.hp}/{ECONOMY.maxHp}
-                  </span>
-                </div>
-                <button
-                  className={styles.repairBtn}
-                  onClick={handleRepair}
-                  disabled={game.hp >= ECONOMY.maxHp || game.isSpinning}
-                >
-                  🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
-                </button>
-              </div>
             </div>
           </div>
 
           <HandBtn spin={handleSpin} isSpinning={game.isSpinning}></HandBtn>
 
           {exploding && <div className={boomStyles.explosion}></div>}
+        </div>
+      </div>
+
+      <div className={styles.panel}>
+        <div
+          className={`${styles.winPlaque} ${
+            game.lastWin > 0 ? styles.winPlaqueActive : ""
+          }`}
+        >
+          {game.lastWin > 0
+            ? `ВЫИГРЫШ +${game.lastWin} (макс: ${game.maxWin})`
+            : "— нет выигрыша —"}
+        </div>
+
+        <div className={styles.hpRow}>
+          <div className={styles.hpBar}>
+            <div
+              className={`${styles.hpFill} ${hpClass}`}
+              style={{ width: `${hpPercent}%` }}
+            ></div>
+            <span className={styles.hpText}>
+              HP {game.hp}/{ECONOMY.maxHp}
+            </span>
+          </div>
+          <button
+            className={styles.repairBtn}
+            onClick={handleRepair}
+            disabled={game.hp >= ECONOMY.maxHp || game.isSpinning}
+          >
+            🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
+          </button>
         </div>
       </div>
 

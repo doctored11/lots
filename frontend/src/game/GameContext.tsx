@@ -48,6 +48,7 @@ interface GameContextType extends GameState {
   spinCost: number;
   // действия
   doSpin: () => SpinResult | { error: string };
+  chargeSpinCost: (cost: number) => void;
   applySpinResult: (r: SpinResult) => void;
   repair: () => string | null; // null = ок, иначе текст ошибки
   shopRoll: () => { item?: string; error?: string };
@@ -159,6 +160,11 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     };
   }
 
+  // списание ставки сразу при нажатии на рычаг
+  function chargeSpinCost(cost: number) {
+    setState((prev) => ({ ...prev, balance: prev.balance - cost }));
+  }
+
   // применение результата после окончания анимации барабанов
   function applySpinResult(r: SpinResult) {
     setState((prev) => {
@@ -170,7 +176,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       const roundedWin = Math.round(r.win);
       return {
         ...prev,
-        balance: prev.balance - r.cost + roundedWin,
+        balance: prev.balance + roundedWin, // ставка уже списана в chargeSpinCost
         hp: r.hpAfter,
         spinsDone: prev.spinsDone + 1,
         inventory,
@@ -246,6 +252,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     setIsAnimating,
     spinCost,
     doSpin,
+    chargeSpinCost,
     applySpinResult,
     repair,
     shopRoll,

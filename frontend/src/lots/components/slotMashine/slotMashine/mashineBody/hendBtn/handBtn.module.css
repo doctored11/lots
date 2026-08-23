@@ -51,7 +51,7 @@
   content: "";
   width: 10%;
   min-width: 5px;
-  height: 50%;
+  height: 25%; /* стержень укорочен (~50% от прежнего) */
   background-color: rgb(116, 115, 118);
   border-top-width: 0;
   border-right-width: 5px;
@@ -177,7 +177,8 @@
     transform: scaleY(1) translateY(-100%) translateX(-50%);
   }
   40% {
-    transform: scaleY(-0.65) translateY(-100%) translateX(-50%);
+    /* стержень сжимается следом за шаром, не обгоняя его */
+    transform: scaleY(0.3) translateY(-100%) translateX(-50%);
   }
   100% {
     transform: scaleY(0.12) translateY(-100%) translateX(-50%);
