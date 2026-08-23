@@ -21,7 +21,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'index.js',
-        publicPath: '/'
+        publicPath: './' // относительные пути — для GitHub Pages и itch.io
 
     },
     module: {
