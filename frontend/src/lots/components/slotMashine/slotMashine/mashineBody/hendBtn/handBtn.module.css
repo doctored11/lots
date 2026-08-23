@@ -105,6 +105,8 @@
   align-items: center;
   flex-wrap: nowrap;
   z-index: 20;
+  /* десктоп: рычаг опущен к телу автомата */
+  transform: translateY(25%);
 }
 .active > .handBtn {
   top: 40%;
