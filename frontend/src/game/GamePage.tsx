@@ -65,6 +65,7 @@ export function GamePage() {
     [0, 1, 2].map(() => React.createRef<HTMLDivElement>())
   );
   const mashineRef = useRef<HTMLDivElement>(null);
+  const shadowRef = useRef<HTMLDivElement>(null);
 
   const showToast = (text: string, ms = 3000) => {
     setToast(text);
@@ -84,22 +85,32 @@ export function GamePage() {
     setTimeout(() => setExploding(false), 900);
   }
 
-  // пересборка: старый автомат улетает (squashJump), новый прилетает (sqwishFall)
+  // пересборка: старый проваливается в дыру (squashJump + тень растёт),
+  // новый прилетает (sqwishFall + тень появляется)
   useEffect(() => {
     if (!game.justBuilt) return;
     game.setJustBuilt(false);
     const el = mashineRef.current;
+    const shadow = shadowRef.current;
     if (!el) return;
-    // старый улетает
+
+    // старый улетает в дыру
+    shadow?.classList.add(boomStyles.shadowGrow);
     el.classList.add(boomStyles.mashineHide);
+
     const t1 = setTimeout(() => {
       // новый прилетает
       el.classList.remove(boomStyles.mashineHide);
+      shadow?.classList.remove(boomStyles.shadowGrow);
       el.classList.add(boomStyles.mashineShow);
+      shadow?.classList.add(boomStyles.shadowAppearance);
     }, 1800);
+
     const t2 = setTimeout(() => {
       el.classList.remove(boomStyles.mashineShow);
+      shadow?.classList.remove(boomStyles.shadowAppearance);
     }, 1800 + 1400);
+
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -265,6 +276,7 @@ export function GamePage() {
 
           {exploding && <div className={boomStyles.explosion}></div>}
         </div>
+        <div id="shadow" className={boomStyles.shadow} ref={shadowRef}></div>
       </div>
 
       <div className={styles.panel}>
