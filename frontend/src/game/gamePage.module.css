@@ -62,6 +62,15 @@
   background-color: rgba(46, 52, 56, 0.937);
 }
 
+/* сцена автомата: позиционный родитель для тени-дыры (как .frame в оригинале) */
+.machineStage {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
 .winPlaque {
   width: 100%;
   box-sizing: border-box;

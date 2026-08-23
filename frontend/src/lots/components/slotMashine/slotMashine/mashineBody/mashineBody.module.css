@@ -126,7 +126,7 @@
   display: flex;
   width: 100%;
   position: relative;
-  overflow: visible; /* иначе анимации приземления/улёта обрезаются по бокам */
+  overflow: hidden; /* обрезка по низу — эффект проваливания в дыру (как в оригинале) */
   min-height: 95%;
   z-index: 5;
   /*  */

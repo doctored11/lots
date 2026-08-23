@@ -242,40 +242,44 @@ export function GamePage() {
         <span className={styles.cost}>прокрут: {game.spinCost}</span>
       </div>
 
-      <div className={machineStyles.mashineContainer}>
-        <div className={machineStyles.mashine} id="mashine" ref={mashineRef}>
-          <div className={machineStyles.out}>            <div className={machineStyles.mashineHead}>
-              <div className={machineStyles.headUp}></div>
-              <div className={machineStyles.headMid}></div>
-              <div className={machineStyles.headLow}></div>
-            </div>
-            <div className={machineStyles.mashineBody}>
-              <div className={machineStyles.dramFrame}>
-                <div className={drumStyles.slotDrum}>
-                  {spinValues.map((_, index) => (
-                    <div
-                      key={index}
-                      className={drumStyles.roll}
-                      style={{
-                        height: `${ITEM_HEIGHT * 2.2}px`,
-                        width: `${ITEM_HEIGHT * 1.2}px`,
-                      }}
-                    >
-                      <TapeContent
-                        reel={game.reel}
-                        tapeRef={tapeRefs.current[index]}
-                      />
-                    </div>
-                  ))}
+      <div className={styles.machineStage}>
+        <div className={machineStyles.mashineContainer}>
+          <div className={machineStyles.mashine} id="mashine" ref={mashineRef}>
+            <div className={machineStyles.out}>
+              <div className={machineStyles.mashineHead}>
+                <div className={machineStyles.headUp}></div>
+                <div className={machineStyles.headMid}></div>
+                <div className={machineStyles.headLow}></div>
+              </div>
+              <div className={machineStyles.mashineBody}>
+                <div className={machineStyles.dramFrame}>
+                  <div className={drumStyles.slotDrum}>
+                    {spinValues.map((_, index) => (
+                      <div
+                        key={index}
+                        className={drumStyles.roll}
+                        style={{
+                          height: `${ITEM_HEIGHT * 2.2}px`,
+                          width: `${ITEM_HEIGHT * 1.2}px`,
+                        }}
+                      >
+                        <TapeContent
+                          reel={game.reel}
+                          tapeRef={tapeRefs.current[index]}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
+
+            <HandBtn spin={handleSpin} isSpinning={game.isSpinning}></HandBtn>
+
+            {exploding && <div className={boomStyles.explosion}></div>}
           </div>
-
-          <HandBtn spin={handleSpin} isSpinning={game.isSpinning}></HandBtn>
-
-          {exploding && <div className={boomStyles.explosion}></div>}
         </div>
+        {/* тень-дыра снаружи контейнера: её низ перекрывает автомат (z-index), как в оригинале */}
         <div id="shadow" className={boomStyles.shadow} ref={shadowRef}></div>
       </div>
 
