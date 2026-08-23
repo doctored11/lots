@@ -60,6 +60,8 @@
   border: 1px solid #1d1d1dec;
   border-radius: 10px;
   background-color: rgba(46, 52, 56, 0.937);
+  position: relative;
+  z-index: 2; /* панель поверх тени-дыры (z-1), как тело автомата (z-5) */
 }
 
 /* сцена автомата: позиционный родитель для тени-дыры (как .frame в оригинале) */
