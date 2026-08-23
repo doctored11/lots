@@ -84,6 +84,17 @@ export function GamePage() {
     setTimeout(() => setExploding(false), 900);
   }
 
+  // прилёт нового автомата после сборки в мастерской (sqwishFall + тень)
+  useEffect(() => {
+    if (!game.justBuilt) return;
+    game.setJustBuilt(false);
+    const el = mashineRef.current;
+    if (!el) return;
+    el.classList.add(boomStyles.mashineShow);
+    const t = setTimeout(() => el.classList.remove(boomStyles.mashineShow), 1400);
+    return () => clearTimeout(t);
+  }, [game.justBuilt]);
+
   function handleSpin() {
     if (game.isSpinning || game.isAnimating) return;
     const result = game.doSpin();
@@ -201,8 +212,7 @@ export function GamePage() {
 
       <div className={machineStyles.mashineContainer}>
         <div className={machineStyles.mashine} id="mashine" ref={mashineRef}>
-          <div className={machineStyles.out}>
-            <div className={machineStyles.mashineHead}>
+          <div className={machineStyles.out}>            <div className={machineStyles.mashineHead}>
               <div className={machineStyles.headUp}></div>
               <div className={machineStyles.headMid}></div>
               <div className={machineStyles.headLow}></div>

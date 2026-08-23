@@ -46,6 +46,8 @@ interface GameContextType extends GameState {
   setIsSpinning: (v: boolean) => void;
   setIsAnimating: (v: boolean) => void;
   spinCost: number;
+  justBuilt: boolean; // автомат только что собран — для анимации прилёта
+  setJustBuilt: (v: boolean) => void;
   // действия
   doSpin: () => SpinResult | { error: string };
   chargeSpinCost: (cost: number) => void;
@@ -114,6 +116,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<GameState>(loadState);
   const [isSpinning, setIsSpinning] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [justBuilt, setJustBuilt] = useState(false);
 
   // автосейв
   useEffect(() => {
@@ -241,6 +244,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         maxWin: 0,
       };
     });
+    setJustBuilt(true); // для анимации прилёта нового автомата
     return null;
   }
 
@@ -251,6 +255,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     setIsSpinning,
     setIsAnimating,
     spinCost,
+    justBuilt,
+    setJustBuilt,
     doSpin,
     chargeSpinCost,
     applySpinResult,
