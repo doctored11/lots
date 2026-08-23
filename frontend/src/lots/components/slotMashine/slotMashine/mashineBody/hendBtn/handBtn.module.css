@@ -12,8 +12,9 @@
   /* padding: 0; */
   margin: 0;
 
-  transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    transform 0.2s cubic-bezier(0.175, 0.885, 0.22, 1.575);
+  /* плавный возврат ручки в исходное положение после прокрута */
+  transition: top 0.5s ease,
+    transform 0.5s cubic-bezier(0.25, 0.8, 0.35, 1);
 
   z-index: 10;
 
@@ -105,6 +106,8 @@
   align-items: center;
   flex-wrap: nowrap;
   z-index: 20;
+  /* рычаг опущен к середине тела автомата */
+  transform: translateY(12%);
 }
 .active > .handBtn {
   top: 40%;
