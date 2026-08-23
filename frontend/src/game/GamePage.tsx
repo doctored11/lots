@@ -84,15 +84,26 @@ export function GamePage() {
     setTimeout(() => setExploding(false), 900);
   }
 
-  // прилёт нового автомата после сборки в мастерской (sqwishFall + тень)
+  // пересборка: старый автомат улетает (squashJump), новый прилетает (sqwishFall)
   useEffect(() => {
     if (!game.justBuilt) return;
     game.setJustBuilt(false);
     const el = mashineRef.current;
     if (!el) return;
-    el.classList.add(boomStyles.mashineShow);
-    const t = setTimeout(() => el.classList.remove(boomStyles.mashineShow), 1400);
-    return () => clearTimeout(t);
+    // старый улетает
+    el.classList.add(boomStyles.mashineHide);
+    const t1 = setTimeout(() => {
+      // новый прилетает
+      el.classList.remove(boomStyles.mashineHide);
+      el.classList.add(boomStyles.mashineShow);
+    }, 1800);
+    const t2 = setTimeout(() => {
+      el.classList.remove(boomStyles.mashineShow);
+    }, 1800 + 1400);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [game.justBuilt]);
 
   function handleSpin() {

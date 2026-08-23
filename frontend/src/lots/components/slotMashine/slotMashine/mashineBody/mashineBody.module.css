@@ -126,7 +126,7 @@
   display: flex;
   width: 100%;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* иначе анимации приземления/улёта обрезаются по бокам */
   min-height: 95%;
   z-index: 5;
   /*  */
