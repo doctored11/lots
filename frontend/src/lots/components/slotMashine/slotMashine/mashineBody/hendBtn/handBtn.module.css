@@ -66,6 +66,10 @@
   border-top: none;
   box-sizing: border-box;
   z-index: 1;
+  /* сгибание идёт от шара вниз */
+  transform-origin: top center;
+  /* плавное распрямление после прокрута */
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.35, 1);
 }
 
 /* горизонтальный кронштейн от корпуса автомата к рычагу */
@@ -103,10 +107,15 @@
   z-index: 2;
 }
 
-/* дёргание: весь рычаг едет вниз и возвращается как одно целое */
+/* дёргание: весь рычаг едет вниз как одно целое,
+   а стержень при этом сгибается/пружинит (scaleY от центра шара вниз) */
 .active > .lever {
   transform: translateX(-50%) translateY(45px);
   animation: moveLever 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s;
+}
+
+.active > .lever > .stick {
+  animation: bendStick 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s;
 }
 
 @keyframes moveLever {
@@ -121,6 +130,28 @@
   }
   100% {
     transform: translateX(-50%) translateY(45px);
+  }
+}
+
+/* сгибание рычага: тянется при рывке вниз, сжимается с перелётом на возврате */
+@keyframes bendStick {
+  0% {
+    transform: scaleY(1);
+  }
+  20% {
+    transform: scaleY(1.25); /* рывок вниз — стержень тянется */
+  }
+  40% {
+    transform: scaleY(1.15);
+  }
+  60% {
+    transform: scaleY(0.55); /* пружина вверх — сжимается */
+  }
+  80% {
+    transform: scaleY(0.85);
+  }
+  100% {
+    transform: scaleY(0.7);
   }
 }
 
