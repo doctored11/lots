@@ -2,78 +2,47 @@
 
 Две задачи: **видеть результат** и **давать промпты Кими на домашнем ПК**.
 
-## 1. Видеть результат — GitHub Pages (бесплатно, без VPS)
+## 1. Видеть результат — GitHub Pages
 
-Уже настроено: `.github/workflows/deploy.yml` — при пуше в ветку `v2` собирается
-фронтенд и деплоится на ветку `gh-pages`.
-
-Один раз включить:
-1. Запушить ветку: `git push -u origin v2`
-2. GitHub → репозиторий `lots` → Settings → Pages → Source: ветка `gh-pages`, папка `/ (root)`.
-3. Через минуту игра будет на `https://doctored11.github.io/lots/`
-
-Сейв в localStorage — прогресс не потеряется между деплоями.
-
-Альтернатива — VPS Франкфурт: скопировать `frontend/dist` на VPS и раздавать
-через nginx/caddy. Но Pages проще и не тратит ресурсы VPS.
+Настроено и работает: https://doctored11.github.io/lots/
+При пуше в ветку `v2` GitHub Actions пересобирает и деплоит (~2 минуты).
+Сейв в localStorage между деплоями не слетает.
 
 ## 2. Давать промпты — SSH на домашний ПК через VPS
 
-### Однократная настройка домашнего ПК (нужен админ)
+Связка: телефон → VPS (136.244.88.222) → туннель → домашний ПК.
+Всё на VPS уже настроено (GatewayPorts, ключи, туннель проверен).
 
-PowerShell **от администратора**:
+### Домашний ПК — уже сделано
 
-```powershell
-# установить OpenSSH Server
-Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
-# запустить и сделать автозапуск
-Start-Service sshd
-Set-Service sshd -StartupType Automatic
-# проверка
-Get-Service sshd
-```
+- OpenSSH Server установлен и запущен (sshd, автозапуск).
+- Туннель `scripts/remote-tunnel.sh` запущен в фоне (если окно закроется/ПК
+  перезагрузится — запусти снова: `bash /c/Users/turboEd/Desktop/cas/scripts/remote-tunnel.sh`
+  из Git Bash, или из PowerShell: `bash C:\Users\turboEd\Desktop\cas\scripts\remote-tunnel.sh`).
+- ПК не должен засыпать: Питание → «Никогда».
 
-### Однократная настройка VPS
+### С телефона (Termius / Termux), мобильный трафик
 
-На VPS (Debian/Ubuntu), файл `/etc/ssh/sshd_config`:
+Два шага в одном месте (на VPS):
 
 ```
-GatewayPorts yes
+ssh root@136.244.88.222          # пароль VPS
+ssh -p 2222 turboEd@localhost    # пароль учётки Windows (turboEd)
+cd /c/Users/turboEd/Desktop/cas
+kimi --resume                    # продолжить сессию Кими
 ```
 
-```bash
-systemctl restart ssh
-# и авторизовать ключ домашнего ПК:
-mkdir -p ~/.ssh
-echo "СОДЕРЖИМОЕ C:\Users\turboEd\.ssh\id_ed25519.pub" >> ~/.ssh/authorized_keys
+Либо напрямую с телефона, минуя заход на VPS:
+
+```
+ssh -p 2222 turboEd@136.244.88.222   # пароль учётки Windows
 ```
 
-(файрвол VPS: порт 2222 открыть не нужно, если заходишь сначала на сам VPS по ssh —
-GatewayPorts нужен только если хочешь стучаться на VPS:2222 напрямую извне)
-
-### Перед отъездом (на домашнем ПК)
-
-```bash
-# 1. отредактировать VPS_USER/VPS_HOST в scripts/remote-tunnel.sh
-# 2. запустить туннель и оставить окно открытым:
-bash scripts/remote-tunnel.sh
-```
-
-### Как работать из поездки
-
-```bash
-ssh root@<VPS>                    # заходишь на VPS
-ssh -p 2222 turboEd@localhost     # через туннель попадаешь на домашний ПК
-cd /c/Users/turboEd/Desktop/cas   # папка проекта
-kimi --resume                     # продолжаешь эту сессию Кими
-```
-
-Всё, что я сделаю, коммичу в git — запускай `git push` (или скажи мне), и через
-~2 минуты результат на GitHub Pages.
+Имя: turboEd. Пароль: тот, которым входишь в Windows (если учётка Microsoft —
+пароль Microsoft-аккаунта).
 
 ### Заметки
 
-- Домашний ПК не должен засыпать: Панель управления → Электропитание → «Никогда».
-- Если SSH не нужен постоянно — туннель можно запускать только когда надо.
-- Окно с этой сессией Кими на домашнем ПК можно закрыть — сессия сохраняется на
-  диске и продолжается через `kimi --resume` из SSH.
+- Если туннель отвалится (ПК выключен/уснул) — связи не будет до возвращения.
+- Проверено: туннель слушает на VPS:2222, sshd на ПК отвечает, парольная
+  аутентификация включена.
