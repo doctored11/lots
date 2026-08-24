@@ -35,6 +35,7 @@ export interface MachineState {
   hp: number;
   maxHp: number; // улучшается отдельно на каждом автомате
   hpLevel: number; // уровень улучшения HP (для цены)
+  nextReelPrice: number; // цена следующего +1 барабана (рандомится при создании/апгрейде)
   spinsDone: number;
   bet: number; // ставка автомата (сохраняется)
   lastWin: number;
@@ -93,15 +94,17 @@ interface GameContextType extends GameState {
 }
 
 function freshMachine(id: number, bet?: number): MachineState {
+  const reelCount = getRandomInt(1, 2); // новые автоматы — с 1-2 барабанами
   return {
     id,
     name: generateMachineName(),
     color: generateMachineColor(),
     reel: [],
-    reelCount: getRandomInt(1, 2), // новые автоматы — с 1-2 барабанами
+    reelCount,
     hp: ECONOMY.maxHp,
     maxHp: ECONOMY.maxHp,
     hpLevel: 0,
+    nextReelPrice: reelUpgradeCost(reelCount), // цена генерится заранее
     spinsDone: 0,
     bet: bet ?? ECONOMY.baseSpinCost,
     lastWin: 0,
@@ -158,6 +161,12 @@ function loadState(): GameState {
       hp: typeof m?.hp === "number" ? m.hp : ECONOMY.startHp,
       maxHp: typeof m?.maxHp === "number" ? m.maxHp : ECONOMY.maxHp,
       hpLevel: typeof m?.hpLevel === "number" ? m.hpLevel : 0,
+      nextReelPrice:
+        typeof m?.nextReelPrice === "number"
+          ? m.nextReelPrice
+          : reelUpgradeCost(
+              Math.min(Math.max(1, typeof m?.reelCount === "number" ? m.reelCount : 3), ECONOMY.maxReels)
+            ),
       spinsDone: typeof m?.spinsDone === "number" ? m.spinsDone : 0,
       bet: typeof m?.bet === "number" && m.bet > 0 ? m.bet : ECONOMY.baseSpinCost,
       lastWin: m?.lastWin || 0,

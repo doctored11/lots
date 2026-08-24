@@ -17,10 +17,11 @@ export interface WinBreakdown {
   multiply: number;   // произведение всех "×"
   damageMult: number; // множитель урона автомату за этот прокрут
   notes: string[];    // человекочитаемые заметки (для UI/логов)
+  skipBase: Set<string>; // ключи, чья базовая награда выжжена обилкой
 }
 
 export function emptyBreakdown(): WinBreakdown {
-  return { plus: 0, multiply: 1, damageMult: 1, notes: [] };
+  return { plus: 0, multiply: 1, damageMult: 1, notes: [], skipBase: new Set() };
 }
 
 export abstract class Ability {
@@ -71,14 +72,15 @@ export class BombPairDamageAbility extends Ability {
   }
 }
 
-// --- обилка перца: два перца выжигают свою линию — сами ничего не дают,
-// зато каждый другой предмет на линии даёт бонус как за два
+// --- обилка перца: два перца выжигают ВСЮ линию — базовые награды
+// не считаются вообще, каждый неперец даёт только бонус "как за два"
 export class PepperBurnAbility extends Ability {
   readonly triggerCount = 2;
   apply(bd: WinBreakdown, ctx: SpinContext) {
     ctx.results.forEach((r) => {
+      bd.skipBase.add(r); // базовая награда выжжена
       if (r === this.itemKey) return; // перец сгорел
-      addReward(bd, r, 2); // остальные — бонус как за два
+      addReward(bd, r, 2); // остальные — только бонус как за два
     });
     bd.notes.push("🌶🌶 перец выжег линию: остальные дают бонус за два");
   }
@@ -107,15 +109,18 @@ export function evaluateSpin(
   results.forEach((s) => {
     counts[s] = (counts[s] || 0) + 1;
   });
-  Object.entries(counts).forEach(([symbol, count]) => {
-    addReward(bd, symbol, count as 1 | 2 | 3 | 4 | 5);
-  });
 
-  // обилки
+  // обилки идут ПЕРВЫМИ — могут выжечь базовые награды (перец)
   const ctx: SpinContext = { reel, combination, results };
   for (const ability of ABILITIES) {
     if (ability.matches(ctx)) ability.apply(bd, ctx);
   }
+
+  // базовые награды, кроме выжженных обилками
+  Object.entries(counts).forEach(([symbol, count]) => {
+    if (bd.skipBase.has(symbol)) return;
+    addReward(bd, symbol, count as 1 | 2 | 3 | 4 | 5);
+  });
 
   const win = Math.max(0, Math.floor(bet * (bd.plus || 1) * bd.multiply));
   return { win, damageMult: bd.damageMult, notes: bd.notes };
