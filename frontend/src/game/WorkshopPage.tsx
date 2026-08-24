@@ -207,6 +207,13 @@ export function WorkshopPage() {
           Описание открывается, когда на барабанах выпадает три одинаковых
           предмета.
         </p>
+        <button
+          className={styles.devBtn}
+          onClick={() => game.unlockAllRecipes()}
+          title="Дев-кнопка: открыть все рецепты (временно, для тестов)"
+        >
+          📖 Открыть все рецепты (тест)
+        </button>
         <div className={styles.grid}>
           {ALL_ITEM_KEYS.map((key) => {
             const item = ITEMS[key];

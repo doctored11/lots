@@ -10,15 +10,15 @@ const eq = (name: string, got: unknown, want?: unknown) =>
   );
 
 // --- новые значения наград ---
-eq("банан 1шт", calculateWinnings(10, ["banana", "grape", "cherry"]), Math.floor(10 * (-1 + 0.1 + 0.2))); // -7
+eq("банан 1шт (зажат в 0)", calculateWinnings(10, ["banana", "grape", "cherry"]), 0);
 eq("банан 3шт", calculateWinnings(10, ["banana", "banana", "banana"]), 100);
-eq("череп 3шт (минус)", calculateWinnings(10, ["skull", "skull", "skull"]), Math.floor(10 * -5)); // -50
+eq("череп 3шт (зажат в 0)", calculateWinnings(10, ["skull", "skull", "skull"]), 0);
 eq("дыня 1шт x0.8", calculateWinnings(10, ["melon", "grape", "grape"]), Math.floor(10 * 0.3 * 0.8));
 eq("перец 3шт +8", calculateWinnings(10, ["chili", "chili", "chili"]), 80);
 eq("самоцвет 2шт x2.5", calculateWinnings(10, ["gem", "gem", "grape"]), Math.floor(10 * 0.1 * 2.5));
 eq("корона 3шт +25", calculateWinnings(10, ["crown", "crown", "crown"]), 250);
-eq("бомба 1шт -5", calculateWinnings(10, ["bomb", "grape", "cherry"]), Math.floor(10 * (-5 + 0.1 + 0.2)));
-eq("бомба 2шт -10", calculateWinnings(10, ["bomb", "bomb", "grape"]), Math.floor(10 * (-10 + 0.1)));
+eq("бомба 1шт -5 (зажат в 0)", calculateWinnings(10, ["bomb", "grape", "cherry"]), 0);
+eq("бомба 2шт -10 (зажат в 0)", calculateWinnings(10, ["bomb", "bomb", "grape"]), 0);
 
 // --- бомба: тройка тянет соседей ---
 // лента [bomb, grape, cherry] — у каждого барабана соседи bomb-образные
@@ -60,3 +60,5 @@ eq("соседи по кольцу", reelNeighbors(["a", "b", "c"], 0), ["c", "b
 
 // --- формат с минусами ---
 eq("формат бомбы", formatItemRewards("bomb"), "1: -5  |  2: -10  |  3: ×8.8");
+
+eq("бомба 2шт + виноград x3 остаётся в плюсе", calculateWinnings(10, ["bomb", "bomb", "grape"], ["grape","grape","grape","grape","grape","grape"]), Math.floor(10 * (-10 + 0.1 + 5.5*6)));

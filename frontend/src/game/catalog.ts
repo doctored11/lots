@@ -262,6 +262,8 @@ export function machineSpinCost(reel: string[]): number {
 }
 
 // выигрыш по выпавшим символам: сначала суммируются "+", потом перемножаются "×"
+// (минусы и деления тоже работают на ставку, но итог не уходит ниже нуля:
+//  максимум что теряется — сама ставка, списанная при нажатии на рычаг)
 // bonusTriples — предметы, засчитанные как тройки (механика бомбы: соседние ряды)
 export function calculateWinnings(
   bet: number,
@@ -291,7 +293,8 @@ export function calculateWinnings(
     else totalMultiply *= reward.factor;
   });
 
-  return Math.floor(bet * (totalPlus || 1) * totalMultiply);
+  const win = Math.floor(bet * (totalPlus || 1) * totalMultiply);
+  return Math.max(0, win); // выигрыш не бывает отрицательным
 }
 
 // соседи по барабану: предметы выше и ниже выпавшего (лента закольцована)

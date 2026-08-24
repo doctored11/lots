@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import {
   ITEMS,
+  ALL_ITEM_KEYS,
   ECONOMY,
   machineBetRange,
   calculateWinnings,
@@ -61,6 +62,7 @@ interface GameContextType extends GameState {
   shopRoll: () => { item?: string; error?: string };
   buildMachine: (reel: string[]) => string | null;
   addCoins: (amount: number) => void; // дев-кнопка для тестов
+  unlockAllRecipes: () => void; // дев-кнопка: открыть все рецепты
   // гача разделена на два шага — чтобы применить результат после анимации кейса
   shopRollPreview: () => { item?: string; error?: string };
   applyShopRoll: (item: string) => void;
@@ -276,6 +278,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     setState((prev) => ({ ...prev, balance: prev.balance + amount }));
   }
 
+  // дев-кнопка для тестов: открыть все рецепты в книге
+  function unlockAllRecipes() {
+    setState((prev) => ({
+      ...prev,
+      unlockedRecipes: [...ALL_ITEM_KEYS],
+    }));
+  }
+
   function buildMachine(reel: string[]): string | null {
     if (reel.length < ECONOMY.reelMin || reel.length > ECONOMY.reelMax) {
       return `Лента должна быть ${ECONOMY.reelMin}–${ECONOMY.reelMax} предметов`;
@@ -326,6 +336,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     applyShopRoll,
     buildMachine,
     addCoins,
+    unlockAllRecipes,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
