@@ -54,6 +54,12 @@ function TapeContent({
 
 export function GamePage() {
   const game = useGame();
+  const machine = game.machines[game.activeMachine] ?? {
+    id: 0,
+    reel: [],
+    hp: 0,
+    spinsDone: 0,
+  };
   const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
   const [pending, setPending] = useState<SpinResult | null>(null);
   const [autoSpin, setAutoSpin] = useState(false);
@@ -203,20 +209,20 @@ export function GamePage() {
     if (!autoSpin) return;
     if (game.isSpinning || game.isAnimating) return;
     if (
-      game.hp <= ECONOMY.maxHp * 0.1 ||
+      machine.hp <= ECONOMY.maxHp * 0.1 ||
       game.balance < game.spinCost
     ) {
       setAutoSpin(false);
-      if (game.hp > 0 && game.hp <= ECONOMY.maxHp * 0.1) {
+      if (machine.hp > 0 && machine.hp <= ECONOMY.maxHp * 0.1) {
         showToast("⚠️ Автокрут выключен: прочность ≤ 10%");
       }
       return;
     }
     const t = setTimeout(handleSpin, 700);
     return () => clearTimeout(t);
-  }, [autoSpin, game.isSpinning, game.isAnimating, game.hp, game.balance]);
+  }, [autoSpin, game.isSpinning, game.isAnimating, machine.hp, game.balance]);
 
-  const hpPercent = Math.max(0, Math.min(100, (game.hp / ECONOMY.maxHp) * 100));
+  const hpPercent = Math.max(0, Math.min(100, (machine.hp / ECONOMY.maxHp) * 100));
   const hpClass =
     hpPercent > 50 ? styles.hpHigh : hpPercent > 20 ? styles.hpMid : styles.hpLow;
 
@@ -261,6 +267,23 @@ export function GamePage() {
           ставка: {game.spinCost}
         </span>
       </div>
+
+      {game.machines.length > 1 && (
+        <div className={styles.machineTabs}>
+          {game.machines.map((m, i) => (
+            <button
+              key={m.id}
+              className={`${styles.machineTab} ${
+                i === game.activeMachine ? styles.machineTabActive : ""
+              }`}
+              onClick={() => game.setActiveMachine(i)}
+            >
+              🎰 {i + 1}
+              {m.hp <= 0 ? " 💥" : ""}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className={styles.betRow}>
         <button
@@ -313,7 +336,7 @@ export function GamePage() {
                         }}
                       >
                         <TapeContent
-                          reel={game.reel}
+                          reel={machine.reel}
                           tapeRef={tapeRefs.current[index]}
                         />
                       </div>
@@ -339,7 +362,7 @@ export function GamePage() {
             {game.lastLostItems.map((k) => ITEMS[k].label).join(", ")}
           </div>
         )}
-        {game.reel.length === 0 && (
+        {machine.reel.length === 0 && (
           <div className={styles.noReelLine}>
             🛠 Лента утеряна — <Link to="/workshop">собери автомат в мастерской</Link>
           </div>
@@ -361,14 +384,14 @@ export function GamePage() {
               style={{ width: `${hpPercent}%` }}
             ></div>
             <span className={styles.hpText}>
-              HP {game.hp}/{ECONOMY.maxHp}
+              HP {machine.hp}/{ECONOMY.maxHp}
             </span>
           </div>
-          {game.hp > 0 ? (
+          {machine.hp > 0 ? (
             <button
               className={styles.repairBtn}
               onClick={handleRepair}
-              disabled={game.hp >= ECONOMY.maxHp || game.isSpinning}
+              disabled={machine.hp >= ECONOMY.maxHp || game.isSpinning}
               title={`+${ECONOMY.repairAmount} HP за ${ECONOMY.repairCost} монет`}
             >
               🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
@@ -380,7 +403,17 @@ export function GamePage() {
               disabled={game.isSpinning || game.isAnimating}
               title="Автомат взорвался — только новый"
             >
-              🛒 Новый автомат ({ECONOMY.newMachineCost})
+              🛒 Заменить ({ECONOMY.newMachineCost})
+            </button>
+          )}
+          {machine.hp > 0 && (
+            <button
+              className={styles.repairBtn}
+              onClick={handleBuyNew}
+              disabled={game.isSpinning || game.isAnimating}
+              title="Купить ещё один автомат (новый слот с пустой лентой)"
+            >
+              🛒 Новый ({ECONOMY.newMachineCost})
             </button>
           )}
         </div>

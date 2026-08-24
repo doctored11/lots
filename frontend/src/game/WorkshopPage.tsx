@@ -56,7 +56,7 @@ function ItemTooltip({
         </b>
       </div>
       <div className={styles.tooltipRow}>
-        Износ автомата: <b>+{item.wear}</b>
+        Износ автомата: <b>{item.wear >= 0 ? `+${item.wear}` : item.wear}</b>
       </div>
       {unlocked ? (
         <>
@@ -112,6 +112,7 @@ function ItemVisual({ itemKey, size }: { itemKey: string; size: number }) {
 
 export function WorkshopPage() {
   const game = useGame();
+  const machine = game.machines[game.activeMachine];
   const [draft, setDraft] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [shopResult, setShopResult] = useState<string | null>(null);
@@ -122,7 +123,8 @@ export function WorkshopPage() {
   const [caseOffset, setCaseOffset] = useState(0);
   const caseWinItem = useRef<string | null>(null);
 
-  const invCount = (key: string) => game.inventory[key] ?? 0;
+  // доступно для сборки = инвентарь минус лоты, занятые в других автоматах
+  const invCount = (key: string) => game.availableCount(key);
   const draftCount = (key: string) => draft.filter((d) => d === key).length;
 
   const addToDraft = (key: string) => {
@@ -269,14 +271,19 @@ export function WorkshopPage() {
               }`}
               onClick={() => addToDraft(key)}
               disabled={
-                draftCount(key) >= count || draft.length >= ECONOMY.reelMax
+                draftCount(key) >= game.availableCount(key) ||
+                draft.length >= ECONOMY.reelMax
               }
             >
               <div className={styles.cardImg}>
                 <ItemVisual itemKey={key} size={56} />
               </div>
               <div className={styles.cardTitle}>{ITEMS[key].label}</div>
-              <div className={styles.cardRarity}>×{count}</div>
+              <div className={styles.cardRarity}>
+                ×{count}
+                {game.availableCount(key) < count &&
+                  ` (свободно ${game.availableCount(key)})`}
+              </div>
               <ItemTooltip
                 itemKey={key}
                 unlocked={game.unlockedRecipes.includes(key)}
@@ -288,11 +295,28 @@ export function WorkshopPage() {
 
       <section>
         <h2>🎰 Сборка автомата</h2>
+        {game.machines.length > 1 && (
+          <div className={styles.machineTabs}>
+            {game.machines.map((m, i) => (
+              <button
+                key={m.id}
+                className={`${styles.machineTab} ${
+                  i === game.activeMachine ? styles.machineTabActive : ""
+                }`}
+                onClick={() => game.setActiveMachine(i)}
+              >
+                🎰 Автомат {i + 1}
+                {m.hp <= 0 ? " 💥" : ""}
+              </button>
+            ))}
+          </div>
+        )}
         <p className={styles.hint}>
           Лента из {ECONOMY.reelMin}–{ECONOMY.reelMax} предметов, сборка стоит{" "}
           {ECONOMY.buildCost} монет. Предметы остаются у тебя, но сгорают, если
-          автомат сломается (HP = 0). Текущая лента:{" "}
-          {game.reel.map((k) => ITEMS[k].label).join(", ")}
+          автомат сломается (HP = 0). Лот, занятый в другом автомате, в этот
+          не вставить. Текущая лента:{" "}
+          {machine.reel.map((k) => ITEMS[k].label).join(", ") || "пусто"}
         </p>
         <div className={styles.draftLine}>
           {draft.length === 0 && (

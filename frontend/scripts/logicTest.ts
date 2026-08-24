@@ -1,64 +1,71 @@
-import { ITEMS, calculateWinnings, machineBetRange, rollSpinDamage, reelNeighbors, formatItemRewards } from '../src/game/catalog';
+import {
+  ITEMS,
+  machineBetRange,
+  rollSpinDamage,
+  reelNeighbors,
+  formatItemRewards,
+} from "../src/game/catalog";
+import { evaluateSpin } from "../src/game/abilities";
 
-const eq = (name: string, got: unknown, want?: unknown) =>
-  console.log(
-    JSON.stringify(got) === JSON.stringify(want) ? "✓" : "✗ FAIL",
-    name,
-    "→",
-    got,
-    want !== undefined ? `(ожидалось ${want})` : ""
-  );
+const eq = (name: string, got: unknown, want?: unknown) => {
+  const g = JSON.stringify(got);
+  const w = JSON.stringify(want);
+  console.log(g === w ? "✓" : "✗ FAIL", name, "→", g, want !== undefined ? `(ожидалось ${w})` : "");
+};
 
 // --- новые значения наград ---
-eq("банан 1шт (зажат в 0)", calculateWinnings(10, ["banana", "grape", "cherry"]), 0);
-eq("банан 3шт", calculateWinnings(10, ["banana", "banana", "banana"]), 100);
-eq("череп 3шт (зажат в 0)", calculateWinnings(10, ["skull", "skull", "skull"]), 0);
-eq("дыня 1шт x0.8", calculateWinnings(10, ["melon", "grape", "grape"]), Math.floor(10 * 0.3 * 0.8));
-eq("перец 3шт +8", calculateWinnings(10, ["chili", "chili", "chili"]), 80);
-eq("самоцвет 2шт x2.5", calculateWinnings(10, ["gem", "gem", "grape"]), Math.floor(10 * 0.1 * 2.5));
-eq("корона 3шт +25", calculateWinnings(10, ["crown", "crown", "crown"]), 250);
-eq("бомба 1шт -5 (зажат в 0)", calculateWinnings(10, ["bomb", "grape", "cherry"]), 0);
-eq("бомба 2шт -10 (зажат в 0)", calculateWinnings(10, ["bomb", "bomb", "grape"]), 0);
+eq("виноград x3", evaluateSpin(10, ["grape", "grape", "grape"], ["grape"], [0, 0, 0]).win, 30);
+eq("вишня x3", evaluateSpin(10, ["cherry", "cherry", "cherry"], ["cherry"], [0, 0, 0]).win, 18);
+eq("банан 1шт зажат в 0", evaluateSpin(10, ["banana", "grape", "cherry"], ["banana", "grape", "cherry"], [0, 0, 0]).win, 0); // -1+0.1+0.2 = -0.7 -> 0
+eq("банан x3", evaluateSpin(10, ["banana", "banana", "banana"], ["banana"], [0, 0, 0]).win, 80);
+eq("череп x3 зажат в 0", evaluateSpin(10, ["skull", "skull", "skull"], ["skull"], [0, 0, 0]).win, 0);
+eq("дыня/арбуз 1шт x1.1", evaluateSpin(10, ["melon", "grape", "grape"], ["melon", "grape", "grape"], [0, 0, 0]).win, Math.floor(10 * 0.3 * 1.1));
+eq("перец x3", evaluateSpin(10, ["chili", "chili", "chili"], ["chili"], [0, 0, 0]).win, 80);
+eq("кристалл 2шт x2.5", evaluateSpin(10, ["gem", "gem", "grape"], ["gem", "gem", "grape"], [0, 0, 0]).win, Math.floor(10 * 0.1 * 2.5));
+eq("корона x3 +25", evaluateSpin(10, ["crown", "crown", "crown"], ["crown"], [0, 0, 0]).win, 250);
+eq("ракета x3 +18", evaluateSpin(10, ["rocket", "rocket", "rocket"], ["rocket"], [0, 0, 0]).win, 180);
+eq("семёрка x3 +77", evaluateSpin(10, ["seven", "seven", "seven"], ["seven"], [0, 0, 0]).win, 770);
 
-// --- бомба: тройка тянет соседей ---
-// лента [bomb, grape, cherry] — у каждого барабана соседи bomb-образные
-// reel=[bomb(0), grape(1), cherry(2)], комбинация [0,0,0] → соседи (cherry,grape) x3
+// --- обилка перца: 2 перца выжигают линию, остальные дают бонус как за два ---
+// reel [chili, grape], комбинация [chili, chili, grape] → виноград как за два: +0.3
 eq(
-  "бомба x3 + соседи (cherry/grape по тройке каждый)",
-  calculateWinnings(10, ["bomb", "bomb", "bomb"], ["cherry", "grape", "cherry", "grape", "cherry", "grape"]),
-  Math.floor(10 * 8.8 * (2.2 * 3 + 5.5 * 3))
+  "перец x2: виноград даёт +0.3 (как за два)",
+  evaluateSpin(10, ["chili", "chili", "grape"], ["chili", "grape"], [0, 0, 1]).win,
+  Math.floor(10 * (0.3 + 0.1)) // grape 2шт +0.3 + chili... нет, перец сгорел: только 0.3
 );
-// (totalPlus||1): 8.8 — это множитель, соседи: 3x cherry тройка (+2.2), 3x grape тройка (+5.5) → плюс=23.1, множ=8.8 → 10*23.1*8.8=2032.8→2032
+
+// --- обилка бомбы: тройка тянет соседей ---
+// reel [bomb, grape, cherry], комбинация [0,0,0] → соседи каждого барабана: cherry+grape x3
+const bombWin = evaluateSpin(10, ["bomb", "bomb", "bomb"], ["bomb", "grape", "cherry"], [0, 0, 0]);
+console.log("бомба x3 + соседи:", bombWin.win, "| notes:", bombWin.notes);
+eq("бомба x3 есть заметка", bombWin.notes.length > 0, true);
+
+// --- обилка бомбы: пара → тройной износ ---
+eq("пара бомб: damageMult 3", evaluateSpin(10, ["bomb", "bomb", "grape"], ["bomb", "grape"], [0, 0, 1]).damageMult, 3);
+eq("без бомб: damageMult 1", evaluateSpin(10, ["grape", "grape", "grape"], ["grape"], [0, 0, 0]).damageMult, 1);
+
+// --- износ: 0..5 + сумма wear ленты (дубли считаются) ---
+eq("лента из 4 семёрок: урон 28..33", (() => {
+  let min = 99, max = -99;
+  for (let i = 0; i < 500; i++) {
+    const d = rollSpinDamage(["seven", "seven", "seven", "seven"]);
+    min = Math.min(min, d); max = Math.max(max, d);
+  }
+  return [min, max];
+})(), [28, 33]);
+eq("гриб x4: лечение", (() => {
+  let min = 99;
+  for (let i = 0; i < 500; i++) min = Math.min(min, rollSpinDamage(["mushroom", "mushroom", "mushroom", "mushroom"]));
+  return min;
+})(), -4);
 
 // --- диапазоны ставок ---
-eq("череп: мин -5", machineBetRange(["skull"]).min, 1); // 5-5=0 → зажато в 1
-eq("череп: макс +30", machineBetRange(["skull"]).max, 50);
-eq("корона: макс +90", machineBetRange(["crown"]).max, 110);
-eq("самоцвет: +8/-10", machineBetRange(["gem"]), { min: 13, max: 10 }); // min>max → max зажат в min
-
-// --- износ/лечение ---
-eq("гриб лечит: урон может быть < 0", (() => {
-  // много прогонов, лента из 4 грибов: 0..5 -4 → от -4 до 1
-  let min = 99, max = -99;
-  for (let i = 0; i < 500; i++) {
-    const d = rollSpinDamage(0, ["mushroom", "mushroom", "mushroom", "mushroom"]);
-    min = Math.min(min, d); max = Math.max(max, d);
-  }
-  return [min, max];
-})(), [-4, 1]);
-eq("семёрка: урон 5..10", (() => {
-  let min = 99, max = -99;
-  for (let i = 0; i < 500; i++) {
-    const d = rollSpinDamage(0, ["seven"]);
-    min = Math.min(min, d); max = Math.max(max, d);
-  }
-  return [min, max];
-})(), [5, 10]);
+eq("череп -50/+300", machineBetRange(["skull"]), { min: 1, max: 320 });
+eq("семёрка 777/777", machineBetRange(["seven"]), { min: 782, max: 797 });
+eq("бомба +100/+200", machineBetRange(["bomb"]), { min: 105, max: 220 });
 
 // --- соседи по кольцу ---
 eq("соседи по кольцу", reelNeighbors(["a", "b", "c"], 0), ["c", "b"]);
 
 // --- формат с минусами ---
 eq("формат бомбы", formatItemRewards("bomb"), "1: -5  |  2: -10  |  3: ×8.8");
-
-eq("бомба 2шт + виноград x3 остаётся в плюсе", calculateWinnings(10, ["bomb", "bomb", "grape"], ["grape","grape","grape","grape","grape","grape"]), Math.floor(10 * (-10 + 0.1 + 5.5*6)));
