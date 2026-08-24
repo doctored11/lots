@@ -127,6 +127,9 @@ export function GamePage() {
       if (result.error === "broken") {
         showToast("💥 Автомат взорвался! Только новый за " + ECONOMY.newMachineCost);
         playExplosion();
+      } else if (result.error === "noReel") {
+        showToast("Лента утеряна — собери новый автомат в мастерской");
+        setAutoSpin(false);
       } else {
         showToast("Не хватает монет на прокрут");
         setAutoSpin(false);
@@ -334,6 +337,11 @@ export function GamePage() {
           <div className={styles.lostLine}>
             💥 При взрыве потеряно:{" "}
             {game.lastLostItems.map((k) => ITEMS[k].label).join(", ")}
+          </div>
+        )}
+        {game.reel.length === 0 && (
+          <div className={styles.noReelLine}>
+            🛠 Лента утеряна — <Link to="/workshop">собери автомат в мастерской</Link>
           </div>
         )}
         <div

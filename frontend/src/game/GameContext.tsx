@@ -103,13 +103,12 @@ function loadState(): GameState {
     Object.entries(parsed.inventory || {}).forEach(([k, v]) => {
       if (ITEMS[k] && typeof v === "number" && v > 0) cleanInv[k] = v;
     });
-    const cleanReel = Array.isArray(parsed.reel)
-      ? parsed.reel.filter((k: string) => ITEMS[k])
-      : [];
     return {
       balance: typeof parsed.balance === "number" ? parsed.balance : ECONOMY.startBalance,
       inventory: cleanInv,
-      reel: cleanReel.length >= ECONOMY.reelMin ? cleanReel : [...ECONOMY.startReel],
+      reel: Array.isArray(parsed.reel)
+        ? parsed.reel.filter((k: string) => ITEMS[k]) // пустая лента валидна (утеряна при взрыве)
+        : [...ECONOMY.startReel],
       hp: typeof parsed.hp === "number" ? parsed.hp : ECONOMY.startHp,
       spinsDone: typeof parsed.spinsDone === "number" ? parsed.spinsDone : 0,
       unlockedRecipes: Array.isArray(parsed.unlockedRecipes)
@@ -163,6 +162,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   // чистый расчёт спина — вызывается в момент нажатия, результат применяется после анимации
   function doSpin(): SpinResult | { error: string } {
     if (state.hp <= 0) return { error: "broken" };
+    if (state.reel.length < ECONOMY.reelMin) return { error: "noReel" };
     if (state.balance < spinCost) return { error: "noMoney" };
 
     const combination = [
@@ -275,6 +275,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       hp: ECONOMY.maxHp,
       spinsDone: 0,
       lastLostItems: [],
+      reel: [], // лента утеряна при взрыве — новую надо собрать в мастерской
     }));
     setJustBuilt(true); // анимация прилёта
     return null;
