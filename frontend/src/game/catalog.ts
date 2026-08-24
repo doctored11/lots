@@ -300,7 +300,7 @@ export function rollItemDrop(): string {
   return pool[getRandomInt(0, pool.length - 1)];
 }
 
-// строка наград для книги рецептов: "1: +0.1 · 2: +0.3 · 3: +5.5"
+// строка наград для книги рецептов: "1: +0.1 | 2: +0.3 | 3: +5.5"
 // "+N" — добавка к ставке, "×N" — множитель ставки
 export function formatItemRewards(key: string): string {
   const values = ITEMS[key]?.values;
@@ -311,5 +311,5 @@ export function formatItemRewards(key: string): string {
       const text = v.type === "plus" ? `+${v.amount}` : `×${v.factor}`;
       return `${count}: ${text}`;
     })
-    .join(" · ");
+    .join("  |  ");
 }

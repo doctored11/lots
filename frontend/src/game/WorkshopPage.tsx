@@ -27,7 +27,7 @@ function rewardExample(itemKey: string): string {
       v.type === "plus" ? Math.floor(bet * v.amount) : Math.floor(bet * v.factor);
     return `${count} шт → ${win}`;
   });
-  return `Пример при ставке ${bet}: ` + parts.join(" · ");
+  return `Пример при ставке ${bet}: ` + parts.join("  |  ");
 }
 
 // тултип с расширенной подсказкой по лоту (показывается при наведении)
