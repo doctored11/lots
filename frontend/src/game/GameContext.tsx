@@ -29,6 +29,7 @@ export interface GameState {
   unlockedRecipes: string[];
   lastWin: number;
   maxWin: number;
+  lastLostItems: string[]; // что сгорело при последнем взрыве
 }
 
 export interface SpinResult {
@@ -58,9 +59,11 @@ interface GameContextType extends GameState {
   doSpin: () => SpinResult | { error: string };
   chargeSpinCost: (cost: number) => void;
   applySpinResult: (r: SpinResult) => void;
-  repair: () => string | null; // null = ок, иначе текст ошибки
+  buyNewMachine: () => string | null; // новый автомат вместо сломанного
   shopRoll: () => { item?: string; error?: string };
   buildMachine: (reel: string[]) => string | null;
+  pendingReel: string[] | null; // лента, ждущая анимации смены автомата
+  applyPendingReel: () => void;
   addCoins: (amount: number) => void; // дев-кнопка для тестов
   unlockAllRecipes: () => void; // дев-кнопка: открыть все рецепты
   // гача разделена на два шага — чтобы применить результат после анимации кейса
@@ -85,6 +88,7 @@ function initialState(): GameState {
     unlockedRecipes: [],
     lastWin: 0,
     maxWin: 0,
+    lastLostItems: [],
   };
 }
 
@@ -112,6 +116,9 @@ function loadState(): GameState {
         : [],
       lastWin: parsed.lastWin || 0,
       maxWin: parsed.maxWin || 0,
+      lastLostItems: Array.isArray(parsed.lastLostItems)
+        ? parsed.lastLostItems.filter((k: string) => ITEMS[k])
+        : [],
     };
   } catch {
     return initialState();
@@ -131,6 +138,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [justBuilt, setJustBuilt] = useState(false);
+  const [pendingReel, setPendingReel] = useState<string[] | null>(null);
 
   const { min: betMin, max: betMax } = machineBetRange(state.reel);
   const [bet, setBetRaw] = useState(betMin);
@@ -218,11 +226,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
       // автомат сломался — предметы ленты сгорают
       let inventory = prev.inventory;
+      let lastLostItems = prev.lastLostItems;
       if (r.broken) {
         inventory = { ...prev.inventory };
         prev.reel.forEach((k) => {
           inventory[k] = Math.max(0, (inventory[k] || 0) - 1);
         });
+        lastLostItems = [...prev.reel];
       }
 
       return {
@@ -232,20 +242,26 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         spinsDone: prev.spinsDone + 1,
         inventory,
         unlockedRecipes,
+        lastLostItems,
         lastWin: roundedWin,
         maxWin: Math.max(prev.maxWin, roundedWin),
       };
     });
   }
 
-  function repair(): string | null {
-    if (state.hp >= ECONOMY.maxHp) return "Автомат полностью исправен";
-    if (state.balance < ECONOMY.repairCost) return "Не хватает монет на ремонт";
+  // ремонта нет — только новый автомат за 1000 монет
+  function buyNewMachine(): string | null {
+    if (state.balance < ECONOMY.newMachineCost) {
+      return `Новый автомат стоит ${ECONOMY.newMachineCost} монет — не хватает`;
+    }
     setState((prev) => ({
       ...prev,
-      balance: prev.balance - ECONOMY.repairCost,
-      hp: Math.min(ECONOMY.maxHp, prev.hp + ECONOMY.repairAmount),
+      balance: prev.balance - ECONOMY.newMachineCost,
+      hp: ECONOMY.maxHp,
+      spinsDone: 0,
+      lastLostItems: [],
     }));
+    setJustBuilt(true); // анимация прилёта
     return null;
   }
 
@@ -301,17 +317,30 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (state.balance < ECONOMY.buildCost) {
       return `Сборка стоит ${ECONOMY.buildCost} монет — не хватает`;
     }
+    // лента применяется отложенно — после анимации улёта старого автомата
+    setPendingReel([...reel]);
     setState((prev) => ({
       ...prev,
       balance: prev.balance - ECONOMY.buildCost,
-      reel: [...reel],
+      lastLostItems: [],
+    }));
+    setJustBuilt(true); // для анимации улет/прилёт
+    return null;
+  }
+
+  // применяет отложенную ленту (вызывается в момент прилёта нового автомата)
+  function applyPendingReel() {
+    if (!pendingReel) return;
+    const reel = pendingReel;
+    setPendingReel(null);
+    setState((prev) => ({
+      ...prev,
+      reel,
       hp: ECONOMY.maxHp, // новый автомат — полный HP
       spinsDone: 0,      // износ сбрасывается
       lastWin: 0,
       maxWin: 0,
     }));
-    setJustBuilt(true); // для анимации прилёта нового автомата
-    return null;
   }
 
   const value: GameContextType = {
@@ -330,11 +359,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     doSpin,
     chargeSpinCost,
     applySpinResult,
-    repair,
+    buyNewMachine,
     shopRoll,
     shopRollPreview,
     applyShopRoll,
     buildMachine,
+    pendingReel,
+    applyPendingReel,
     addCoins,
     unlockAllRecipes,
   };

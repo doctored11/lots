@@ -196,6 +196,16 @@
   cursor: default;
 }
 
+.lostLine {
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #ff9a8a;
+  background-color: rgba(80, 30, 30, 0.5);
+  border: 1px solid #d9534f;
+  border-radius: 6px;
+}
+
 .controls {
   display: flex;
   align-items: center;

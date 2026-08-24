@@ -135,9 +135,9 @@ export const ITEMS: Record<string, ItemDef> = {
     key: "skull", label: "Череп", emoji: "💀",
     rarity: "uncommon", spinCost: 3,
     wear: 0,
-    betMinMod: -5, betMaxMod: 30,
+    betMinMod: -50, betMaxMod: 300,
     values: { 1: { type: "plus", amount: -0.1 }, 2: { type: "plus", amount: 0 }, 3: { type: "plus", amount: -5 } },
-    desc: "Пассивка: сильно понижает мин. ставку (-5) и поднимает макс. (+30), износа не даёт. Но выпадения почти всегда в минус: 1 шт -0.1, 2 шт 0, 3 шт -5.",
+    desc: "Пассивка: рубит мин. ставку (-50) и вздымает макс. (+300), износа не даёт. Но выпадения почти всегда в минус: 1 шт -0.1, 2 шт 0, 3 шт -5.",
   },
   chili: {
     key: "chili", label: "Перец", emoji: "🌶",
@@ -175,9 +175,9 @@ export const ITEMS: Record<string, ItemDef> = {
     key: "seven", label: "Семёрка", emoji: "7️⃣",
     rarity: "legendary", spinCost: 12,
     wear: 5,
-    betMinMod: 5, betMaxMod: 40,
+    betMinMod: 777, betMaxMod: 777,
     values: { 1: { type: "plus", amount: 0.7 }, 2: { type: "multiply", factor: 3 }, 3: { type: "plus", amount: 77 } },
-    desc: "Легендарная семёрка. Три семёрки — +77. Но жрёт прочность автомата: ~5 HP за прокрут.",
+    desc: "Легендарная семёрка. Три семёрки — +77. Ставки летят в небеса: +777 к мин и макс. Жрёт прочность автомата: ~5 HP за прокрут.",
   },
   crown: {
     key: "crown", label: "Корона", emoji: "👑",
@@ -206,6 +206,7 @@ export const ECONOMY = {
   maxHp: 100,
   repairCost: 50,     // цена ремонта
   repairAmount: 10,   // +HP за ремонт
+  newMachineCost: 1000, // новый автомат вместо сломанного (чинить нельзя)
   shopRollCost: 1000, // цена прокрута магазина (гача)
   buildCost: 200,   // плата за сборку автомата — чтобы не перестраивали часто
   reelMin: 4,

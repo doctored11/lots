@@ -85,8 +85,8 @@ export function GamePage() {
     setTimeout(() => setExploding(false), 900);
   }
 
-  // пересборка: старый проваливается в дыру (squashJump + тень растёт),
-  // новый прилетает (sqwishFall + тень появляется)
+  // пересборка/покупка: старый проваливается в дыру (squashJump + тень растёт),
+  // в момент исчезновения подменяем ленту, новый прилетает (sqwishFall + тень)
   useEffect(() => {
     if (!game.justBuilt) return;
     const el = mashineRef.current;
@@ -98,6 +98,8 @@ export function GamePage() {
     el.classList.add(boomStyles.mashineHide);
 
     const t1 = setTimeout(() => {
+      // подмена ленты пока автомат скрыт — вылетает именно старый
+      game.applyPendingReel();
       // новый прилетает
       el.classList.remove(boomStyles.mashineHide);
       shadow?.classList.remove(boomStyles.shadowGrow);
@@ -123,7 +125,7 @@ export function GamePage() {
     const result = game.doSpin();
     if ("error" in result) {
       if (result.error === "broken") {
-        showToast("💥 Автомат сломан! Нужен ремонт");
+        showToast("💥 Автомат взорвался! Только новый за " + ECONOMY.newMachineCost);
         playExplosion();
       } else {
         showToast("Не хватает монет на прокрут");
@@ -193,12 +195,18 @@ export function GamePage() {
     });
   }, [spinValues]);
 
-  // idle-элемент: автопрокрут
+  // idle-элемент: автопрокрут (выключается при HP ≤ 10% — бережём автомат)
   useEffect(() => {
     if (!autoSpin) return;
     if (game.isSpinning || game.isAnimating) return;
-    if (game.hp <= 0 || game.balance < game.spinCost) {
+    if (
+      game.hp <= ECONOMY.maxHp * 0.1 ||
+      game.balance < game.spinCost
+    ) {
       setAutoSpin(false);
+      if (game.hp > 0 && game.hp <= ECONOMY.maxHp * 0.1) {
+        showToast("⚠️ Автокрут выключен: прочность ≤ 10%");
+      }
       return;
     }
     const t = setTimeout(handleSpin, 700);
@@ -209,10 +217,10 @@ export function GamePage() {
   const hpClass =
     hpPercent > 50 ? styles.hpHigh : hpPercent > 20 ? styles.hpMid : styles.hpLow;
 
-  const handleRepair = () => {
-    const err = game.repair();
+  const handleBuyNew = () => {
+    const err = game.buyNewMachine();
     if (err) showToast(err);
-    else addFloat(-ECONOMY.repairCost);
+    else addFloat(-ECONOMY.newMachineCost);
   };
 
   return (
@@ -316,6 +324,12 @@ export function GamePage() {
       </div>
 
       <div className={styles.panel}>
+        {game.lastLostItems.length > 0 && (
+          <div className={styles.lostLine}>
+            💥 При взрыве потеряно:{" "}
+            {game.lastLostItems.map((k) => ITEMS[k].label).join(", ")}
+          </div>
+        )}
         <div
           className={`${styles.winPlaque} ${
             game.lastWin > 0 ? styles.winPlaqueActive : ""
@@ -338,10 +352,11 @@ export function GamePage() {
           </div>
           <button
             className={styles.repairBtn}
-            onClick={handleRepair}
-            disabled={game.hp >= ECONOMY.maxHp || game.isSpinning}
+            onClick={handleBuyNew}
+            disabled={game.isSpinning || game.isAnimating}
+            title="Ремонта нет — только новый автомат"
           >
-            🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
+            🛒 Новый автомат ({ECONOMY.newMachineCost})
           </button>
         </div>
       </div>
