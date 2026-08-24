@@ -108,6 +108,23 @@
   background: rgba(72, 94, 60, 0.937);
 }
 
+.machineName {
+  font-size: 12px;
+  color: #98979ef8;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.upgradeRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.upgradeRow .repairBtn {
+  flex: 1;
+}
+
 .machine {
   border: 1px solid #1d1d1dec;
   border-radius: 10px;

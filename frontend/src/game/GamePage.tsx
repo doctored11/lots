@@ -12,6 +12,10 @@ import drumStyles from "../lots/components/slotMashine/slotMashine/mashineBody/m
 import boomStyles from "../lots/components/changeMashine/changeMashine.module.css";
 
 const ITEM_HEIGHT = 96;
+// высота барабана ужимается, если барабанов больше 3
+function itemHeightFor(reelCount: number): number {
+  return reelCount <= 3 ? ITEM_HEIGHT : Math.floor(ITEM_HEIGHT * (3 / reelCount));
+}
 
 interface FloatNum {
   id: number;
@@ -22,33 +26,37 @@ let floatId = 0;
 function TapeContent({
   reel,
   tapeRef,
+  itemHeight,
 }: {
   reel: string[];
   tapeRef: React.RefObject<HTMLDivElement>;
+  itemHeight: number;
 }) {
   useEffect(() => {
-    if (!tapeRef.current) return;
+    if (!tapeRef || !tapeRef.current) return;
     tapeRef.current.innerHTML = "";
-    reel.forEach((key) => {
+    // несобранный автомат — лента из вопросов
+    const keys = reel.length > 0 ? reel : ["?", "?", "?", "?"];
+    keys.forEach((key) => {
       const item = ITEMS[key];
-      if (!item) return;
       let el: HTMLElement;
-      if (item.image) {
+      if (item?.image) {
         el = document.createElement("img");
         (el as HTMLImageElement).src = item.image;
       } else {
         el = document.createElement("div");
-        el.textContent = item.emoji;
-        el.style.fontSize = `${ITEM_HEIGHT * 0.6}px`;
+        el.textContent = item ? item.emoji : "?";
+        el.style.fontSize = `${itemHeight * 0.6}px`;
         el.style.display = "flex";
         el.style.alignItems = "center";
         el.style.justifyContent = "center";
+        if (!item) el.style.color = "#98979ef8";
       }
-      el.style.height = `${ITEM_HEIGHT}px`;
-      el.style.width = `${ITEM_HEIGHT}px`;
+      el.style.height = `${itemHeight}px`;
+      el.style.width = `${itemHeight}px`;
       tapeRef.current?.appendChild(el);
     });
-  }, [reel]);
+  }, [reel, itemHeight]);
   return <div ref={tapeRef} className={drumStyles.tape}></div>;
 }
 
@@ -56,11 +64,18 @@ export function GamePage() {
   const game = useGame();
   const machine = game.machines[game.activeMachine] ?? {
     id: 0,
+    name: "?",
     reel: [],
+    reelCount: 3,
     hp: 0,
+    maxHp: 100,
+    hpLevel: 0,
     spinsDone: 0,
   };
-  const [spinValues, setSpinValues] = useState<number[]>([0, 0, 0]);
+  const reelCount = machine.reelCount;
+  const [spinValues, setSpinValues] = useState<number[]>(
+    Array(reelCount).fill(0)
+  );
   const [pending, setPending] = useState<SpinResult | null>(null);
   const [autoSpin, setAutoSpin] = useState(false);
   const [toast, setToast] = useState("");
@@ -70,6 +85,18 @@ export function GamePage() {
   const tapeRefs = useRef<React.RefObject<HTMLDivElement>[]>(
     [0, 1, 2].map(() => React.createRef<HTMLDivElement>())
   );
+  // refs под количество барабанов активного автомата (1..5)
+  if (tapeRefs.current.length !== reelCount) {
+    tapeRefs.current = Array.from({ length: reelCount }, () =>
+      React.createRef<HTMLDivElement>()
+    );
+  }
+  // spinValues под количество барабанов
+  useEffect(() => {
+    setSpinValues((prev) =>
+      prev.length === reelCount ? prev : Array(reelCount).fill(0)
+    );
+  }, [reelCount]);
   const mashineRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
 
@@ -166,10 +193,12 @@ export function GamePage() {
   // запуск анимации барабанов
   useEffect(() => {
     if (!game.isSpinning || !pending) return;
+    // на смене автомата spinValues может временно не совпадать с числом барабанов
+    if (tapeRefs.current.length < spinValues.length) return;
     const promises = spinValues.map((value, index) =>
       rollSpin(
         tapeRefs.current[index].current!,
-        ITEM_HEIGHT,
+        itemHeight,
         getRandomInt(12, 35),
         getRandomInt(3, 8),
         value
@@ -178,7 +207,7 @@ export function GamePage() {
     Promise.all(promises).then(() => {
       // подсветка выпавших символов
       spinValues.forEach((targetIndex, reelIndex) => {
-        const tape = tapeRefs.current[reelIndex].current;
+        const tape = tapeRefs.current[reelIndex]?.current;
         const el = tape?.children[targetIndex];
         if (el instanceof HTMLElement) {
           el.classList.add(drumStyles.winEl);
@@ -209,11 +238,11 @@ export function GamePage() {
     if (!autoSpin) return;
     if (game.isSpinning || game.isAnimating) return;
     if (
-      machine.hp <= ECONOMY.maxHp * 0.1 ||
+      machine.hp <= machine.maxHp * 0.1 ||
       game.balance < game.spinCost
     ) {
       setAutoSpin(false);
-      if (machine.hp > 0 && machine.hp <= ECONOMY.maxHp * 0.1) {
+      if (machine.hp > 0 && machine.hp <= machine.maxHp * 0.1) {
         showToast("⚠️ Автокрут выключен: прочность ≤ 10%");
       }
       return;
@@ -222,7 +251,8 @@ export function GamePage() {
     return () => clearTimeout(t);
   }, [autoSpin, game.isSpinning, game.isAnimating, machine.hp, game.balance]);
 
-  const hpPercent = Math.max(0, Math.min(100, (machine.hp / ECONOMY.maxHp) * 100));
+  const itemHeight = itemHeightFor(reelCount);
+  const hpPercent = Math.max(0, Math.min(100, (machine.hp / machine.maxHp) * 100));
   const hpClass =
     hpPercent > 50 ? styles.hpHigh : hpPercent > 20 ? styles.hpMid : styles.hpLow;
 
@@ -230,6 +260,12 @@ export function GamePage() {
     const err = game.buyNewMachine();
     if (err) showToast(err);
     else addFloat(-ECONOMY.newMachineCost);
+  };
+
+  const handleBuyExtra = () => {
+    const err = game.buyExtraMachine();
+    if (err) showToast(err);
+    else addFloat(-game.nextExtraMachineCost);
   };
 
   const handleRepair = () => {
@@ -277,13 +313,20 @@ export function GamePage() {
                 i === game.activeMachine ? styles.machineTabActive : ""
               }`}
               onClick={() => game.setActiveMachine(i)}
+              title={`${m.name} · барабанов: ${m.reelCount} · HP ${m.hp}/${m.maxHp}`}
             >
-              🎰 {i + 1}
+              {m.name}
               {m.hp <= 0 ? " 💥" : ""}
+              {m.reel.length === 0 && m.hp > 0 ? " ❓" : ""}
             </button>
           ))}
         </div>
       )}
+
+      {/* имя активного автомата — чтобы понимать, куда что ставишь */}
+      <div className={styles.machineName}>
+        {machine.name} · барабанов: {machine.reelCount}
+      </div>
 
       <div className={styles.betRow}>
         <button
@@ -331,13 +374,14 @@ export function GamePage() {
                         key={index}
                         className={drumStyles.roll}
                         style={{
-                          height: `${ITEM_HEIGHT * 2.2}px`,
-                          width: `${ITEM_HEIGHT * 1.2}px`,
+                          height: `${itemHeight * 2.2}px`,
+                          width: `${itemHeight * 1.2}px`,
                         }}
                       >
                         <TapeContent
                           reel={machine.reel}
                           tapeRef={tapeRefs.current[index]}
+                          itemHeight={itemHeight}
                         />
                       </div>
                     ))}
@@ -384,14 +428,14 @@ export function GamePage() {
               style={{ width: `${hpPercent}%` }}
             ></div>
             <span className={styles.hpText}>
-              HP {machine.hp}/{ECONOMY.maxHp}
+              HP {machine.hp}/{machine.maxHp}
             </span>
           </div>
           {machine.hp > 0 ? (
             <button
               className={styles.repairBtn}
               onClick={handleRepair}
-              disabled={machine.hp >= ECONOMY.maxHp || game.isSpinning}
+              disabled={machine.hp >= machine.maxHp || game.isSpinning}
               title={`+${ECONOMY.repairAmount} HP за ${ECONOMY.repairCost} монет`}
             >
               🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
@@ -409,13 +453,45 @@ export function GamePage() {
           {machine.hp > 0 && (
             <button
               className={styles.repairBtn}
-              onClick={handleBuyNew}
+              onClick={handleBuyExtra}
               disabled={game.isSpinning || game.isAnimating}
-              title="Купить ещё один автомат (новый слот с пустой лентой)"
+              title="Купить ещё один автомат (новый слот с пустой лентой, 1-2 барабана)"
             >
-              🛒 Новый ({ECONOMY.newMachineCost})
+              🛒 Новый ({game.nextExtraMachineCost})
             </button>
           )}
+        </div>
+
+        {/* улучшения активного автомата */}
+        <div className={styles.upgradeRow}>
+          <button
+            className={styles.repairBtn}
+            onClick={() => {
+              const err = game.upgradeReels();
+              if (err) showToast(err);
+              else addFloat(-game.nextReelUpgradeCost);
+            }}
+            disabled={
+              machine.reelCount >= ECONOMY.maxReels ||
+              game.isSpinning ||
+              game.balance < game.nextReelUpgradeCost
+            }
+            title={`+1 барабан (сейчас ${machine.reelCount}, макс ${ECONOMY.maxReels})`}
+          >
+            🎰 +лента (~{game.nextReelUpgradeCost}+)
+          </button>
+          <button
+            className={styles.repairBtn}
+            onClick={() => {
+              const err = game.upgradeHp();
+              if (err) showToast(err);
+              else addFloat(-game.nextHpUpgradeCost);
+            }}
+            disabled={game.isSpinning || game.balance < game.nextHpUpgradeCost}
+            title={`+${ECONOMY.hpUpgradeStep} к макс. HP (сейчас ${machine.maxHp})`}
+          >
+            ❤️ +{ECONOMY.hpUpgradeStep} макс HP ({game.nextHpUpgradeCost})
+          </button>
         </div>
       </div>
 

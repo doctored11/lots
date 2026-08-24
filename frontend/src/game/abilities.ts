@@ -28,28 +28,30 @@ export abstract class Ability {
   constructor(public readonly itemKey: string) {}
   // сколько экземпляров лота на линии активирует обилку
   abstract readonly triggerCount: number;
+  // срабатывать ли при большем количестве (на 4-5 барабанах)
+  readonly orMore: boolean = false;
 
   matches(ctx: SpinContext): boolean {
-    return (
-      ctx.results.filter((r) => r === this.itemKey).length === this.triggerCount
-    );
+    const n = ctx.results.filter((r) => r === this.itemKey).length;
+    return this.orMore ? n >= this.triggerCount : n === this.triggerCount;
   }
 
   abstract apply(bd: WinBreakdown, ctx: SpinContext): void;
 }
 
-// награда одного лота за count экземпляров пишется в breakdown
-export function addReward(bd: WinBreakdown, itemKey: string, count: 1 | 2 | 3) {
+// награда одного лота за count экземпляров пишется в breakdown (1..5)
+export function addReward(bd: WinBreakdown, itemKey: string, count: 1 | 2 | 3 | 4 | 5) {
   const reward = ITEMS[itemKey]?.values[count];
   if (!reward) return;
   if (reward.type === "plus") bd.plus += reward.amount;
   else bd.multiply *= reward.factor;
 }
 
-// --- обилка бомбы: три бомбы тянут соседей сверху/снизу на каждом барабане,
+// --- обилка бомбы: три и больше бомб тянут соседей сверху/снизу на каждом барабане,
 // каждый сосед даёт свой потенциал за тройку
 export class BombChainAbility extends Ability {
   readonly triggerCount = 3;
+  readonly orMore = true; // на 4-5 барабанах работает и при 4-5 бомбах
   apply(bd: WinBreakdown, ctx: SpinContext) {
     ctx.combination.forEach((idx) => {
       reelNeighbors(ctx.reel, idx).forEach((neighbor) => {
@@ -106,7 +108,7 @@ export function evaluateSpin(
     counts[s] = (counts[s] || 0) + 1;
   });
   Object.entries(counts).forEach(([symbol, count]) => {
-    addReward(bd, symbol, count as 1 | 2 | 3);
+    addReward(bd, symbol, count as 1 | 2 | 3 | 4 | 5);
   });
 
   // обилки

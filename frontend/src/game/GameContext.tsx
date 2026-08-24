@@ -13,6 +13,11 @@ import {
   rollSpinDamage,
   rollItemDrop,
   rollStarterRare,
+  getRandomInt,
+  generateMachineName,
+  extraMachineCost,
+  reelUpgradeCost,
+  hpUpgradeCost,
   Rarity,
 } from "./catalog";
 import { evaluateSpin } from "./abilities";
@@ -22,9 +27,13 @@ const SAVE_KEY = "slotGameV4"; // смена ключа = сброс прогр�
 // один автомат: изолированные лента, HP и своя ставка (диапазон от ленты)
 export interface MachineState {
   id: number;
+  name: string; // смешное имя: прил + животное + 3 цифры
   reel: string[];
+  reelCount: number; // количество барабанов (1..5), дефолт 3
   hp: number;
-  spinsDone: number; // для возможных механик от количества прокрутов
+  maxHp: number; // улучшается отдельно на каждом автомате
+  hpLevel: number; // уровень улучшения HP (для цены)
+  spinsDone: number;
 }
 
 export interface GameState {
@@ -68,7 +77,13 @@ interface GameContextType extends GameState {
   chargeSpinCost: (cost: number) => void;
   applySpinResult: (r: SpinResult) => void;
   buyNewMachine: () => string | null; // замена взорвавшегося или новый слот
+  buyExtraMachine: () => string | null; // докупить автомат (от 10к по экспоненте)
   repair: () => string | null; // ремонт +10 HP за 50 (активного автомата)
+  upgradeReels: () => string | null; // +1 барабан (макс 5), дорого
+  upgradeHp: () => string | null; // +50 макс HP, дорожает с уровнем
+  nextExtraMachineCost: number; // цена следующего автомата
+  nextReelUpgradeCost: number; // цена +1 барабана активного (Infinity если макс)
+  nextHpUpgradeCost: number; // цена +50 макс HP активного
   shopRoll: () => { item?: string; error?: string };
   buildMachine: (reel: string[]) => string | null; // сборка ленты активного автомата
   pendingReel: string[] | null; // лента, ждущая анимации прилёта
@@ -92,7 +107,18 @@ function initialState(): GameState {
   return {
     balance: ECONOMY.startBalance,
     inventory,
-    machines: [{ id: 1, reel: [...ECONOMY.startReel], hp: ECONOMY.startHp, spinsDone: 0 }],
+    machines: [
+      {
+        id: 1,
+        name: generateMachineName(),
+        reel: [...ECONOMY.startReel],
+        reelCount: 3, // первый автомат по умолчанию с тремя лентами
+        hp: ECONOMY.startHp,
+        maxHp: ECONOMY.maxHp,
+        hpLevel: 0,
+        spinsDone: 0,
+      },
+    ],
     activeMachine: 0,
     unlockedRecipes: [],
     lastWin: 0,
@@ -113,10 +139,17 @@ function loadState(): GameState {
     });
     const cleanMachine = (m: any, idx: number): MachineState => ({
       id: typeof m?.id === "number" ? m.id : idx + 1,
+      name: typeof m?.name === "string" ? m.name : generateMachineName(),
       reel: Array.isArray(m?.reel)
         ? m.reel.filter((k: string) => ITEMS[k]) // пустая лента валидна (утеряна при взрыве)
         : [],
+      reelCount: Math.min(
+        Math.max(1, typeof m?.reelCount === "number" ? m.reelCount : 3),
+        ECONOMY.maxReels
+      ),
       hp: typeof m?.hp === "number" ? m.hp : ECONOMY.startHp,
+      maxHp: typeof m?.maxHp === "number" ? m.maxHp : ECONOMY.maxHp,
+      hpLevel: typeof m?.hpLevel === "number" ? m.hpLevel : 0,
       spinsDone: typeof m?.spinsDone === "number" ? m.spinsDone : 0,
     });
     // миграция старого сейва (reel/hp на верхнем уровне)
@@ -214,11 +247,10 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (machine.reel.length < ECONOMY.reelMin) return { error: "noReel" };
     if (state.balance < spinCost) return { error: "noMoney" };
 
-    const combination = [
-      getRandomIdx(machine.reel),
-      getRandomIdx(machine.reel),
-      getRandomIdx(machine.reel),
-    ];
+    // барабанов = reelCount автомата (1..5)
+    const combination = Array.from({ length: machine.reelCount }, () =>
+      getRandomIdx(machine.reel)
+    );
     const results = combination.map((i) => machine.reel[i]);
 
     // выигрыш и множитель урона — через движок обилок
@@ -226,19 +258,23 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
     // износ: рандом 0..5 + гарантированный износ всех лотов ленты (включая дубли)
     let damage = rollSpinDamage(machine.reel) * evaluation.damageMult;
-    // отрицательный урон (лечащие предметы) лечит, но не выше максимума
+    // отрицательный урон (лечащие предметы) лечит, но не выше максимума автомата
     const hpAfter = Math.min(
-      ECONOMY.maxHp,
+      machine.maxHp,
       Math.max(0, machine.hp - damage)
     );
 
+    // рецепт открывается за тройку и больше (на 4-5 барабанах тоже)
     let unlockedRecipe: string | null = null;
-    if (
-      results[0] === results[1] &&
-      results[1] === results[2] &&
-      !state.unlockedRecipes.includes(results[0])
-    ) {
-      unlockedRecipe = results[0];
+    const counts: Record<string, number> = {};
+    results.forEach((r) => {
+      counts[r] = (counts[r] || 0) + 1;
+    });
+    for (const [key, count] of Object.entries(counts)) {
+      if (count >= 3 && !state.unlockedRecipes.includes(key)) {
+        unlockedRecipe = key;
+        break;
+      }
     }
 
     return {
@@ -302,40 +338,90 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   function repair(): string | null {
     if (!machine) return "Нет автомата";
     if (machine.hp <= 0) return "Автомат взорвался — только новый";
-    if (machine.hp >= ECONOMY.maxHp) return "Автомат полностью исправен";
+    if (machine.hp >= machine.maxHp) return "Автомат полностью исправен";
     if (state.balance < ECONOMY.repairCost) return "Не хватает монет на ремонт";
     setState((prev) => ({ ...prev, balance: prev.balance - ECONOMY.repairCost }));
-    patchMachine({ hp: Math.min(ECONOMY.maxHp, machine.hp + ECONOMY.repairAmount) });
+    patchMachine({ hp: Math.min(machine.maxHp, machine.hp + ECONOMY.repairAmount) });
     return null;
   }
 
-  // новый автомат за 1000 монет: замена взорвавшегося (пустая лента) или новый слот
+  // новый автомат: рандомно 1 или 2 барабана, пустая лента, смешное имя
+  function freshMachine(id: number): MachineState {
+    return {
+      id,
+      name: generateMachineName(),
+      reel: [],
+      reelCount: getRandomInt(1, 2), // новые автоматы — с 1-2 лентами
+      hp: ECONOMY.maxHp,
+      maxHp: ECONOMY.maxHp,
+      hpLevel: 0,
+      spinsDone: 0,
+    };
+  }
+
+  // замена взорвавшегося автомата за 1000 монет (лента утеряна навсегда)
   function buyNewMachine(): string | null {
+    if (!machine || machine.hp > 0) return "Автомат ещё жив — чини его";
     if (state.balance < ECONOMY.newMachineCost) {
       return `Новый автомат стоит ${ECONOMY.newMachineCost} монет — не хватает`;
     }
     setState((prev) => {
       const machines = [...prev.machines];
-      const active = machines[prev.activeMachine];
-      let activeMachine = prev.activeMachine;
-      if (active && active.hp <= 0) {
-        // замена взорвавшегося — лента утеряна навсегда
-        machines[prev.activeMachine] = { ...active, reel: [], hp: ECONOMY.maxHp, spinsDone: 0 };
-      } else {
-        // новый слот с пустой лентой — собрать в мастерской
-        const newId = Math.max(0, ...machines.map((m) => m.id)) + 1;
-        machines.push({ id: newId, reel: [], hp: ECONOMY.maxHp, spinsDone: 0 });
-        activeMachine = machines.length - 1;
-      }
+      machines[prev.activeMachine] = freshMachine(machines[prev.activeMachine].id);
       return {
         ...prev,
         balance: prev.balance - ECONOMY.newMachineCost,
         machines,
-        activeMachine,
         lastLostItems: [],
       };
     });
     setJustBuilt(true); // анимация прилёта
+    return null;
+  }
+
+  // докупить дополнительный автомат: 10к, дальше по экспоненте
+  function buyExtraMachine(): string | null {
+    const cost = extraMachineCost(state.machines.length);
+    if (state.balance < cost) {
+      return `Новый автомат стоит ${cost} монет — не хватает`;
+    }
+    setState((prev) => {
+      const newId = Math.max(0, ...prev.machines.map((m) => m.id)) + 1;
+      const machines = [...prev.machines, freshMachine(newId)];
+      return {
+        ...prev,
+        balance: prev.balance - cost,
+        machines,
+        activeMachine: machines.length - 1,
+        lastLostItems: [],
+      };
+    });
+    setJustBuilt(true);
+    return null;
+  }
+
+  // улучшение: +1 барабан (макс 5). Цена: 100к + рандом до 300к, дальше ×2
+  function upgradeReels(): string | null {
+    if (!machine) return "Нет автомата";
+    if (machine.reelCount >= ECONOMY.maxReels) return "Максимум барабанов";
+    const cost = reelUpgradeCost(machine.reelCount);
+    if (state.balance < cost) return `Улучшение стоит ${cost} монет — не хватает`;
+    setState((prev) => ({ ...prev, balance: prev.balance - cost }));
+    patchMachine({ reelCount: machine.reelCount + 1 });
+    return null;
+  }
+
+  // улучшение: +50 макс HP. Цена растёт с уровнем
+  function upgradeHp(): string | null {
+    if (!machine) return "Нет автомата";
+    const cost = hpUpgradeCost(machine.hpLevel);
+    if (state.balance < cost) return `Улучшение стоит ${cost} монет — не хватает`;
+    setState((prev) => ({ ...prev, balance: prev.balance - cost }));
+    patchMachine({
+      maxHp: machine.maxHp + ECONOMY.hpUpgradeStep,
+      hp: machine.hp + ECONOMY.hpUpgradeStep, // прибавка сразу доступна
+      hpLevel: machine.hpLevel + 1,
+    });
     return null;
   }
 
@@ -412,7 +498,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (!pendingReel) return;
     const reel = pendingReel;
     setPendingReel(null);
-    patchMachine({ reel, hp: ECONOMY.maxHp, spinsDone: 0 });
+    patchMachine({ reel, hp: machine?.maxHp ?? ECONOMY.maxHp, spinsDone: 0 });
     setState((prev) => ({ ...prev, lastWin: 0, maxWin: 0 }));
   }
 
@@ -439,6 +525,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     chargeSpinCost,
     applySpinResult,
     buyNewMachine,
+    buyExtraMachine,
+    upgradeReels,
+    upgradeHp,
+    nextExtraMachineCost: extraMachineCost(state.machines.length),
+    nextReelUpgradeCost: machine
+      ? reelUpgradeCost(machine.reelCount, () => 0) // база для UI; рандом — при покупке
+      : Infinity,
+    nextHpUpgradeCost: machine ? hpUpgradeCost(machine.hpLevel) : Infinity,
     repair,
     shopRoll,
     shopRollPreview,

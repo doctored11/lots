@@ -17,7 +17,7 @@ export interface ItemDef {
   wear: number; // вклад предмета в износ автомата за прокрут (отрицательный = лечит)
   betMinMod: number; // сдвиг минимальной ставки автомата
   betMaxMod: number; // сдвиг максимальной ставки автомата
-  values: { 1: RewardValue; 2: RewardValue; 3: RewardValue };
+  values: { 1: RewardValue; 2: RewardValue; 3: RewardValue; 4: RewardValue; 5: RewardValue };
   desc: string; // открывается в книге рецептов после тройки
 }
 
@@ -30,7 +30,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 1,
     wear: 0,
     betMinMod: 0, betMaxMod: 5,
-    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.3 }, 3: { type: "plus", amount: 3 } },
+    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.3 }, 3: { type: "plus", amount: 3 }, 4: { type: "plus", amount: 5 }, 5: { type: "plus", amount: 8 } },
     desc: "Скромный, но падает чаще всех. Три грозди — +3 к ставке.",
   },
   cherry: {
@@ -38,7 +38,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 1,
     wear: 2,
     betMinMod: 5, betMaxMod: 222,
-    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.5 }, 3: { type: "plus", amount: 1.8 } },
+    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.5 }, 3: { type: "plus", amount: 1.8 }, 4: { type: "plus", amount: 3 }, 5: { type: "plus", amount: 5 } },
     desc: "Вишенка на барабане. Раздвигает ставки (+5/+222), но грызёт прочность (+2 износа).",
   },
   banana: {
@@ -46,7 +46,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 1,
     wear: 0,
     betMinMod: 0, betMaxMod: 10,
-    values: { 1: { type: "plus", amount: -1 }, 2: { type: "plus", amount: 0.1 }, 3: { type: "plus", amount: 8 } },
+    values: { 1: { type: "plus", amount: -1 }, 2: { type: "plus", amount: 0.1 }, 3: { type: "plus", amount: 8 }, 4: { type: "plus", amount: 14 }, 5: { type: "plus", amount: 22 } },
     desc: "Скользкий фрукт: один — минус 1, пара +0.1, тройка +8.",
   },
   mushroom: {
@@ -54,7 +54,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "uncommon", spinCost: 2,
     wear: -1,
     betMinMod: -20, betMaxMod: 30,
-    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 1.8 } },
+    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 1.8 }, 4: { type: "plus", amount: 3 }, 5: { type: "plus", amount: 5 } },
     desc: "Целебный гриб: восполняет 1 HP автомату за прокрут и снижает мин. ставку (-20).",
   },
   melon: {
@@ -62,7 +62,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "uncommon", spinCost: 2,
     wear: 3,
     betMinMod: -10, betMaxMod: 10,
-    values: { 1: { type: "multiply", factor: 1.1 }, 2: { type: "plus", amount: 1 }, 3: { type: "plus", amount: 6 } },
+    values: { 1: { type: "multiply", factor: 1.1 }, 2: { type: "plus", amount: 1 }, 3: { type: "plus", amount: 6 }, 4: { type: "plus", amount: 10 }, 5: { type: "plus", amount: 16 } },
     desc: "Арбуз. Одна штука чуть усиливает выигрыш (x1.1), три — +6.",
   },
   clover: {
@@ -70,7 +70,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "rare", spinCost: 5,
     wear: 2,
     betMinMod: 50, betMaxMod: 50,
-    values: { 1: { type: "multiply", factor: 1.3 }, 2: { type: "multiply", factor: 2.5 }, 3: { type: "plus", amount: 12 } },
+    values: { 1: { type: "multiply", factor: 1.3 }, 2: { type: "multiply", factor: 2.5 }, 3: { type: "plus", amount: 12 }, 4: { type: "plus", amount: 20 }, 5: { type: "plus", amount: 35 } },
     desc: "Счастливый клевер: один x1.3, пара x2.5, тройка +12. Ставки +50/+50.",
   },
   blueBerrie: {
@@ -78,7 +78,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "rare", spinCost: 5,
     wear: 1,
     betMinMod: 10, betMaxMod: 100,
-    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 17.7 } },
+    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 17.7 }, 4: { type: "plus", amount: 28 }, 5: { type: "plus", amount: 45 } },
     desc: "Редкая черника. Три ягоды — +17.7. Потолок ставки +100.",
   },
   bomb: {
@@ -86,7 +86,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "legendary", spinCost: 10,
     wear: 5,
     betMinMod: 100, betMaxMod: 200,
-    values: { 1: { type: "plus", amount: -5 }, 2: { type: "plus", amount: -10 }, 3: { type: "multiply", factor: 8.8 } },
+    values: { 1: { type: "plus", amount: -5 }, 2: { type: "plus", amount: -10 }, 3: { type: "multiply", factor: 8.8 }, 4: { type: "multiply", factor: 14 }, 5: { type: "multiply", factor: 22 } },
     desc: "Опасна! 1 шт -5, пара -10 и тройной износ. Три бомбы: x8.8 и каждая тянет соседей на барабане — их бонус за тройку. Ставки +100/+200, износ +5.",
   },
 
@@ -96,7 +96,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 1,
     wear: 1,
     betMinMod: -10, betMaxMod: 10,
-    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 3 } },
+    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 3 }, 4: { type: "plus", amount: 5 }, 5: { type: "plus", amount: 8 } },
     desc: "Кислый, но надёжный. Три лимона — +3.",
   },
   apple: {
@@ -104,7 +104,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 1,
     wear: 0,
     betMinMod: -50, betMaxMod: -10,
-    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 2.6 } },
+    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 2.6 }, 4: { type: "plus", amount: 4.2 }, 5: { type: "plus", amount: 7 } },
     desc: "Простое яблоко. Сужает ставки (-50/-10) — играть мелко.",
   },
   coin: {
@@ -112,7 +112,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 2,
     wear: 1,
     betMinMod: -10, betMaxMod: -100,
-    values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.7 }, 3: { type: "plus", amount: 4 } },
+    values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.7 }, 3: { type: "plus", amount: 4 }, 4: { type: "plus", amount: 7 }, 5: { type: "plus", amount: 12 } },
     desc: "Звонкая монета. Режет макс. ставку (-100).",
   },
   bell: {
@@ -120,7 +120,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 2,
     wear: 2,
     betMinMod: 0, betMaxMod: 10,
-    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.8 }, 3: { type: "plus", amount: 4 } },
+    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "plus", amount: 0.8 }, 3: { type: "plus", amount: 4 }, 4: { type: "plus", amount: 7 }, 5: { type: "plus", amount: 12 } },
     desc: "Классика жанра. Три колокола — +4.",
   },
   dice: {
@@ -128,7 +128,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "uncommon", spinCost: 3,
     wear: 1,
     betMinMod: 20, betMaxMod: 50,
-    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "multiply", factor: 1.5 }, 3: { type: "plus", amount: 6 } },
+    values: { 1: { type: "plus", amount: 0.2 }, 2: { type: "multiply", factor: 1.5 }, 3: { type: "plus", amount: 6 }, 4: { type: "plus", amount: 10 }, 5: { type: "plus", amount: 16 } },
     desc: "Игральная кость. Пара множит x1.5.",
   },
   skull: {
@@ -136,7 +136,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "uncommon", spinCost: 3,
     wear: 0,
     betMinMod: -50, betMaxMod: 300,
-    values: { 1: { type: "plus", amount: -0.1 }, 2: { type: "plus", amount: 0 }, 3: { type: "plus", amount: -5 } },
+    values: { 1: { type: "plus", amount: -0.1 }, 2: { type: "plus", amount: 0 }, 3: { type: "plus", amount: -5 }, 4: { type: "plus", amount: -12 }, 5: { type: "plus", amount: -30 } },
     desc: "Пассивка: мин. ставка -50, макс. +300, износа нет. Но выпадения почти всегда в минус.",
   },
   chili: {
@@ -144,7 +144,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "uncommon", spinCost: 3,
     wear: 2,
     betMinMod: 10, betMaxMod: 20,
-    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0 }, 3: { type: "plus", amount: 8 } },
+    values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0 }, 3: { type: "plus", amount: 8 }, 4: { type: "plus", amount: 14 }, 5: { type: "plus", amount: 22 } },
     desc: "Острый перец. Пара выжигает свою линию: остальные предметы на линии дают бонус как за два. Три штуки — +8.",
   },
   star: {
@@ -152,7 +152,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "rare", spinCost: 6,
     wear: 1,
     betMinMod: 5, betMaxMod: 25,
-    values: { 1: { type: "multiply", factor: 1.2 }, 2: { type: "plus", amount: 2 }, 3: { type: "plus", amount: 20 } },
+    values: { 1: { type: "multiply", factor: 1.2 }, 2: { type: "plus", amount: 2 }, 3: { type: "plus", amount: 20 }, 4: { type: "plus", amount: 35 }, 5: { type: "plus", amount: 55 } },
     desc: "Счастливая звезда. Три звезды — +20.",
   },
   gem: {
@@ -160,7 +160,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "rare", spinCost: 6,
     wear: 3,
     betMinMod: 40, betMaxMod: 330,
-    values: { 1: { type: "plus", amount: 1 }, 2: { type: "multiply", factor: 2.5 }, 3: { type: "plus", amount: 10 } },
+    values: { 1: { type: "plus", amount: 1 }, 2: { type: "multiply", factor: 2.5 }, 3: { type: "plus", amount: 10 }, 4: { type: "plus", amount: 18 }, 5: { type: "plus", amount: 30 } },
     desc: "Кристалл: 1 шт +1, пара x2.5, тройка +10. Ставки +40/+330, износ +3.",
   },
   rocket: {
@@ -168,7 +168,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "rare", spinCost: 7,
     wear: 5,
     betMinMod: 500, betMaxMod: 1000,
-    values: { 1: { type: "plus", amount: 0.5 }, 2: { type: "plus", amount: 1.5 }, 3: { type: "plus", amount: 18 } },
+    values: { 1: { type: "plus", amount: 0.5 }, 2: { type: "plus", amount: 1.5 }, 3: { type: "plus", amount: 18 }, 4: { type: "plus", amount: 30 }, 5: { type: "plus", amount: 50 } },
     desc: "На луну! Ставки +500/+1000, износ +5. Три ракеты — +18.",
   },
   seven: {
@@ -176,7 +176,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "legendary", spinCost: 12,
     wear: 7,
     betMinMod: 777, betMaxMod: 777,
-    values: { 1: { type: "plus", amount: 0.7 }, 2: { type: "multiply", factor: 3 }, 3: { type: "plus", amount: 77 } },
+    values: { 1: { type: "plus", amount: 0.7 }, 2: { type: "multiply", factor: 3 }, 3: { type: "plus", amount: 77 }, 4: { type: "plus", amount: 150 }, 5: { type: "plus", amount: 300 } },
     desc: "Легендарная семёрка. Ставки +777/+777, износ 7 за прокрут. Три семёрки — +77.",
   },
   crown: {
@@ -184,7 +184,7 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "legendary", spinCost: 15,
     wear: 4,
     betMinMod: 400, betMaxMod: 450,
-    values: { 1: { type: "multiply", factor: 1.5 }, 2: { type: "multiply", factor: 4 }, 3: { type: "plus", amount: 25 } },
+    values: { 1: { type: "multiply", factor: 1.5 }, 2: { type: "multiply", factor: 4 }, 3: { type: "plus", amount: 25 }, 4: { type: "plus", amount: 45 }, 5: { type: "plus", amount: 70 } },
     desc: "Королевская корона. Ставки +400/+450. Одна x1.5, пара x4, тройка +25.",
   },
 };
@@ -214,11 +214,56 @@ export const ECONOMY = {
   baseSpinCost: 5,    // базовая минимальная ставка
   baseBetMax: 20,     // базовая максимальная ставка
   spinDamageBase: 5,  // урон за прокрут: 0..5 + износ
-  wearEverySpins: 25, // каждые N прокрутов +1 к износу
-  spinDamageCap: 12,
+  // покупка дополнительных автоматов: 10к, дальше по экспоненте
+  extraMachineBaseCost: 10000,
+  extraMachineGrowth: 2,
+  // улучшение: +1 лента (макс 5). Первое — 100к + рандом до 300к
+  maxReels: 5,
+  reelUpgradeBase: 100000,
+  reelUpgradeRandom: 200000,
+  reelUpgradeGrowth: 2,
+  // улучшение макс. HP автомата
+  hpUpgradeStep: 50,       // +50 к макс. HP за уровень
+  hpUpgradeBaseCost: 5000, // первый уровень 5к, дальше ×1.8
+  hpUpgradeGrowth: 1.8,
   startInventory: ["grape", "grape", "cherry", "banana"] as string[],
   startReel: ["grape", "grape", "cherry", "banana"] as string[],
 };
+
+// --- генератор имён автоматов: прилагательное + животное + 3 цифры ---
+const MACHINE_ADJ = [
+  "Гневный", "Сонный", "Хитрый", "Дерзкий", "Пьяный", "Космический",
+  "Злой", "Добрый", "Шальной", "Ленивый", "Голодный", "Сумасшедший",
+];
+const MACHINE_ANIMAL = [
+  "Барсук", "Енот", "Капибара", "Выдра", "Панда", "Ленивец",
+  "Тапир", "Ёж", "Крот", "Сурок", "Лис", "Хорёк",
+];
+
+export function generateMachineName(): string {
+  const adj = MACHINE_ADJ[getRandomInt(0, MACHINE_ADJ.length - 1)];
+  const animal = MACHINE_ANIMAL[getRandomInt(0, MACHINE_ANIMAL.length - 1)];
+  const num = getRandomInt(100, 999);
+  return `${adj} ${animal}-${num}`;
+}
+
+// цена следующего дополнительного автомата (по экспоненте от уже имеющихся)
+export function extraMachineCost(ownedCount: number): number {
+  return ECONOMY.extraMachineBaseCost * Math.pow(ECONOMY.extraMachineGrowth, ownedCount - 1);
+}
+
+// цена улучшения ленты для уровня (с 3 лент — базовый автомат)
+export function reelUpgradeCost(currentReels: number, rng: () => number = Math.random): number {
+  if (currentReels >= ECONOMY.maxReels) return Infinity;
+  const level = currentReels - 2; // 3 ленты = уровень 1
+  const base = ECONOMY.reelUpgradeBase + Math.floor(rng() * ECONOMY.reelUpgradeRandom);
+  return Math.floor(base * Math.pow(ECONOMY.reelUpgradeGrowth, level - 1));
+}
+
+// цена улучшения HP для уровня
+export function hpUpgradeCost(hpLevel: number): number {
+  return Math.floor(ECONOMY.hpUpgradeBaseCost * Math.pow(ECONOMY.hpUpgradeGrowth, hpLevel));
+}
 
 // случайный редкий предмет в стартовый набор
 export function rollStarterRare(): string {
