@@ -219,15 +219,6 @@ export function MachineView({ mi }: { mi: number }) {
 
   return (
     <div className={styles.machineCard} id={`machine-${machine.id}`}>
-      <div className={styles.machineCardHead}>
-        <span className={styles.machineCardName} style={{ color: machine.color }}>
-          {machine.name}
-        </span>
-        <span className={styles.machineCardMeta}>
-          {machine.reelCount}🎰 {machine.bet}💰
-        </span>
-      </div>
-
       <div className={styles.machineStage}>
         <div className={machineStyles.mashineContainer}>
           <div
@@ -245,6 +236,8 @@ export function MachineView({ mi }: { mi: number }) {
                 className={machineStyles.mashineBody}
                 style={{ backgroundColor: machine.color }}
               >
+                {/* имя на корпусе */}
+                <div className={styles.machineBodyName}>{machine.name}</div>
                 <div className={machineStyles.dramFrame}>
                   <div className={drumStyles.slotDrum}>
                     {spinValues.map((_, index) => (
@@ -276,6 +269,7 @@ export function MachineView({ mi }: { mi: number }) {
         <div className={boomStyles.shadow} ref={shadowRef}></div>
       </div>
 
+      {/* под автоматом: выигрыш, HP+хил, ставка, автокрут */}
       <div className={styles.machinePanel}>
         <div
           className={`${styles.winPlaque} ${
@@ -307,7 +301,7 @@ export function MachineView({ mi }: { mi: number }) {
               disabled={machine.hp >= machine.maxHp || isSpinning}
               title={`+${ECONOMY.repairAmount} HP за ${ECONOMY.repairCost} монет`}
             >
-              🔧{ECONOMY.repairCost}
+              🔧+{ECONOMY.repairAmount}HP ({ECONOMY.repairCost})
             </button>
           ) : (
             <button
@@ -318,7 +312,7 @@ export function MachineView({ mi }: { mi: number }) {
               }}
               title="Восстановить автомат (улучшения сохранятся, лоты утеряны)"
             >
-              🛒{ECONOMY.newMachineCost}
+              🛒восстановить ({ECONOMY.newMachineCost})
             </button>
           )}
         </div>
@@ -347,42 +341,14 @@ export function MachineView({ mi }: { mi: number }) {
           >
             +
           </button>
-        </div>
-
-        <div className={styles.upgradeRow}>
-          <button
-            className={styles.repairBtn}
-            onClick={() => {
-              const err = game.upgradeReels(mi);
-              if (err) showToast(err);
-            }}
-            disabled={
-              machine.reelCount >= ECONOMY.maxReels ||
-              isSpinning ||
-              game.balance < game.reelUpgradePrice(mi)
-            }
-            title={`+1 барабан (сейчас ${machine.reelCount}, макс ${ECONOMY.maxReels})`}
-          >
-            🎰+лента
-          </button>
-          <button
-            className={styles.repairBtn}
-            onClick={() => {
-              const err = game.upgradeHp(mi);
-              if (err) showToast(err);
-            }}
-            disabled={isSpinning || game.balance < game.hpUpgradePrice(mi)}
-            title={`+${ECONOMY.hpUpgradeStep} к макс. HP`}
-          >
-            ❤️+HP
-          </button>
+          <span className={styles.betValue}>{machine.bet}💰</span>
           <label className={styles.autoLabel}>
             <input
               type="checkbox"
               checked={autoSpin}
               onChange={(e) => setAutoSpin(e.target.checked)}
             />
-            авто
+            автокрут
           </label>
         </div>
 

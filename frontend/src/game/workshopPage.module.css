@@ -209,6 +209,12 @@
   background: rgba(72, 94, 60, 0.937);
 }
 
+.upgradeBtns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 /* --- кейс --- */
 .caseViewport {
   position: relative;

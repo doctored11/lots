@@ -304,8 +304,9 @@ export function WorkshopPage() {
                   i === game.activeMachine ? styles.machineTabActive : ""
                 }`}
                 onClick={() => game.setActiveMachine(i)}
+                style={{ borderColor: m.color }}
               >
-                🎰 Автомат {i + 1}
+                {m.name}
                 {m.hp <= 0 ? " 💥" : ""}
               </button>
             ))}
@@ -342,6 +343,42 @@ export function WorkshopPage() {
           {ECONOMY.buildCost} 💰
         </button>
         {message && <p className={styles.message}>{message}</p>}
+      </section>
+
+      <section>
+        <h2>⬆️ Улучшения: {machine.name}</h2>
+        <p className={styles.hint}>
+          Барабанов: {machine.reelCount}/{ECONOMY.maxReels} · макс HP:{" "}
+          {machine.maxHp} · улучшения выбранного во вкладке автомата
+        </p>
+        <div className={styles.upgradeBtns}>
+          <button
+            className={styles.buildBtn}
+            disabled={
+              machine.reelCount >= ECONOMY.maxReels ||
+              game.balance < game.reelUpgradePrice(game.activeMachine)
+            }
+            onClick={() => {
+              const err = game.upgradeReels(game.activeMachine);
+              if (err) setMessage("❌ " + err);
+              else setMessage("✅ +1 барабан!");
+            }}
+          >
+            🎰 +1 лента ({game.reelUpgradePrice(game.activeMachine)}+ 💰)
+          </button>
+          <button
+            className={styles.buildBtn}
+            disabled={game.balance < game.hpUpgradePrice(game.activeMachine)}
+            onClick={() => {
+              const err = game.upgradeHp(game.activeMachine);
+              if (err) setMessage("❌ " + err);
+              else setMessage("✅ Макс HP увеличен!");
+            }}
+          >
+            ❤️ +{ECONOMY.hpUpgradeStep} макс HP (
+            {game.hpUpgradePrice(game.activeMachine)} 💰)
+          </button>
+        </div>
       </section>
 
       <section>
