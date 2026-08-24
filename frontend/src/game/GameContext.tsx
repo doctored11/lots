@@ -59,7 +59,8 @@ interface GameContextType extends GameState {
   doSpin: () => SpinResult | { error: string };
   chargeSpinCost: (cost: number) => void;
   applySpinResult: (r: SpinResult) => void;
-  buyNewMachine: () => string | null; // новый автомат вместо сломанного
+  buyNewMachine: () => string | null; // новый автомат (только если взорвался)
+  repair: () => string | null; // ремонт +10 HP за 50
   shopRoll: () => { item?: string; error?: string };
   buildMachine: (reel: string[]) => string | null;
   pendingReel: string[] | null; // лента, ждущая анимации смены автомата
@@ -249,8 +250,22 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     });
   }
 
-  // ремонта нет — только новый автомат за 1000 монет
+  // ремонт: +10 HP за 50 монет (сломанный автомат уже не чинится — только новый)
+  function repair(): string | null {
+    if (state.hp <= 0) return "Автомат взорвался — только новый";
+    if (state.hp >= ECONOMY.maxHp) return "Автомат полностью исправен";
+    if (state.balance < ECONOMY.repairCost) return "Не хватает монет на ремонт";
+    setState((prev) => ({
+      ...prev,
+      balance: prev.balance - ECONOMY.repairCost,
+      hp: Math.min(ECONOMY.maxHp, prev.hp + ECONOMY.repairAmount),
+    }));
+    return null;
+  }
+
+  // новый автомат за 1000 монет — только если старый взорвался
   function buyNewMachine(): string | null {
+    if (state.hp > 0) return "Автомат ещё жив — чини его";
     if (state.balance < ECONOMY.newMachineCost) {
       return `Новый автомат стоит ${ECONOMY.newMachineCost} монет — не хватает`;
     }
@@ -360,6 +375,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     chargeSpinCost,
     applySpinResult,
     buyNewMachine,
+    repair,
     shopRoll,
     shopRollPreview,
     applyShopRoll,

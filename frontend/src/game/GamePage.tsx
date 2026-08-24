@@ -223,6 +223,12 @@ export function GamePage() {
     else addFloat(-ECONOMY.newMachineCost);
   };
 
+  const handleRepair = () => {
+    const err = game.repair();
+    if (err) showToast(err);
+    else addFloat(-ECONOMY.repairCost);
+  };
+
   return (
     <div className={styles.gamePage}>
       <div className={styles.topStats}>
@@ -350,14 +356,25 @@ export function GamePage() {
               HP {game.hp}/{ECONOMY.maxHp}
             </span>
           </div>
-          <button
-            className={styles.repairBtn}
-            onClick={handleBuyNew}
-            disabled={game.isSpinning || game.isAnimating}
-            title="Ремонта нет — только новый автомат"
-          >
-            🛒 Новый автомат ({ECONOMY.newMachineCost})
-          </button>
+          {game.hp > 0 ? (
+            <button
+              className={styles.repairBtn}
+              onClick={handleRepair}
+              disabled={game.hp >= ECONOMY.maxHp || game.isSpinning}
+              title={`+${ECONOMY.repairAmount} HP за ${ECONOMY.repairCost} монет`}
+            >
+              🔧 +{ECONOMY.repairAmount} HP ({ECONOMY.repairCost})
+            </button>
+          ) : (
+            <button
+              className={styles.repairBtn}
+              onClick={handleBuyNew}
+              disabled={game.isSpinning || game.isAnimating}
+              title="Автомат взорвался — только новый"
+            >
+              🛒 Новый автомат ({ECONOMY.newMachineCost})
+            </button>
+          )}
         </div>
       </div>
 
