@@ -14,7 +14,7 @@ export interface ItemDef {
   image?: string; // путь до png (dist/source/*)
   rarity: Rarity;
   spinCost: number; // вклад предмета в цену прокрута автомата
-  wear: number; // вклад предмета в износ автомата за прокрут
+  wear: number; // вклад предмета в износ автомата за прокрут (отрицательный = лечит)
   betMinMod: number; // сдвиг минимальной ставки автомата
   betMaxMod: number; // сдвиг максимальной ставки автомата
   values: { 1: RewardValue; 2: RewardValue; 3: RewardValue };
@@ -46,24 +46,24 @@ export const ITEMS: Record<string, ItemDef> = {
     rarity: "common", spinCost: 1,
     wear: 0,
     betMinMod: 0, betMaxMod: 8,
-    values: { 1: { type: "plus", amount: 0.0 }, 2: { type: "plus", amount: 0.5 }, 3: { type: "plus", amount: 10 } },
-    desc: "Скользкий фрукт: пара даёт +0.5, тройка — целых +10.",
+    values: { 1: { type: "plus", amount: -1 }, 2: { type: "plus", amount: 0.1 }, 3: { type: "plus", amount: 10 } },
+    desc: "Скользкий фрукт: один — минус 1 к выигрышу, пара даёт +0.1, тройка — целых +10.",
   },
   mushroom: {
     key: "mushroom", label: "Гриб", emoji: "🍄", image: img("mushrum_v1"),
     rarity: "uncommon", spinCost: 2,
-    wear: 0,
+    wear: -1,
     betMinMod: 0, betMaxMod: 10,
     values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.4 }, 3: { type: "plus", amount: 4 } },
-    desc: "Лесной гриб. Три штуки дают +4 к ставке.",
+    desc: "Целебный гриб: восполняет 1 HP автомату за каждый прокрут. Три штуки дают +4 к ставке.",
   },
   melon: {
     key: "melon", label: "Дыня", emoji: "🍈", image: img("melon"),
     rarity: "uncommon", spinCost: 2,
     wear: 0,
     betMinMod: 0, betMaxMod: 12,
-    values: { 1: { type: "plus", amount: 0.0 }, 2: { type: "plus", amount: 0.2 }, 3: { type: "plus", amount: 7.7 } },
-    desc: "Сочная дыня. Одна почти ничего не стоит, но три — это +7.7.",
+    values: { 1: { type: "multiply", factor: 0.8 }, 2: { type: "plus", amount: 1 }, 3: { type: "plus", amount: 7 } },
+    desc: "Одна дыня портит выигрыш (x0.8), пара даёт +1, три — +7.",
   },
   clover: {
     key: "clover", label: "Клевер", emoji: "🍀", image: img("clover"),
@@ -76,18 +76,18 @@ export const ITEMS: Record<string, ItemDef> = {
   blueBerrie: {
     key: "blueBerrie", label: "Черника", emoji: "🫐", image: img("blueBerrie"),
     rarity: "rare", spinCost: 5,
-    wear: 1,
-    betMinMod: 2, betMaxMod: 20,
+    wear: -1,
+    betMinMod: 2, betMaxMod: 40,
     values: { 1: { type: "plus", amount: 0.1 }, 2: { type: "plus", amount: 0.5 }, 3: { type: "plus", amount: 16.6 } },
-    desc: "Редкая черника. Три ягоды — +16.6 к ставке.",
+    desc: "Целебная ягода: +1 HP за прокрут и сильно поднимает потолок ставки (+40). Три ягоды — +16.6 к ставке.",
   },
   bomb: {
     key: "bomb", label: "Бомба", emoji: "💣", image: img("bomb"),
     rarity: "legendary", spinCost: 10,
     wear: 2,
     betMinMod: -5, betMaxMod: 50,
-    values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.8 }, 3: { type: "multiply", factor: 8.8 } },
-    desc: "Сердце автомата. Три бомбы взрывают выигрыш до ×8.8.",
+    values: { 1: { type: "plus", amount: -5 }, 2: { type: "plus", amount: -10 }, 3: { type: "multiply", factor: 8.8 } },
+    desc: "Опасна! Одна — минус 5, пара — минус 10 и тройной износ автомата за прокрут. Три бомбы: x8.8, и каждая тянет соседей сверху/снизу на барабане — они дают свой потенциал за тройку.",
   },
 
   // --- новые (эмодзи-плейсхолдеры, картинки будут позже) ---
@@ -134,18 +134,18 @@ export const ITEMS: Record<string, ItemDef> = {
   skull: {
     key: "skull", label: "Череп", emoji: "💀",
     rarity: "uncommon", spinCost: 3,
-    wear: 1,
-    betMinMod: -2, betMaxMod: 20,
-    values: { 1: { type: "plus", amount: 0.0 }, 2: { type: "plus", amount: 1.0 }, 3: { type: "plus", amount: 9 } },
-    desc: "Опасный символ. Одна штука пустая, зато тройка — +9.",
+    wear: 0,
+    betMinMod: -5, betMaxMod: 30,
+    values: { 1: { type: "plus", amount: -0.1 }, 2: { type: "plus", amount: 0 }, 3: { type: "plus", amount: -5 } },
+    desc: "Пассивка: сильно понижает мин. ставку (-5) и поднимает макс. (+30), износа не даёт. Но выпадения почти всегда в минус: 1 шт -0.1, 2 шт 0, 3 шт -5.",
   },
   chili: {
     key: "chili", label: "Перец", emoji: "🌶",
     rarity: "uncommon", spinCost: 3,
     wear: 1,
     betMinMod: 1, betMaxMod: 12,
-    values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.6 }, 3: { type: "multiply", factor: 3 } },
-    desc: "Острый перец. Три штуки утраивают выигрыш.",
+    values: { 1: { type: "plus", amount: 0.3 }, 2: { type: "plus", amount: 0.6 }, 3: { type: "plus", amount: 8 } },
+    desc: "Острый перец. Три штуки — +8 к ставке.",
   },
   star: {
     key: "star", label: "Звезда", emoji: "⭐",
@@ -158,10 +158,10 @@ export const ITEMS: Record<string, ItemDef> = {
   gem: {
     key: "gem", label: "Самоцвет", emoji: "💎",
     rarity: "rare", spinCost: 6,
-    wear: 1,
-    betMinMod: 3, betMaxMod: 30,
-    values: { 1: { type: "plus", amount: 0.4 }, 2: { type: "multiply", factor: 2.5 }, 3: { type: "multiply", factor: 5 } },
-    desc: "Драгоценность. Пара множит ×2.5, тройка — ×5.",
+    wear: 3,
+    betMinMod: 8, betMaxMod: -10,
+    values: { 1: { type: "plus", amount: 1 }, 2: { type: "multiply", factor: 2.5 }, 3: { type: "plus", amount: 10 } },
+    desc: "Драгоценность: 1 шт +1, пара x2.5, тройка +10. Но жрёт прочность (+3 износа), -10 к макс. и +8 к мин. ставке.",
   },
   rocket: {
     key: "rocket", label: "Ракета", emoji: "🚀",
@@ -174,18 +174,18 @@ export const ITEMS: Record<string, ItemDef> = {
   seven: {
     key: "seven", label: "Семёрка", emoji: "7️⃣",
     rarity: "legendary", spinCost: 12,
-    wear: 2,
+    wear: 5,
     betMinMod: 5, betMaxMod: 40,
     values: { 1: { type: "plus", amount: 0.7 }, 2: { type: "multiply", factor: 3 }, 3: { type: "plus", amount: 77 } },
-    desc: "Легендарная семёрка. Три семёрки — +77. Джекпот классики.",
+    desc: "Легендарная семёрка. Три семёрки — +77. Но жрёт прочность автомата: ~5 HP за прокрут.",
   },
   crown: {
     key: "crown", label: "Корона", emoji: "👑",
     rarity: "legendary", spinCost: 15,
     wear: 2,
-    betMinMod: 8, betMaxMod: 60,
-    values: { 1: { type: "multiply", factor: 1.5 }, 2: { type: "multiply", factor: 4 }, 3: { type: "multiply", factor: 12 } },
-    desc: "Королевская корона. Даже одна множит ставку ×1.5, тройка — ×12.",
+    betMinMod: 8, betMaxMod: 90,
+    values: { 1: { type: "multiply", factor: 1.5 }, 2: { type: "multiply", factor: 4 }, 3: { type: "plus", amount: 25 } },
+    desc: "Королевская корона: сильно поднимает потолок ставки (+90). Одна x1.5, пара x4, тройка +25.",
   },
 };
 
@@ -261,8 +261,13 @@ export function machineSpinCost(reel: string[]): number {
   return machineBetRange(reel).min;
 }
 
-// выигрыш по выпавшим символам (та же формула, что была на бэкенде)
-export function calculateWinnings(bet: number, results: string[]): number {
+// выигрыш по выпавшим символам: сначала суммируются "+", потом перемножаются "×"
+// bonusTriples — предметы, засчитанные как тройки (механика бомбы: соседние ряды)
+export function calculateWinnings(
+  bet: number,
+  results: string[],
+  bonusTriples: string[] = []
+): number {
   let totalPlus = 0;
   let totalMultiply = 1;
 
@@ -278,10 +283,25 @@ export function calculateWinnings(bet: number, results: string[]): number {
     else totalMultiply *= reward.factor;
   });
 
+  // бонусные предметы считаются как их награда за тройку
+  bonusTriples.forEach((symbol) => {
+    const reward = ITEMS[symbol]?.values[3];
+    if (!reward) return;
+    if (reward.type === "plus") totalPlus += reward.amount;
+    else totalMultiply *= reward.factor;
+  });
+
   return Math.floor(bet * (totalPlus || 1) * totalMultiply);
 }
 
+// соседи по барабану: предметы выше и ниже выпавшего (лента закольцована)
+export function reelNeighbors(reel: string[], index: number): string[] {
+  const len = reel.length;
+  return [reel[(index - 1 + len) % len], reel[(index + 1) % len]];
+}
+
 // урон автомату за прокрут: 0..5 + износ от предметов ленты + растущий износ
+// (предметы с отрицательным износом лечат автомат)
 export function rollSpinDamage(spinsDone: number, reel: string[] = []): number {
   const itemsWear = reel.reduce((sum, key) => sum + (ITEMS[key]?.wear ?? 0), 0);
   const wear = Math.floor(spinsDone / ECONOMY.wearEverySpins);
@@ -291,7 +311,7 @@ export function rollSpinDamage(spinsDone: number, reel: string[] = []): number {
   );
 }
 
-// случайный предмет (дроп за спин / гача магазина)
+// случайный предмет (гача магазина)
 export function rollItemDrop(): string {
   const pool: string[] = [];
   Object.values(ITEMS).forEach((item) => {
@@ -308,7 +328,12 @@ export function formatItemRewards(key: string): string {
   return ([1, 2, 3] as const)
     .map((count) => {
       const v = values[count];
-      const text = v.type === "plus" ? `+${v.amount}` : `×${v.factor}`;
+      const text =
+        v.type === "plus"
+          ? v.amount < 0
+            ? `${v.amount}` // минус уже в числе
+            : `+${v.amount}`
+          : `×${v.factor}`;
       return `${count}: ${text}`;
     })
     .join("  |  ");

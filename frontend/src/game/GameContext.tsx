@@ -10,6 +10,7 @@ import {
   ECONOMY,
   machineBetRange,
   calculateWinnings,
+  reelNeighbors,
   rollSpinDamage,
   rollItemDrop,
   rollStarterRare,
@@ -159,9 +160,25 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       getRandomIdx(state.reel),
     ];
     const results = combination.map((i) => state.reel[i]);
-    const win = calculateWinnings(spinCost, results);
-    const damage = rollSpinDamage(state.spinsDone, state.reel);
-    const hpAfter = Math.max(0, state.hp - damage);
+
+    // тройка бомб: каждая бомба тянет предметы с рядов выше и ниже,
+    // каждый сосед даёт свой потенциал за тройку
+    let bonusTriples: string[] = [];
+    const isBombTriple = results.every((r) => r === "bomb");
+    if (isBombTriple) {
+      bonusTriples = combination.flatMap((idx) =>
+        reelNeighbors(state.reel, idx)
+      );
+    }
+
+    const win = calculateWinnings(spinCost, results, bonusTriples);
+    let damage = rollSpinDamage(state.spinsDone, state.reel);
+    // пара бомб на барабанах — тройной износ за прокрут
+    if (results.filter((r) => r === "bomb").length === 2) {
+      damage *= 3;
+    }
+    // отрицательный урон (лечащие предметы) лечит, но не выше максимума
+    const hpAfter = Math.min(ECONOMY.maxHp, Math.max(0, state.hp - damage));
 
     let unlockedRecipe: string | null = null;
     if (
