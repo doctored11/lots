@@ -5,8 +5,8 @@
 #
 # Перед запуском отредактируй VPS_USER и VPS_HOST под свою VPS.
 
-VPS_USER="root"          # <- поменяй
-VPS_HOST="1.2.3.4"       # <- поменяй (IP VPS в Франкфурте)
+VPS_USER="root"
+VPS_HOST="136.244.88.222" # VPS Франкфурт (marzban-main)
 REMOTE_PORT=2222         # порт на VPS, через который торчит домашний ПК
 KEY="$HOME/.ssh/id_ed25519"
 

@@ -247,6 +247,14 @@ export function generateMachineName(): string {
   return `${adj} ${animal}-${num}`;
 }
 
+// случайный цвет корпуса автомата
+export function generateMachineColor(): string {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) color += letters[getRandomInt(0, 15)];
+  return color + "f0";
+}
+
 // цена следующего дополнительного автомата (по экспоненте от уже имеющихся)
 export function extraMachineCost(ownedCount: number): number {
   return ECONOMY.extraMachineBaseCost * Math.pow(ECONOMY.extraMachineGrowth, ownedCount - 1);
