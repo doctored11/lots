@@ -247,7 +247,10 @@ export function WorkshopPage() {
               </div>
               <div className={styles.cardTitle}>{ITEMS[key].label}</div>
               <div className={styles.cardRarity}>×{count}</div>
-              <ItemTooltip itemKey={key} unlocked={true} />
+              <ItemTooltip
+                itemKey={key}
+                unlocked={game.unlockedRecipes.includes(key)}
+              />
             </button>
           ))}
         </div>

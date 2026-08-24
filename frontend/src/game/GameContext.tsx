@@ -16,7 +16,7 @@ import {
   Rarity,
 } from "./catalog";
 
-const SAVE_KEY = "slotGameV3";
+const SAVE_KEY = "slotGameV4"; // смена ключа = сброс прогресса у всех
 
 export interface GameState {
   balance: number;
