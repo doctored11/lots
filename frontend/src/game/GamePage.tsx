@@ -240,8 +240,37 @@ export function GamePage() {
         >
           +1000 💰
         </button>
-        <span className={styles.cost} title="Ставка = база 5 + сумма вкладов лотов в ленте. Выигрыш считается от ставки.">
+        <span className={styles.cost} title="Ставка за прокрут. Выигрыш считается от неё. Диапазон зависит от лотов в ленте.">
           ставка: {game.spinCost}
+        </span>
+      </div>
+
+      <div className={styles.betRow}>
+        <button
+          className={styles.betBtn}
+          onClick={() => game.setBet(game.bet - 1)}
+          disabled={game.bet <= game.betMin || game.isSpinning}
+        >
+          −
+        </button>
+        <input
+          type="range"
+          className={styles.betSlider}
+          min={game.betMin}
+          max={game.betMax}
+          value={game.bet}
+          disabled={game.isSpinning}
+          onChange={(e) => game.setBet(Number(e.target.value))}
+        />
+        <button
+          className={styles.betBtn}
+          onClick={() => game.setBet(game.bet + 1)}
+          disabled={game.bet >= game.betMax || game.isSpinning}
+        >
+          +
+        </button>
+        <span className={styles.betRange}>
+          {game.betMin}–{game.betMax}
         </span>
       </div>
 

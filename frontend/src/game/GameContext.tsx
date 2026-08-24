@@ -8,7 +8,7 @@ import React, {
 import {
   ITEMS,
   ECONOMY,
-  machineSpinCost,
+  machineBetRange,
   calculateWinnings,
   rollSpinDamage,
   rollItemDrop,
@@ -48,6 +48,10 @@ interface GameContextType extends GameState {
   spinCost: number;
   justBuilt: boolean; // автомат только что собран — для анимации прилёта
   setJustBuilt: (v: boolean) => void;
+  bet: number; // выбранная игроком ставка
+  setBet: (v: number) => void;
+  betMin: number;
+  betMax: number;
   // действия
   doSpin: () => SpinResult | { error: string };
   chargeSpinCost: (cost: number) => void;
@@ -125,12 +129,24 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [justBuilt, setJustBuilt] = useState(false);
 
+  const { min: betMin, max: betMax } = machineBetRange(state.reel);
+  const [bet, setBetRaw] = useState(betMin);
+
+  // при смене ленты ставка зажимается в новый диапазон
+  useEffect(() => {
+    setBetRaw((b) => Math.min(Math.max(b, betMin), betMax));
+  }, [betMin, betMax]);
+
+  const setBet = (v: number) =>
+    setBetRaw(Math.min(Math.max(v, betMin), betMax));
+
   // автосейв
   useEffect(() => {
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   }, [state]);
 
-  const spinCost = machineSpinCost(state.reel);
+  // цена прокрута = выбранная ставка
+  const spinCost = bet;
 
   // чистый расчёт спина — вызывается в момент нажатия, результат применяется после анимации
   function doSpin(): SpinResult | { error: string } {
@@ -280,6 +296,10 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     spinCost,
     justBuilt,
     setJustBuilt,
+    bet,
+    setBet,
+    betMin,
+    betMax,
     doSpin,
     chargeSpinCost,
     applySpinResult,

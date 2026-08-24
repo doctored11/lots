@@ -16,6 +16,20 @@ function randomCaseItem(): string {
   return rollItemDrop();
 }
 
+// пример награды с реальными числами предмета: "пример: ставка 10, 3 шт → 200"
+function rewardExample(itemKey: string): string {
+  const item = ITEMS[itemKey];
+  if (!item) return "";
+  const bet = 10;
+  const parts = ([1, 2, 3] as const).map((count) => {
+    const v = item.values[count];
+    const win =
+      v.type === "plus" ? Math.floor(bet * v.amount) : Math.floor(bet * v.factor);
+    return `${count} шт → ${win}`;
+  });
+  return `Пример при ставке ${bet}: ` + parts.join(" · ");
+}
+
 // тултип с расширенной подсказкой по лоту (показывается при наведении)
 function ItemTooltip({
   itemKey,
@@ -35,7 +49,11 @@ function ItemTooltip({
         {RARITY_LABELS[item.rarity]}
       </div>
       <div className={styles.tooltipRow}>
-        Вклад в ставку: <b>+{item.spinCost}</b>
+        Ставка автомата:{" "}
+        <b>
+          {item.betMinMod >= 0 ? `+${item.betMinMod}` : item.betMinMod} к мин ·{" "}
+          {item.betMaxMod >= 0 ? `+${item.betMaxMod}` : item.betMaxMod} к макс
+        </b>
       </div>
       <div className={styles.tooltipRow}>
         Износ автомата: <b>+{item.wear}</b>
@@ -48,6 +66,9 @@ function ItemTooltip({
           <div className={styles.tooltipNote}>
             +N — добавка к ставке, ×N — множитель ставки. Выигрыш = ставка ×
             (сумма +) × (произведение ×).
+          </div>
+          <div className={styles.tooltipNote}>
+            {rewardExample(itemKey)}
           </div>
           <div className={styles.tooltipDesc}>{item.desc}</div>
         </>
@@ -204,7 +225,9 @@ export function WorkshopPage() {
                   {unlocked ? item.label : "???"}
                 </div>
                 <div className={styles.cardRarity}>
-                  {RARITY_LABELS[item.rarity]} · цена {item.spinCost}
+                  {RARITY_LABELS[item.rarity]} · ставка{" "}
+                  {item.betMinMod >= 0 ? `+${item.betMinMod}` : item.betMinMod}/
+                  {item.betMaxMod >= 0 ? `+${item.betMaxMod}` : item.betMaxMod}
                 </div>
                 <div className={styles.cardDesc}>
                   {unlocked
