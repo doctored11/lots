@@ -11,9 +11,15 @@ import styles from "./gamePage.module.css";
 
 const ITEM_HEIGHT = 96;
 const ROLL_HEIGHT = Math.floor(ITEM_HEIGHT * 2.2); // окно барабана — всегда одинаковое
-// ширина барабана ужимается, если барабанов больше 3 (высота — нет!)
-function itemHeightFor(reelCount: number): number {
-  return reelCount <= 3 ? ITEM_HEIGHT : Math.floor(ITEM_HEIGHT * (3 / reelCount));
+// ленты НИКОГДА не уменьшаем: базовый размер как у 3 лент
+function itemHeightFor(_reelCount: number): number {
+  return ITEM_HEIGHT;
+}
+
+// ширина корпуса: минимум под 3 ленты (меньше — пустоты по бокам), больше — растягиваем
+function mashineWidthFor(reelCount: number): number {
+  const drums = Math.max(3, reelCount);
+  return Math.floor(drums * (ITEM_HEIGHT * 1.2) + 40);
 }
 
 function TapeContent({
@@ -237,7 +243,11 @@ export function MachineView({ mi }: { mi: number }) {
           <div
             className={machineStyles.mashine}
             ref={mashineRef}
-            style={{ ["--color" as string]: machine.color }}
+            style={{
+              ["--color" as string]: machine.color,
+              width: `${mashineWidthFor(reelCount)}px`,
+              maxWidth: "none", // растягиваем только по ширине лент, ленты не жмём
+            }}
           >
             <div className={machineStyles.out}>
               <div className={machineStyles.mashineHead}>
