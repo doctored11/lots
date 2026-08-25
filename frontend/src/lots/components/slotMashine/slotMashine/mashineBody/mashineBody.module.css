@@ -38,44 +38,33 @@
 }
 .mashineHead {
   box-sizing: border-box;
-  /* background-color: var(--color); */
   width: 110%;
-  /* flex: 2; */
   transform: translateY(10%);
-  /* border: 2px solid #0c22e7; */
   display: flex;
   flex-direction: column;
   position: relative;
   align-items: center;
   align-content: center;
   justify-content: flex-end;
-  /* min-height: 20%; */
-  max-height: 20%;
   position: relative;
   z-index: 3;
-  /* height: 5vh; */
 }
 .headLow {
-  min-height: 40px;
-  height: 40%;
-  /* padding-top: 5%; */
+  height: 40px; /* фиксированная высота — купол не растёт от ширины корпуса */
   width: 100%;
   background-image: url("../../../../source/slotHead2.png");
   background-size: 100% 100%;
 }
 .headMid {
-  height: 60%;
-  /* padding-top: 5%; */
+  height: 90px; /* фиксированная высота — купол не растёт от ширины корпуса */
   width: 80%;
-  /* height: 50%; */
-  min-height: 70px;
   background-size: 100% 100%;
   background-image: url("../../../../source/topHead.png");
 }
 .headUp {
-  /* height: 10%; */
-  padding-top: 10%;
-  width: 10%;
+  height: 26px; /* фиксированная высота */
+  padding-top: 0;
+  width: 12%;
   background-size: 100% 100%;
   background-image: url("../../../../source/topHeadSlot.png");
   position: relative;
