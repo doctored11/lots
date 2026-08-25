@@ -477,6 +477,10 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   function buildMachine(reel: string[]): string | null {
     const machine = state.machines[state.activeMachine];
     if (!machine) return "Нет автомата";
+    // сломанный автомат нельзя собирать — сначала платное восстановление
+    if (machine.hp <= 0) {
+      return `Автомат взорван! Сначала восстанови его за ${ECONOMY.newMachineCost} монет`;
+    }
     if (reel.length < ECONOMY.reelMin || reel.length > ECONOMY.reelMax) {
       return `Лента должна быть ${ECONOMY.reelMin}–${ECONOMY.reelMax} предметов`;
     }

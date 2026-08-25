@@ -102,10 +102,13 @@ export function GamePage() {
       )}
 
       {/* ряд автоматов: на ПК влезает ~5, на телефоне 2-3 со скроллом */}
-      <div className={styles.machinesRow}>
-        {game.machines.map((m, i) => (
-          <MachineView key={m.id} mi={i} />
-        ))}
+      {/* зал казино: стены, пол; ряд автоматов прибит к полу внизу */}
+      <div className={styles.casinoHall}>
+        <div className={styles.machinesRow}>
+          {game.machines.map((m, i) => (
+            <MachineView key={m.id} mi={i} />
+          ))}
+        </div>
       </div>
     </div>
   );
