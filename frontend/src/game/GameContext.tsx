@@ -38,6 +38,7 @@ export interface MachineState {
   nextReelPrice: number; // цена следующего +1 барабана (рандомится при создании/апгрейде)
   spinsDone: number;
   bet: number; // ставка автомата (сохраняется)
+  autoSpin: boolean; // автокрут автомата (сохраняется, слетает только при особых событиях)
   lastWin: number;
   maxWin: number;
 }
@@ -75,6 +76,7 @@ interface GameContextType extends GameState {
   chargeSpinCost: (cost: number) => void;
   applySpinResult: (mi: number, r: SpinResult) => void;
   setBet: (mi: number, v: number) => void;
+  setAutoSpin: (mi: number, v: boolean) => void; // включить/выключить автокрут автомата
   restoreMachine: (mi: number) => string | null; // восстановить взорвавшийся (улучшения сохраняются)
   buyExtraMachine: () => string | null; // докупить автомат (от 10к по экспоненте)
   repair: (mi: number) => string | null; // ремонт +10 HP за 50
@@ -107,6 +109,7 @@ function freshMachine(id: number, bet?: number): MachineState {
     nextReelPrice: reelUpgradeCost(reelCount), // цена генерится заранее
     spinsDone: 0,
     bet: bet ?? ECONOMY.baseSpinCost,
+    autoSpin: false,
     lastWin: 0,
     maxWin: 0,
   };
@@ -169,6 +172,7 @@ function loadState(): GameState {
             ),
       spinsDone: typeof m?.spinsDone === "number" ? m.spinsDone : 0,
       bet: typeof m?.bet === "number" && m.bet > 0 ? m.bet : ECONOMY.baseSpinCost,
+      autoSpin: m?.autoSpin === true,
       lastWin: m?.lastWin || 0,
       maxWin: m?.maxWin || 0,
     });
@@ -335,6 +339,11 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     });
   }
 
+  // автокрут конкретного автомата
+  function setAutoSpin(mi: number, v: boolean) {
+    patchMachineAt(mi, { autoSpin: v });
+  }
+
   // ставка конкретного автомата, зажатая в его диапазон
   function setBet(mi: number, v: number) {
     const m = state.machines[mi];
@@ -368,7 +377,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       return `Восстановление стоит ${ECONOMY.newMachineCost} монет — не хватает`;
     }
     setState((prev) => ({ ...prev, balance: prev.balance - ECONOMY.newMachineCost }));
-    patchMachineAt(mi, { hp: machine.maxHp, spinsDone: 0, lastWin: 0, maxWin: 0 });
+    patchMachineAt(mi, {
+      hp: machine.maxHp,
+      spinsDone: 0,
+      lastWin: 0,
+      maxWin: 0,
+      autoSpin: false, // при восстановлении автокрут слетает
+    });
     setState((prev) => ({ ...prev, lastLostItems: [] }));
     setJustBuilt(machine.id);
     return null;
@@ -399,7 +414,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     const cost = reelUpgradeCost(machine.reelCount);
     if (state.balance < cost) return `Улучшение стоит ${cost} монет — не хватает`;
     setState((prev) => ({ ...prev, balance: prev.balance - cost }));
-    patchMachineAt(mi, { reelCount: machine.reelCount + 1 });
+    patchMachineAt(mi, { reelCount: machine.reelCount + 1, autoSpin: false });
     return null;
   }
 
@@ -414,6 +429,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       maxHp: machine.maxHp + ECONOMY.hpUpgradeStep,
       hp: machine.hp + ECONOMY.hpUpgradeStep, // прибавка сразу доступна
       hpLevel: machine.hpLevel + 1,
+      autoSpin: false, // при любом улучшении автокрут слетает
     });
     return null;
   }
@@ -488,6 +504,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       spinsDone: 0,
       lastWin: 0,
       maxWin: 0,
+      autoSpin: false, // при замене ленты автокрут слетает
     });
     setJustBuilt(machine.id); // для анимации улет/прилёт
     return null;
@@ -510,6 +527,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     chargeSpinCost,
     applySpinResult,
     setBet,
+    setAutoSpin,
     restoreMachine,
     buyExtraMachine,
     repair,

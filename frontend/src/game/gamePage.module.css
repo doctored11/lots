@@ -121,10 +121,10 @@
   width: fit-content;
 }
 
-/* имя на корпусе автомата */
+/* имя на корпусе автомата — на теле, под рамкой барабанов */
 .machineBodyName {
   position: absolute;
-  top: 4px;
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 13px;
@@ -134,6 +134,14 @@
   white-space: nowrap;
   z-index: 6;
   pointer-events: none;
+}
+
+/* обёртка рычага: займёт своё место во flex-ряде, внутри зумится */
+.handScale {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  min-width: 70px;
 }
 
 .machineCardHead {

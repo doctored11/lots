@@ -10,7 +10,8 @@ import boomStyles from "../lots/components/changeMashine/changeMashine.module.cs
 import styles from "./gamePage.module.css";
 
 const ITEM_HEIGHT = 96;
-// высота барабана ужимается, если барабанов больше 3
+const ROLL_HEIGHT = Math.floor(ITEM_HEIGHT * 2.2); // окно барабана — всегда одинаковое
+// ширина барабана ужимается, если барабанов больше 3 (высота — нет!)
 function itemHeightFor(reelCount: number): number {
   return reelCount <= 3 ? ITEM_HEIGHT : Math.floor(ITEM_HEIGHT * (3 / reelCount));
 }
@@ -38,14 +39,15 @@ function TapeContent({
       } else {
         el = document.createElement("div");
         el.textContent = item ? item.emoji : "?";
-        el.style.fontSize = `${itemHeight * 0.6}px`;
+        el.style.fontSize = `${itemHeight * 0.5}px`;
         el.style.display = "flex";
         el.style.alignItems = "center";
         el.style.justifyContent = "center";
         if (!item) el.style.color = "#98979ef8";
       }
-      el.style.height = `${itemHeight}px`;
-      el.style.width = `${itemHeight}px`;
+      // иконка чуть меньше ячейки — не вылезает за рамку барабана
+      el.style.height = `${itemHeight * 0.85}px`;
+      el.style.width = `${itemHeight * 0.85}px`;
       tapeRef.current?.appendChild(el);
     });
   }, [reel, itemHeight]);
@@ -63,7 +65,8 @@ export function MachineView({ mi }: { mi: number }) {
     Array(reelCount).fill(0)
   );
   const [pending, setPending] = useState<SpinResult | null>(null);
-  const [autoSpin, setAutoSpin] = useState(false);
+  const autoSpin = machine?.autoSpin ?? false; // автокрут живёт в стейте, не слетает при переходах
+  const setAutoSpin = (v: boolean) => game.setAutoSpin(mi, v);
   const [isSpinning, setIsSpinning] = useState(false);
   const [toast, setToast] = useState("");
   const [exploding, setExploding] = useState(false);
@@ -155,10 +158,15 @@ export function MachineView({ mi }: { mi: number }) {
     setPending(result);
   }
 
+  // минимальная длительность прокрута — рычаг должен успеть отыграть анимацию
+  const MIN_SPIN_MS = 1600;
+  const spinStartRef = useRef(0);
+
   // запуск анимации барабанов
   useEffect(() => {
     if (!isSpinning || !pending) return;
     if (tapeRefs.current.length < spinValues.length) return;
+    spinStartRef.current = Date.now();
     const promises = spinValues.map((value, index) =>
       rollSpin(
         tapeRefs.current[index].current!,
@@ -169,6 +177,10 @@ export function MachineView({ mi }: { mi: number }) {
       )
     );
     Promise.all(promises).then(() => {
+      // если прокрут был быстрым — ждём, пока рычаг доиграет анимацию
+      const elapsed = Date.now() - spinStartRef.current;
+      const wait = Math.max(0, MIN_SPIN_MS - elapsed);
+      setTimeout(() => {
       spinValues.forEach((targetIndex, reelIndex) => {
         const tape = tapeRefs.current[reelIndex]?.current;
         const el = tape?.children[targetIndex];
@@ -189,6 +201,7 @@ export function MachineView({ mi }: { mi: number }) {
         setTimeout(() => showToast("💥 Автомат взорвался!", 4000), 600);
       }
       setPending(null);
+      }, wait);
     });
   }, [spinValues]);
 
@@ -245,8 +258,8 @@ export function MachineView({ mi }: { mi: number }) {
                         key={index}
                         className={drumStyles.roll}
                         style={{
-                          height: `${itemHeight * 2.2}px`,
-                          width: `${itemHeight * 1.2}px`,
+                          height: `${ROLL_HEIGHT}px`, // окно всегда одной высоты
+                          width: `${itemHeight * 1.2}px`, // жмётся только ширина
                         }}
                       >
                         <TapeContent
@@ -261,7 +274,13 @@ export function MachineView({ mi }: { mi: number }) {
               </div>
             </div>
 
-            <HandBtn spin={handleSpin} isSpinning={isSpinning}></HandBtn>
+            {/* рычаг масштабируется под ширину автомата */}
+            <div
+              className={styles.handScale}
+              style={{ zoom: Math.max(0.6, itemHeight / ITEM_HEIGHT) }}
+            >
+              <HandBtn spin={handleSpin} isSpinning={isSpinning}></HandBtn>
+            </div>
 
             {exploding && <div className={boomStyles.explosion}></div>}
           </div>
