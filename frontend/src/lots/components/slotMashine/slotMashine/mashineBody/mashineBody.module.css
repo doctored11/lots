@@ -120,7 +120,7 @@
 }
 .mashineContainer {
   align-items: flex-end;
-  padding: 10% 2% 0 5%;
+  padding: 40px 2% 0 5%; /* фиксированный отступ сверху — высота не зависит от ширины */
   justify-content: center;
   flex-direction: row;
   display: flex;
