@@ -111,7 +111,7 @@
   filter: brightness(1.3);
 }
 
-/* зал казино: стены, плинтус и дощатый пол; автоматы стоят на полу */
+/* зал казино: зелёные полосатые стены (как в старых казино), дощатый пол */
 .casinoHall {
   flex: 1;
   position: relative;
@@ -119,25 +119,42 @@
   flex-direction: column;
   justify-content: flex-end; /* ряд автоматов прибит к полу внизу экрана */
   background:
-    /* плинтус над полом */
-    linear-gradient(to bottom, transparent 0 calc(100% - 96px), #3a2f26 calc(100% - 96px) calc(100% - 88px), transparent calc(100% - 88px)),
-    /* стены: тёмно-синие с лёгкой подсветкой сверху */
-    radial-gradient(ellipse at 50% 0%, #2c2f4a 0%, #1b1e30 55%, #141624 100%);
+    /* полосатые зелёные стены старого казино */
+    repeating-linear-gradient(
+      to right,
+      #1e4d2c 0px,
+      #1e4d2c 42px,
+      #2a6b3c 42px,
+      #2a6b3c 84px
+    );
 }
 
-/* дощатый пол с перспективой */
+/* мягкая тень внизу стен для глубины */
+.casinoHall::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 180px;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* дощатый пол повыше: автоматы перекрывают его часть */
 .casinoHall::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 96px;
+  height: 180px;
   background:
-    repeating-linear-gradient(to bottom, rgba(0,0,0,0.18) 0 2px, transparent 2px 24px),
+    repeating-linear-gradient(to bottom, rgba(0,0,0,0.18) 0 2px, transparent 2px 30px),
     repeating-linear-gradient(to right, rgba(0,0,0,0.12) 0 2px, transparent 2px 64px),
     linear-gradient(to bottom, #6b4a2e 0%, #573c24 45%, #3f2c1a 100%);
-  border-top: 2px solid #8a653e;
+  border-top: 3px solid #8a653e;
   pointer-events: none;
   z-index: 1;
 }
